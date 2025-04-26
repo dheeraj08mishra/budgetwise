@@ -1,0 +1,25 @@
+{
+  "name": "finance_tracker",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "parcel src/index.html",
+    "build": "parcel build src/index.html --dist-dir build --public-url ./",
+    "deploy": "npm run build && firebase deploy"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.4",
+    "firebase": "^11.6.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^6.30.0",
+    "tailwindcss": "^4.1.4"
+  },
+  "devDependencies": {
+    "daisyui": "^5.0.28",
+    "parcel": "^2.14.4"
+  }
+}
