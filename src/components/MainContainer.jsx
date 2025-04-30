@@ -34,6 +34,9 @@ const MainContainer = () => {
     category: "",
     note: "",
   });
+  const totalIncome = transactions
+    .filter((t) => t.type === "income")
+    .reduce((acc, t) => acc + t.amount, 0);
 
   useEffect(() => {
     const fetchTransactionsFromDB = async () => {
@@ -66,10 +69,6 @@ const MainContainer = () => {
 
     fetchTransactionsFromDB();
   }, [user, transactions.length, dispatch]);
-
-  const totalIncome = transactions
-    .filter((t) => t.type === "income")
-    .reduce((acc, t) => acc + t.amount, 0);
 
   const totalExpense = transactions
     .filter((t) => t.type === "expense")
@@ -127,8 +126,12 @@ const MainContainer = () => {
             note: transaction.note,
             createdAt: serverTimestamp(),
           });
+
           toast.success("Transaction updated successfully!");
           dispatch(updateTransaction(transaction));
+          if (transaction.type === "income") {
+            dispatch(setSalary(transaction.amount));
+          }
         });
       } catch (err) {
         console.log("Error updating transaction:", err.code, err.message);

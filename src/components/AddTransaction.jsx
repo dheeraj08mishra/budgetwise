@@ -69,14 +69,14 @@ const AddTransaction = () => {
       try {
         await addDoc(collection(db, "users", user.uid, "transactions"), {
           ...transaction,
-          createdAt: serverTimestamp(), // correct
+          createdAt: serverTimestamp(),
         });
         dispatch(
           addTransaction([
             ...transactions,
             {
               ...transaction,
-              createdAt: new Date().toISOString(), // fallback, until Firestore gives us timestamp
+              createdAt: new Date().toISOString(),
             },
           ])
         );
