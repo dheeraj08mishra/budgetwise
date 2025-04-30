@@ -6,14 +6,14 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [signUp, setSignUp] = useState(true);
   const usernameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-  //   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const toggleSignup = () => {
     setSignUp(!signUp);
@@ -23,7 +23,7 @@ const Login = () => {
     const validationInfo = checkValidation(
       emailRef.current.value,
       passwordRef.current.value,
-      signUp ? nameRef.current.value : null
+      signUp ? usernameRef.current.value : null
     );
 
     if (validationInfo) {
@@ -40,8 +40,11 @@ const Login = () => {
         );
 
         await updateProfile(userCredential.user, {
-          displayName: nameRef.current.value,
+          displayName: usernameRef.current.value,
         });
+
+        // after successful signup
+        navigate("/");
 
         console.log("Signed up & profile updated");
       } else {
@@ -52,7 +55,7 @@ const Login = () => {
         );
 
         console.log("Logged in");
-        // navigate("/");
+        navigate("/");
       }
 
       // redirect after login/signup
