@@ -54,7 +54,11 @@ REACT_APP_FIREBASE_API_KEY=your_firebase_key
 ## 📸 Screenshots
 
 ### 🏠 Home Page
-![image](https://github.com/user-attachments/assets/c7d3824e-6843-448c-8f9b-6c262923466f)
+![image](https://github.com/user-attachments/assets/e608f611-307a-488a-ae26-23103cefbde8)
+![image](https://github.com/user-attachments/assets/63fc38b0-9739-40c2-83c9-160564cd76bd)
+![image](https://github.com/user-attachments/assets/a8106ae0-36a3-4606-9de5-e290286e9566)
+
+
 
 ###  Transaction form Page
 ![image](https://github.com/user-attachments/assets/06cb6d3a-9c9c-4eb1-a79f-9586c1c30b28)
