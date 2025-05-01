@@ -21,6 +21,8 @@ import { db, auth } from "../utils/firebase";
 import { setSalary } from "../utils/redux/budgetSlice";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
+import PieChartCategory from "./PieChartCategory";
+import BarChartTrends from "./BarChartTrends";
 
 const MainContainer = () => {
   const dispatch = useDispatch();
@@ -140,19 +142,47 @@ const MainContainer = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
-      <div className="bg-gray-700 p-6 rounded-lg shadow-md w-full max-w-md mb-6">
-        <h2 className="text-2xl font-bold mb-2">
-          💰 Balance: ₹ {totalBalance}
-        </h2>
-        <div className="flex justify-between text-sm">
-          <p>Income: ₹ {totalIncome}</p>
-          <p>Expense: ₹ {totalExpense}</p>
+    <div className="flex flex-col items-center  min-h-screen bg-gray-900 text-white p-4 space-y-8">
+      <section className="w-full max-w-6xl space-y-6 mx-auto">
+        {/* Center this box */}
+        <div className="flex justify-center">
+          <div className="bg-gray-700 p-6 rounded-lg shadow-md w-full max-w-md mb-6">
+            <h2 className="text-2xl font-bold mb-2">
+              💰 Balance: ₹ {totalBalance}
+            </h2>
+            <div className="flex justify-between text-sm">
+              <p>Income: ₹ {totalIncome}</p>
+              <p>Expense: ₹ {totalExpense}</p>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 w-full max-w-5xl">
-        <div className="bg-gray-700 p-6 rounded-lg shadow-md flex-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-gray-700 p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4">
+              📊 Category Breakdown
+            </h3>
+            <PieChartCategory />
+          </div>
+
+          <div className="bg-gray-700 p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4">📁 Budget Tracking</h3>
+            <Budget />
+          </div>
+        </div>
+      </section>
+
+      {/* Section 2: Bar Chart Trends */}
+      <section className="w-full max-w-6xl">
+        <div className="bg-gray-700 p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-4">📈 Trends</h3>
+          <BarChartTrends />
+        </div>
+      </section>
+
+      {/* Section 3: Recent Transactions */}
+      <section className="w-2/3 max-w-6xl">
+        <div className="bg-gray-700 p-6 rounded-lg shadow-md">
           <h3 className="text-xl font-semibold mb-4">📄 Recent Transactions</h3>
           {sortedTransactions.length === 0 ? (
             <p>
@@ -309,13 +339,7 @@ const MainContainer = () => {
             </AnimatePresence>
           )}
         </div>
-
-        {transactions.length > 0 && (
-          <>
-            <Budget />
-          </>
-        )}
-      </div>
+      </section>
     </div>
   );
 };

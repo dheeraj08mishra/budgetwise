@@ -1,51 +1,94 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../utils/redux/userSlice";
 import { auth } from "../utils/firebase";
 import { signOut } from "firebase/auth";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Menu, X } from "lucide-react"; // optional: install lucide-react for icons
 
 const Header = () => {
   const user = useSelector((store) => store.user.currentUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const logoutUser = async () => {
     if (user) {
       try {
-        await signOut(auth); // Firebase logout
-        dispatch(logout()); // Redux logout
-        navigate("/"); // Redirect to home
+        await signOut(auth);
+        dispatch(logout());
+        navigate("/");
       } catch (err) {
         console.error("Error signing out:", err);
       }
     } else {
-      navigate("/"); // Optional: take to login page instead of "/"
+      navigate("/");
     }
   };
-  return (
-    <div className="flex items-center justify-between p-4 bg-gray-800 text-white">
-      <h1 className="text-2xl font-bold">Finance Tracker</h1>
-      <nav className="flex space-x-4">
-        <Link to="/" className="hover:text-cyan-400">
-          Home
-        </Link>
-        <Link to="/transactions" className="hover:text-cyan-400">
-          Transactions
-        </Link>
-        <Link to="/budget" className="hover:text-cyan-400">
-          Budget
-        </Link>
-      </nav>
 
-      <div className="flex items-center space-x-4">
-        <button onClick={logoutUser} className="bg-cyan-900 px-4 py-2 rounded">
-          Logout
+  return (
+    <header className="bg-gray-800 text-white p-4">
+      <div className="flex items-center justify-between max-w-6xl mx-auto">
+        <h1 className="text-2xl font-bold">Finance Tracker</h1>
+
+        {/* Hamburger icon for mobile */}
+        <button
+          className="md:hidden"
+          onClick={() => setMenuOpen((prev) => !prev)}
+        >
+          {menuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
+
+        {/* Desktop nav */}
+        <nav className="hidden md:flex space-x-4">
+          <Link to="/">
+            <button className="bg-cyan-900 px-4 py-2 rounded hover:bg-cyan-700">
+              Home
+            </button>
+          </Link>
+          <Link to="/transactions">
+            <button className="bg-cyan-900 px-4 py-2 rounded hover:bg-cyan-700">
+              Add Transaction
+            </button>
+          </Link>
+        </nav>
+
+        {/* Desktop logout */}
+        <div className="hidden md:flex">
+          <button
+            onClick={logoutUser}
+            className="bg-cyan-900 px-4 py-2 rounded hover:bg-cyan-700"
+          >
+            Logout
+          </button>
+        </div>
       </div>
-    </div>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="md:hidden mt-4 space-y-4 text-center">
+          <Link to="/" onClick={() => setMenuOpen(false)}>
+            <button className="bg-cyan-900 px-4 py-2 rounded w-full">
+              Home
+            </button>
+          </Link>
+          <Link to="/transactions" onClick={() => setMenuOpen(false)}>
+            <button className="bg-cyan-900 px-4 py-2 rounded w-full">
+              Add Transaction
+            </button>
+          </Link>
+          <button
+            onClick={() => {
+              setMenuOpen(false);
+              logoutUser();
+            }}
+            className="bg-cyan-900 px-4 py-2 rounded w-full"
+          >
+            Logout
+          </button>
+        </div>
+      )}
+    </header>
   );
 };
 
