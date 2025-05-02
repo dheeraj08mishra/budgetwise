@@ -1,43 +1,56 @@
 # 💰 Personal Finance Tracker
 
-Track your income, set budgets, manage expenses, and visualize your financial health – all in one powerful, modern finance tracking web app.
+A responsive and user-friendly web application to help users manage income, expenses, budgets, and gain insights into their financial health.
+
+---
+
+## 🔧 Tech Stack
+
+- **Frontend**: React, Tailwind CSS, Redux Toolkit
+- **Backend**: Firebase (Firestore + Auth)
+- **Bundler**: Parcel
+- **Data Visualization**: Recharts (Pie Chart)
+
+---
+
+## ✨ Features
+
+- ✅ **Firebase Authentication** (Login / Logout)
+- ✅ **Add Transaction Form** with Validation
+- ✅ **Edit/Delete Transactions**
+- ✅ **Real-time Balance Summary**
+- ✅ **Income vs Expense Breakdown**
+- ✅ **Category-wise Pie Chart**
+- ✅ **Budget Tracker Section**
+- ✅ **Real-time Syncing with Firebase**
+- ✅ **Responsive UI** for Mobile, Tablet, and Desktop
+
+### 🔜 Upcoming Features
+
+- 📄 **Transaction History Page**
+  - Sortable & Filterable Table
+  - Search by Description
+  - Pagination / Infinite Scroll
+
+---
 
 ### 🔗 [Live Demo](https://finance-tracker-ui.web.app/)
 
-## 🚀 Features
-
-- ✅  Add income,Track and categorize transactions
-- ✅ Real-time syncing with Firebase
-- ✅ Budget progress bars with visual indicators
-- ✅ Redux-powered global state management
-- ✅ Authentication with Firebase Auth
-- ✅ Responsive and clean UI with Tailwind CSS
-
 ---
 
-## 🛠 Tech Stack
-
-- **React + Redux Toolkit**
-- **Firebase (Auth + Firestore)**
-- **Tailwind CSS**
-- **Parcel (bundler)**
-
-
----
-## 🔧 Setup Instructions
-
+## 🛠️ Setup Instructions
 
 ```bash
 # 1. Clone the repo
 git clone https://github.com/dheeraj08mishra/finance_tracker.git
+cd finance_tracker
 
 # 2. Install dependencies
 npm install
 
-
-# 3. Start the app
+# 3. Start the development server
 npm run dev
-```
+
 
 ---
 
@@ -50,7 +63,7 @@ REACT_APP_FIREBASE_API_KEY=your_firebase_key
 ```
 
 
----
+--------------------
 ## 📸 Screenshots
 
 ### 🏠 Home Page
