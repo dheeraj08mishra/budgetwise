@@ -19,9 +19,18 @@ const BarChartTrends = () => {
     if (!transaction) return acc;
     if (transaction.type === "income") return acc;
 
-    const date = dayjs(transaction.createdAt).format("MMM D");
+    const date = dayjs(transaction.date).format("MMM D");
     if (!acc[date]) acc[date] = 0;
     acc[date] += transaction.amount;
+    // sort the data by date
+    const sortedKeys = Object.keys(acc).sort((a, b) => {
+      return dayjs(a, "MMM D").diff(dayjs(b, "MMM D"));
+    });
+    const sortedAcc = {};
+    sortedKeys.forEach((key) => {
+      sortedAcc[key] = acc[key];
+    });
+    acc = sortedAcc;
     return acc;
   }, {});
   const data = Object.entries(groupedData).map(([date, amount]) => ({

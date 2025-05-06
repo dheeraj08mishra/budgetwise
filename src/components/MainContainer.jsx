@@ -79,7 +79,7 @@ const MainContainer = () => {
   const totalBalance = totalIncome - totalExpense;
 
   const sortedTransactions = [...transactions].sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    (a, b) => new Date(b.date) - new Date(a.date)
   );
 
   const handleDeleteTransaction = async (transaction) => {
@@ -290,7 +290,7 @@ const MainContainer = () => {
                             </span>
                           </p>
                           <p className="text-xs text-gray-400">
-                            {new Date(t.createdAt).toLocaleDateString("en-US", {
+                            {new Date(t.date).toLocaleDateString("en-US", {
                               weekday: "short",
                               year: "numeric",
                               month: "short",
