@@ -36,7 +36,7 @@ const Budget = () => {
   }
 
   return (
-    <div className="bg-gray-700 p-6 rounded-lg shadow-md h-1/2 flex-1">
+    <div className="bg-gray-700 p-6 rounded-lg shadow-md h-2/3 flex-1">
       <h3 className="text-xl font-semibold mb-4">🎯 Budget Tracking</h3>
       {budgets.map((b) => {
         // const totalBudgetAmount = (b.budget * salary) / 100;
