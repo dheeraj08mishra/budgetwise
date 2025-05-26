@@ -3,6 +3,7 @@ const transactionSlice = createSlice({
   name: "transaction",
   initialState: {
     transactions: [],
+    totalTransactions: 0,
   },
   reducers: {
     addTransaction: (state, action) => {
@@ -10,19 +11,26 @@ const transactionSlice = createSlice({
     },
     removeTransaction: (state, action) => {
       state.transactions = state.transactions.filter(
-        (transaction) => transaction.id !== action.payload.id
+        (transaction) => transaction._id !== action.payload._id
       );
     },
     updateTransaction: (state, action) => {
       const index = state.transactions.findIndex(
-        (transaction) => transaction.id === action.payload.id
+        (transaction) => transaction._id === action.payload._id
       );
       if (index !== -1) {
         state.transactions[index] = action.payload;
       }
     },
+    setTotalTransactions: (state, action) => {
+      state.totalTransactions = action.payload;
+    },
   },
 });
-export const { addTransaction, removeTransaction, updateTransaction } =
-  transactionSlice.actions;
+export const {
+  addTransaction,
+  removeTransaction,
+  updateTransaction,
+  setTotalTransactions,
+} = transactionSlice.actions;
 export default transactionSlice.reducer;

@@ -2,11 +2,9 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   salary: 0,
-  budgets: [
-    { id: 1, category: "need", budget: 0, spent: 0 },
-    { id: 2, category: "want", budget: 0, spent: 0 },
-    { id: 3, category: "investment", budget: 0, spent: 0 },
-  ],
+  totalExpenseAmount: 0,
+  totalIncomeAmount: 0,
+  balance: 0,
 };
 
 const budgetSlice = createSlice({
@@ -16,31 +14,23 @@ const budgetSlice = createSlice({
     setSalary: (state, action) => {
       state.salary = action.payload;
     },
-    setBudget: (state, action) => {
-      const { need, want, investment } = action.payload;
-      state.budgets = state.budgets.map((b) => {
-        if (b.category === "need") return { ...b, budget: need };
-        if (b.category === "want") return { ...b, budget: want };
-        if (b.category === "investment") return { ...b, budget: investment };
-        return b;
-      });
+    setBalance: (state, action) => {
+      state.balance = action.payload;
     },
-    addSpending: (state, action) => {
-      const { category, amount } = action.payload;
-      const existingBudget = state.budgets.find((b) => b.category === category);
-      if (existingBudget) {
-        existingBudget.spent += amount; // ✅ Add, not overwrite
-      }
+    setTotalExpenseAmount: (state, action) => {
+      state.totalExpenseAmount = action.payload;
     },
-    clearSpending: (state) => {
-      state.budgets.forEach((b) => {
-        b.spent = 0;
-      });
+    setTotalIncomeAmount: (state, action) => {
+      state.totalIncomeAmount = action.payload;
     },
   },
 });
 
-export const { setBudget, addSpending, setSalary, clearSpending } =
-  budgetSlice.actions;
+export const {
+  setSalary,
+  setBalance,
+  setTotalExpenseAmount,
+  setTotalIncomeAmount,
+} = budgetSlice.actions;
 
 export default budgetSlice.reducer;
