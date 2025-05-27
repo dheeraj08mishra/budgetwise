@@ -1,4 +1,5 @@
 import { createSlice, current } from "@reduxjs/toolkit";
+import { logout } from "./userSlice";
 
 const profileSlice = createSlice({
   name: "profile",
@@ -12,10 +13,11 @@ const profileSlice = createSlice({
         ...state.currentUser,
         ...user,
       };
-      // Log the current state for debugging
-      console.log("Updated profile:", current(state));
+    },
+    logout: (state) => {
+      state.currentUser = null;
     },
   },
 });
-export const { updateProfile } = profileSlice.actions;
+export const { updateProfile, logout } = profileSlice.actions;
 export default profileSlice.reducer;
