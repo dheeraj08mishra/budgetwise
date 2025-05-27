@@ -29,23 +29,28 @@ const Search = () => {
   const handleSearch = async (query) => {
     try {
       const trimmedQuery = query.toLowerCase().trim();
-      if (!trimmedQuery) return;
 
-      const response = await fetch(
-        "http://localhost:3000/filter/note?note=" + trimmedQuery,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
+      const endpoint = trimmedQuery
+        ? `http://localhost:3000/filter/note?note=${trimmedQuery}`
+        : `http://localhost:3000/user/transactions`; // <-- Show all if query is empty
+
+      const response = await fetch(endpoint, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
       const data = await response.json();
 
       if (response.ok) {
-        toast.success(`Found ${data.data.length} matching transactions`);
-        dispatch(addTransaction(data.data));
+        const message = trimmedQuery
+          ? `Found ${data.data.transactions.length} matching transactions`
+          : `Showing all ${data.data.transactions.length} transactions`;
+
+        toast.success(message);
+        dispatch(addTransaction(data.data.transactions));
       } else {
         toast.error(data.message || "Failed to fetch transactions");
       }
