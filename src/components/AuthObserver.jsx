@@ -1,12 +1,10 @@
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../utils/firebase";
 import { useDispatch, useSelector } from "react-redux";
-import { login, logout } from "../utils/redux/userSlice";
+import { updateProfile } from "../utils/redux/profileSlice";
 import { useEffect } from "react";
 
 const AuthObserver = ({ children }) => {
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector((store) => store.user.currentUser);
+  const isLoggedIn = useSelector((store) => store.profile.currentUser);
 
   useEffect(() => {
     const restoreUser = async () => {
@@ -16,7 +14,7 @@ const AuthObserver = ({ children }) => {
         });
         const data = await res.json();
         if (res.ok) {
-          dispatch(login(data.user)); // restore into Redux
+          dispatch(updateProfile(data.user)); // restore into Redux
         }
       } catch (err) {
         console.error("Error restoring user:", err);

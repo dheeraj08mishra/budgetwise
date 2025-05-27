@@ -15,7 +15,7 @@ import { setSalary } from "../utils/redux/budgetSlice";
 
 const Body = () => {
   const dispatch = useDispatch();
-  const user = useSelector((store) => store.user.currentUser);
+  const user = useSelector((store) => store.profile.currentUser);
 
   useEffect(() => {
     fetchTransaction();
@@ -78,7 +78,7 @@ const Body = () => {
     },
   ]);
   return (
-    <div className="flex flex-col">
+    <div className="min-h-screen bg-base-200  ">
       <AuthObserver>
         <RouterProvider router={router} />
       </AuthObserver>

@@ -7,6 +7,9 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  LineChart,
+  Line,
+  Legend,
 } from "recharts";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
@@ -14,13 +17,12 @@ import dayjs from "dayjs";
 const BarChartTrends = () => {
   const transactions = useSelector((store) => store.transaction.transactions);
 
-  // Group and sort data by date
   const data = useMemo(() => {
     const grouped = {};
-    for (const transaction of transactions) {
-      if (!transaction || transaction.type === "income") continue;
-      const date = dayjs(transaction.date).format("MMM D");
-      grouped[date] = (grouped[date] || 0) + transaction.amount;
+    for (const t of transactions) {
+      if (!t || t.type === "income") continue;
+      const date = dayjs(t.date).format("MMM D");
+      grouped[date] = (grouped[date] || 0) + t.amount;
     }
     return Object.entries(grouped)
       .map(([date, amount]) => ({ date, amount }))
@@ -38,24 +40,53 @@ const BarChartTrends = () => {
   }
 
   if (data.length === 0)
-    return <p className="text-gray-400">No transactions to display.</p>;
+    return <p className="text-gray-400 text-center">No expense trends yet.</p>;
 
   return (
-    <div style={{ width: "100%", height: 300 }}>
-      <ResponsiveContainer>
-        <BarChart
-          data={displayData}
-          barCategoryGap={data.length < minBars ? "80%" : "10%"}
-          barGap={data.length < minBars ? 10 : 4}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="amount" fill="#60A5FA" radius={[4, 4, 0, 0]} />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+    <>
+      <div className="w-full h-[300px]">
+        {/* <ResponsiveContainer>
+          <BarChart
+            data={displayData}
+            barCategoryGap={data.length < minBars ? "80%" : "10%"}
+            barGap={data.length < minBars ? 10 : 4}
+          >
+            <CartesianGrid strokeDasharray="1 1" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="amount" fill="#60A5FA" radius={[6, 6, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer> */}
+
+        <ResponsiveContainer>
+          <LineChart
+            width={700}
+            height={400}
+            data={displayData}
+            margin={{
+              top: 5,
+              right: 30,
+              left: 20,
+              bottom: 5,
+            }}
+          >
+            {/* <CartesianGrid strokeDasharray="1 1" /> */}
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="amount"
+              stroke="#8884d8"
+              activeDot={{ r: 8 }}
+              strokeWidth={2}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </>
   );
 };
 

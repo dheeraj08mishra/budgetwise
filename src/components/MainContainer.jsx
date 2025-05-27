@@ -6,52 +6,68 @@ import RecentTransactionsList from "./RecentTransactionsList";
 
 const MainContainer = () => {
   const transactions = useSelector((store) => store.transaction.transactions);
+
   const totalIncome = transactions
     .filter((transaction) => transaction.type === "income")
     .reduce((acc, transaction) => acc + transaction.amount, 0);
+
   const totalExpense = transactions
     .filter((transaction) => transaction.type === "expense")
     .reduce((acc, transaction) => acc + transaction.amount, 0);
+
   const totalBalance = totalIncome - totalExpense;
 
   return (
-    <div className="flex flex-col items-center  min-h-screen bg-gray-900 text-white p-4 space-y-8">
+    <div className="flex flex-col items-center min-h-screen bg-base-200 text-base-content p-4 space-y-8">
+      {/* Header Card */}
       <section className="w-full max-w-6xl space-y-6 mx-auto">
         <div className="flex justify-center">
-          <div className="bg-gray-700 p-6 rounded-lg shadow-md w-full max-w-md mb-6">
-            <h2 className="text-2xl font-bold mb-2">
-              💰 Balance: ₹ {totalBalance}
-            </h2>
-            <div className="flex justify-between text-sm">
-              <p>Income: ₹ {totalIncome}</p>
-              <p>Expense: ₹ {totalExpense}</p>
+          <div className="card w-full max-w-md bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h2 className="card-title text-2xl font-bold">
+                💰 Balance: ₹ {totalBalance.toFixed(2)}
+              </h2>
+              <div className="flex justify-between text-sm mt-2">
+                <p className="text-success">
+                  Income: ₹ {totalIncome.toFixed(2)}
+                </p>
+                <p className="text-error">
+                  Expense: ₹ {totalExpense.toFixed(2)}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-        {/* section 1: pie chart and budget tracking */}
+
+        {/* Charts Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-4">
-              📊 Category Breakdown
-            </h3>
-            <PieChartCategory />
+          <div className="card bg-base-100 shadow-lg">
+            <div className="card-body">
+              <h3 className="card-title text-xl mb-4">📊 Category Breakdown</h3>
+              <PieChartCategory />
+            </div>
           </div>
 
-          <div>
-            <Budget />
+          <div className="card bg-base-100 shadow-lg">
+            <div className="card-body">
+              <h3 className="card-title text-xl mb-4">🎯 Budget Overview</h3>
+              <Budget />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Section 2: Bar Chart Trends */}
+      {/* Trends Section */}
       <section className="w-full max-w-6xl">
-        <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-semibold mb-4">📈 Trends Day wise</h3>
-          <BarChartTrends />
+        <div className="card bg-base-100 shadow-lg">
+          <div className="card-body">
+            <h3 className="card-title text-xl mb-4">📈 Trends (Day-wise)</h3>
+            <BarChartTrends />
+          </div>
         </div>
       </section>
 
-      {/* Section 3: Recent Transactions */}
+      {/* Recent Transactions */}
       <RecentTransactionsList />
     </div>
   );

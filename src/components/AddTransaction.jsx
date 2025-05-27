@@ -19,7 +19,7 @@ const AddTransaction = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const transactions = useSelector((store) => store.transaction.transactions);
-  const user = useSelector((store) => store.user.currentUser);
+  const user = useSelector((store) => store.profile);
   const totalExpenseAmount = useSelector(
     (store) => store.budget.totalExpenseAmount
   );
@@ -122,85 +122,106 @@ const AddTransaction = () => {
   };
 
   return (
-    <div className="hero bg-base-100 min-h-screen">
-      <div className="hero-content flex-col lg:flex-row-reverse">
-        <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
-          <div className="card-body">
-            <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
-              <legend className="fieldset-legend">Add Transaction</legend>
-              <label className="label">
-                <span className="label-text">Type</span>
-              </label>
-              <select
-                className="select rounded-xl select-bordered w-full select-neutral outline-none"
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-              >
-                <option disabled value="">
-                  Select Type
-                </option>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-              </select>
+    <div className="min-h-screen bg-base-100 flex items-center justify-center p-4">
+      <div className="card w-full max-w-md bg-base-200 shadow-lg">
+        <div className="card-body space-y-4">
+          <h2 className="text-2xl font-bold text-center">Add Transaction</h2>
 
-              <label className="label">Amount</label>
-              <input
-                type="number"
-                className="input input-neutral rounded-2xl"
-                placeholder="Amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
-              <label className="label">
-                <span className="label-text">Category</span>
-              </label>
-              <select
-                className="select rounded-xl select-bordered w-full select-neutral outline-none"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                <option disabled value="">
-                  Select Type
-                </option>
-                <option value="need">Need</option>
-                <option value="want">Want</option>
-                <option value="investment">Investment</option>
-                <option value="other">Other</option>
-              </select>
+          {/* Type */}
+          <div>
+            <label className="label">
+              <span className="label-text">Transaction Type</span>
+            </label>
+            <select
+              className="select select-bordered w-full rounded-xl"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+            >
+              <option disabled value="">
+                Select Type
+              </option>
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
 
-              <label className="label">Date</label>
-              <input
-                type="date"
-                className="input input-neutral rounded-2xl"
-                value={date}
-                min={firstOfMonth}
-                max={new Date().toISOString().split("T")[0]}
-                onChange={(e) => setDate(e.target.value)}
-              />
-              <label className="label">Note</label>
-              <input
-                type="text"
-                className="input input-neutral rounded-2xl"
-                placeholder="Note (optional)"
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-              />
-              <div className="flex flex-row gap-4 items-center">
-                <button
-                  onClick={addTransactionList}
-                  type="submit"
-                  className="btn btn-secondary rounded-4xl mt-4"
-                >
-                  Add Transaction
-                </button>
-                <button
-                  onClick={resetForm}
-                  className="btn btn-primary rounded-4xl mt-4"
-                >
-                  Reset Details
-                </button>
-              </div>
-            </fieldset>
+          {/* Amount */}
+          <div>
+            <label className="label">
+              <span className="label-text">Amount</span>
+            </label>
+            <input
+              type="number"
+              placeholder="Enter amount"
+              className="input input-bordered w-full rounded-xl"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="label">
+              <span className="label-text">Category</span>
+            </label>
+            <select
+              className="select select-bordered w-full rounded-xl"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option disabled value="">
+                Select Category
+              </option>
+              <option value="need">Need</option>
+              <option value="want">Want</option>
+              <option value="investment">Investment</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          {/* Date */}
+          <div>
+            <label className="label">
+              <span className="label-text">Date</span>
+            </label>
+            <input
+              type="date"
+              className="input input-bordered w-full rounded-xl"
+              value={date}
+              min={firstOfMonth}
+              max={new Date().toISOString().split("T")[0]}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
+
+          {/* Note */}
+          <div>
+            <label className="label">
+              <span className="label-text">Note</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Optional note"
+              className="input input-bordered w-full rounded-xl"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-between pt-4">
+            <button
+              onClick={addTransactionList}
+              className="btn btn-secondary rounded-xl w-[48%]"
+            >
+              Add
+            </button>
+            <button
+              onClick={resetForm}
+              className="btn btn-outline btn-primary rounded-xl w-[48%]"
+            >
+              Reset
+            </button>
           </div>
         </div>
       </div>

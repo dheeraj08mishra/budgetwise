@@ -1,24 +1,19 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, current } from "@reduxjs/toolkit";
 
 const profileSlice = createSlice({
   name: "profile",
   initialState: {
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    photoURL: "",
+    currentUser: null,
   },
   reducers: {
     updateProfile: (state, action) => {
-      const { firstName, lastName, email, phone, address, photoURL } =
-        action.payload;
-      state.firstName = firstName;
-      state.lastName = lastName;
-      state.email = email;
-      state.phone = phone;
-      state.address = address;
-      state.photoURL = photoURL;
+      const user = action.payload;
+      state.currentUser = {
+        ...state.currentUser,
+        ...user,
+      };
+      // Log the current state for debugging
+      console.log("Updated profile:", current(state));
     },
   },
 });

@@ -5,7 +5,7 @@ import { logout } from "../utils/redux/userSlice";
 import { toast } from "react-hot-toast";
 
 const Header = () => {
-  const user = useSelector((store) => store.user.currentUser);
+  const user = useSelector((store) => store.profile.currentUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -35,62 +35,61 @@ const Header = () => {
   return (
     <>
       {/* <header className="bg-gray-800 text-white p-4"> */}
-      <div className="navbar bg-gray-800  shadow-sm p-4">
+      <div className="navbar bg-base-100 shadow-md sticky top-0 z-50">
         <div className="flex-1">
-          <a className="btn btn-ghost text-3xl">Finance Tracker</a>
+          <Link
+            to="/"
+            className="btn btn-ghost normal-case text-2xl text-white hover:underline to-blue-400"
+          >
+            💰 Finance Tracker
+          </Link>
         </div>
-        <div className="flex gap-2">
-          <div className="dropdown dropdown-end">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost btn-circle avatar"
-            >
-              <div className="w-10 rounded-full">
-                <img
-                  alt="Tailwind CSS Navbar component"
-                  src={
-                    "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"
-                  }
-                />
-              </div>
+        <div className="dropdown dropdown-end">
+          <div
+            tabIndex={0}
+            role="button"
+            className="btn btn-ghost btn-circle avatar hover:scale-105 transition-transform"
+          >
+            <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+              <img
+                alt="User avatar"
+                src={
+                  user.photo ||
+                  "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"
+                }
+              />
             </div>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
-            >
-              <li>
-                <Link to="/" className="justify-between">
-                  <span>Dashboard</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/profile" className="justify-between">
-                  <span>Profile</span>
-                  <span className="badge badge-primary">New</span>
-                </Link>
-              </li>
-
-              <li>
-                <Link to="/transactions">
-                  <span>Add Transaction</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/history">
-                  <span>History</span>
-                </Link>
-              </li>
-
-              <li>
-                <span onClick={logoutUser} className="text-red-600">
-                  Logout
-                </span>
-              </li>
-            </ul>
           </div>
+          <ul
+            tabIndex={0}
+            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+          >
+            <li>
+              <Link to="/">🏠 Dashboard</Link>
+            </li>
+            <li>
+              <Link to="/profile">
+                👤 Profile <span className="badge badge-primary">New</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/transactions">➕ Add Transaction</Link>
+            </li>
+            <li>
+              <Link to="/history">📜 History</Link>
+            </li>
+            <li>
+              <button
+                onClick={logoutUser}
+                className="text-error hover:text-red-700"
+              >
+                🚪 Logout
+              </button>
+            </li>
+          </ul>
         </div>
       </div>
+
       {/* </header> */}
     </>
   );

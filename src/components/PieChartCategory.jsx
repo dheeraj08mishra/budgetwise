@@ -9,13 +9,16 @@ import {
 } from "recharts";
 
 import { useSelector } from "react-redux";
+
 const COLORS = {
   need: "#34D399",
   want: "#FBBF24",
   investment: "#60A5FA",
 };
+
 const PieChartCategory = () => {
   const transactions = useSelector((store) => store.transaction.transactions);
+
   const groupedData = transactions.reduce((acc, transaction) => {
     if (!transaction) return acc;
     if (transaction.type === "income") return acc;
@@ -33,13 +36,12 @@ const PieChartCategory = () => {
     type: item.type,
     color: COLORS[item.name] || "#ccc",
   }));
-  console.log(data);
 
-  // Convert to array format for recharts
   if (data.length === 0)
     return <p className="text-gray-400">No transactions to display.</p>;
+
   return (
-    <div style={{ width: "100%", height: 300 }}>
+    <div className="w-full h-[300px]">
       <ResponsiveContainer>
         <PieChart>
           <Pie
@@ -48,13 +50,22 @@ const PieChartCategory = () => {
             cx="50%"
             cy="50%"
             outerRadius={80}
-            label
+            label={({ name, percent }) =>
+              `${name} (${(percent * 100).toFixed(0)}%)`
+            }
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
-          <Tooltip />
+          <Tooltip
+            formatter={(value) =>
+              new Intl.NumberFormat("en", {
+                style: "currency",
+                currency: "USD",
+              }).format(value)
+            }
+          />
           <Legend />
         </PieChart>
       </ResponsiveContainer>

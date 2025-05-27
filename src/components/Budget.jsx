@@ -6,7 +6,7 @@ const Budget = () => {
   const navigate = useNavigate();
   const salary = useSelector((state) => state.budget.salary);
   const transactions = useSelector((state) => state.transaction.transactions);
-  const user = useSelector((state) => state.user.currentUser);
+  const user = useSelector((state) => state.profile.currentUser);
 
   const [needAmount, setNeedAmount] = useState(0);
   const [wantAmount, setWantAmount] = useState(0);
@@ -78,64 +78,36 @@ const Budget = () => {
 
   return (
     <>
-      <div className="bg-gray-700 p-6 rounded-xl flex-1">
-        <h3 className="text-xl font-semibold mb-4">🎯 Budget Tracking</h3>
-        <fieldset className="fieldset bg-gray-700 w-md p-4 text-lg">
-          <div className="flex justify-between mb-1">
-            <label className="fieldset-legend">Need</label>
-            <label className="fieldset-legend">{needSpent}%</label>
+      <fieldset className="fieldset w-full p-4 border border-base-300 rounded-lg">
+        {[
+          { label: "Need", value: needSpent, amount: needAmount },
+          { label: "Want", value: wantSpent, amount: wantAmount },
+          {
+            label: "Investment",
+            value: investmentSpent,
+            amount: investmentAmount,
+          },
+        ].map((item) => (
+          <div key={item.label} className="mb-4">
+            <div className="flex justify-between mb-1 text-sm font-medium">
+              <span>{item.label}</span>
+              <span>{item.value}%</span>
+            </div>
+            <progress
+              className={`progress  w-full ${
+                item.value <= 50
+                  ? "progress-success"
+                  : item.value <= 70
+                  ? "progress-warning"
+                  : "progress-error"
+              }`}
+              value={item.value}
+              max="100"
+            ></progress>
+            <p className="text-xs mt-1 text-gray-500">₹{item.amount} spent</p>
           </div>
-          <progress
-            className={`progress w-full ${
-              needSpent <= 50
-                ? "progress-success"
-                : needSpent <= 70
-                ? "progress-warning"
-                : "progress-error"
-            }`}
-            value={needSpent}
-            max="100"
-          ></progress>
-
-          <p className="text-sm text-gray-400 label">₹{needAmount} spent</p>
-
-          <div className="flex justify-between mb-1">
-            <label className="fieldset-legend">Want</label>
-            <label className="fieldset-legend">{wantSpent}%</label>
-          </div>
-          <progress
-            className={`progress w-full ${
-              wantSpent <= 50
-                ? "progress-success"
-                : wantSpent <= 70
-                ? "progress-warning"
-                : "progress-error"
-            }`}
-            value={wantSpent}
-            max="100"
-          ></progress>
-          <p className="text-sm text-gray-400 label">₹{wantAmount} spent</p>
-
-          <div className="flex justify-between mb-1">
-            <label className="fieldset-legend">Investment</label>
-            <label className="fieldset-legend">{investmentSpent}%</label>
-          </div>
-          <progress
-            className={`progress w-full ${
-              investmentSpent <= 50
-                ? "progress-success"
-                : investmentSpent <= 70
-                ? "progress-warning"
-                : "progress-error"
-            }`}
-            value={investmentSpent}
-            max="100"
-          ></progress>
-          <p className="text-sm text-gray-400 label">
-            ₹{investmentAmount} spent
-          </p>
-        </fieldset>
-      </div>
+        ))}
+      </fieldset>
     </>
   );
 };
