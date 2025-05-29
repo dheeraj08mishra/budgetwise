@@ -1,4 +1,3 @@
-import React from "react";
 const FilterByCategory = ({ category, setCategory }) => {
   return (
     <div className="form-control w-full">

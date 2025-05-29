@@ -34,13 +34,21 @@ const PieChartCategory = () => {
     return acc;
   }, {});
 
-  groupedData.remaining = {
-    name: "remaining",
-    value:
-      salary -
-      Object.values(groupedData).reduce((sum, item) => sum + item.value, 0),
-    type: "remaining",
-  };
+  if (salary === 0) {
+    groupedData.remaining = {
+      name: "remaining",
+      value: 0,
+      type: "remaining",
+    };
+  } else {
+    groupedData.remaining = {
+      name: "remaining",
+      value:
+        salary -
+        Object.values(groupedData).reduce((sum, item) => sum + item.value, 0),
+      type: "remaining",
+    };
+  }
   const data = Object.values(groupedData).map((item) => ({
     name: item.name.charAt(0).toUpperCase() + item.name.slice(1),
     value: item.value,
