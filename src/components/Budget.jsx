@@ -11,9 +11,11 @@ const Budget = () => {
   const [needAmount, setNeedAmount] = useState(0);
   const [wantAmount, setWantAmount] = useState(0);
   const [investmentAmount, setInvestmentAmount] = useState(0);
+  const [otherAmount, setOtherAmount] = useState(0);
   const [needSpent, setNeedSpent] = useState(0);
   const [wantSpent, setWantSpent] = useState(0);
   const [investmentSpent, setInvestmentSpent] = useState(0);
+  const [otherSpent, setOtherSpent] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -21,14 +23,17 @@ const Budget = () => {
     let need = 0,
       want = 0,
       investment = 0;
+    let other = 0;
     transactions.forEach((transaction) => {
-      if (transaction.userId === user._id) {
+      if (transaction.userId === user._id && transaction.type === "expense") {
         if (transaction.category === "need") {
           need += transaction.amount;
         } else if (transaction.category === "want") {
           want += transaction.amount;
         } else if (transaction.category === "investment") {
           investment += transaction.amount;
+        } else if (transaction.category === "other") {
+          other += transaction.amount;
         }
       }
     });
@@ -36,17 +41,20 @@ const Budget = () => {
     setNeedAmount(need);
     setWantAmount(want);
     setInvestmentAmount(investment);
+    setOtherAmount(other);
 
     if (salary === 0) {
       setNeedSpent(0);
       setWantSpent(0);
       setInvestmentSpent(0);
+      setOtherSpent(0);
       return;
     }
 
     setNeedSpent(Math.round((need / salary) * 100));
     setWantSpent(Math.round((want / salary) * 100));
     setInvestmentSpent(Math.round((investment / salary) * 100));
+    setOtherSpent(Math.round((other / salary) * 100));
   }, [transactions]);
 
   if (transactions.length === 0) {
@@ -86,6 +94,11 @@ const Budget = () => {
             label: "Investment",
             value: investmentSpent,
             amount: investmentAmount,
+          },
+          {
+            label: "Other",
+            value: otherSpent,
+            amount: otherAmount,
           },
         ].map((item) => (
           <div key={item.label} className="mb-4">

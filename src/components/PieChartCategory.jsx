@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import {
   PieChart,
   Pie,
@@ -14,10 +15,13 @@ const COLORS = {
   need: "#34D399",
   want: "#FBBF24",
   investment: "#60A5FA",
+  other: "#F472B6",
+  remaining: "#A78BFA",
 };
 
 const PieChartCategory = () => {
   const transactions = useSelector((store) => store.transaction.transactions);
+  const salary = useSelector((store) => store.budget.salary);
 
   const groupedData = transactions.reduce((acc, transaction) => {
     if (!transaction) return acc;
@@ -30,6 +34,13 @@ const PieChartCategory = () => {
     return acc;
   }, {});
 
+  groupedData.remaining = {
+    name: "remaining",
+    value:
+      salary -
+      Object.values(groupedData).reduce((sum, item) => sum + item.value, 0),
+    type: "remaining",
+  };
   const data = Object.values(groupedData).map((item) => ({
     name: item.name.charAt(0).toUpperCase() + item.name.slice(1),
     value: item.value,
@@ -62,7 +73,7 @@ const PieChartCategory = () => {
             formatter={(value) =>
               new Intl.NumberFormat("en", {
                 style: "currency",
-                currency: "USD",
+                currency: "INR",
               }).format(value)
             }
           />

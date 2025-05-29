@@ -18,6 +18,8 @@ const RecentTransactionsList = ({ calledFrom }) => {
   const dispatch = useDispatch();
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
+  const [recordPerPages, setRecordPerPages] = useState(25);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const transactions = useSelector((store) => store.transaction.transactions);
   const totalTransactionsLimit = useSelector(
@@ -53,14 +55,29 @@ const RecentTransactionsList = ({ calledFrom }) => {
     fetchTransactions();
   }, [dispatch, totalTransactionsLimit]);
 
-  const sortedTransactions = [...transactions].sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  );
+  useEffect(() => {
+    setCurrentPage(1);
+    setRecordPerPages(25);
+  }, [transactions]);
 
-  const displayedTransactions =
+  const totalPages = Math.ceil(transactions.length / recordPerPages);
+  let displayedTransactions =
     calledFrom === "history"
-      ? sortedTransactions
-      : sortedTransactions.slice(0, 10);
+      ? transactions.slice(
+          (currentPage - 1) * recordPerPages,
+          currentPage * recordPerPages
+        )
+      : transactions.slice(0, 10);
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+    }
+  };
+  const previousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => Math.max(prev - 1, 1));
+    }
+  };
 
   const openModalForEdit = (transaction) => {
     setEditModalOpen(true);
@@ -94,7 +111,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             type,
-            amount: parseFloat(amount).toFixed(2),
+            amount: Number(parseFloat(amount).toFixed(2)),
             category,
             date,
             note,
@@ -143,6 +160,30 @@ const RecentTransactionsList = ({ calledFrom }) => {
                 ? "📄 Recent 10 Transactions"
                 : "📋 All Transactions"}
             </h3>
+            <div className="flex items-center gap-3 flex-wrap">
+              {calledFrom === "history" && (
+                <>
+                  <label className="label">
+                    <span className="label-text">Records per page:</span>
+                  </label>
+
+                  <select
+                    className="select select-bordered select-lg select-neutral w-full max-w-xs"
+                    value={recordPerPages}
+                    onChange={(e) => {
+                      setRecordPerPages(parseInt(e.target.value));
+                      setCurrentPage(1); // Reset to first page
+                    }}
+                  >
+                    {[10, 25, 50, 100].map((num) => (
+                      <option key={num} value={num}>
+                        {num}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
+            </div>
             <Link
               to={calledFrom !== "history" ? "/history" : "/"}
               className="btn btn-link text-base"
@@ -312,6 +353,30 @@ const RecentTransactionsList = ({ calledFrom }) => {
             </div>
           </div>
         </dialog>
+      )}
+
+      {calledFrom === "history" && (
+        <div className=" flex justify-center items-center join gap-4 p-4 mb-6">
+          <button
+            onClick={previousPage}
+            className={`join-item btn btn-lg btn-primary  ${
+              currentPage === 1 ? "btn-disabled" : ""
+            }`}
+          >
+            «
+          </button>
+          <button className={`join-item btn btn-lg btn-secondary`}>
+            Page<strong> {currentPage} </strong> of {totalPages}
+          </button>
+          <button
+            onClick={nextPage}
+            className={`join-item btn btn-lg btn-primary ${
+              currentPage === totalPages ? "btn-disabled" : ""
+            }`}
+          >
+            »
+          </button>
+        </div>
       )}
     </>
   );

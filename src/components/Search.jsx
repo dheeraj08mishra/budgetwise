@@ -1,23 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import { addTransaction } from "../utils/redux/transactionSlice";
 
-const debounce = (func, delay) => {
-  let timeoutId;
-  return (...args) => {
-    if (timeoutId) clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      func(...args);
-    }, delay);
-  };
-};
-
-const Search = () => {
-  const dispatch = useDispatch();
+const Search = ({ searchInput, setSearchInput }) => {
   const navigate = useNavigate();
-  const [searchInput, setSearchInput] = useState("");
   const isLoggedIn = useSelector((store) => store.profile.currentUser);
 
   useEffect(() => {
@@ -26,87 +12,22 @@ const Search = () => {
     }
   }, [isLoggedIn]);
 
-  const handleSearch = async (query) => {
-    try {
-      const trimmedQuery = query.toLowerCase().trim();
-
-      const endpoint = trimmedQuery
-        ? `http://localhost:3000/filter/note?note=${trimmedQuery}`
-        : `http://localhost:3000/user/transactions`; // <-- Show all if query is empty
-
-      const response = await fetch(endpoint, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        const message = trimmedQuery
-          ? `Found ${data.data.transactions.length} matching transactions`
-          : `Showing all ${data.data.transactions.length} transactions`;
-
-        toast.success(message);
-        dispatch(addTransaction(data.data.transactions));
-      } else {
-        toast.error(data.message || "Failed to fetch transactions");
-      }
-    } catch (error) {
-      toast.error("An error occurred while searching. Please try again.");
-    }
-  };
-
-  const debouncedSearch = useCallback(debounce(handleSearch, 1000), []);
-
-  const handleSearchChange = (event) => {
-    const value = event.target.value;
-    setSearchInput(value);
-    debouncedSearch(value);
-  };
-
   return (
-    <div className="flex items-center justify-center w-full mb-4">
-      <label className="input">
-        <svg
-          className="h-[1em] opacity-50"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-        >
-          <g
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            strokeWidth="2.5"
-            fill="none"
-            stroke="currentColor"
-          >
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.3-4.3"></path>
-          </g>
-        </svg>
-        <input
-          type="search"
-          id="note"
-          placeholder="Search"
-          className="w-full rounded-4xl"
-          value={searchInput}
-          onChange={handleSearchChange}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleSearch(searchInput);
-            }
-          }}
-        />
+    <div className="form-control w-full">
+      <label className="label">
+        <span className="label-text text-sm font-semibold">Search by Note</span>
       </label>
-      <button
-        className="btn btn-primary ml-2 rounded-4xl"
-        onClick={() => handleSearch(searchInput)}
-      >
-        Search
-      </button>
+      <input
+        type="search"
+        id="note"
+        placeholder="e.g. groceries, rent..."
+        className="input input-bordered input-neutral w-full rounded-xl"
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") e.preventDefault();
+        }}
+      />
     </div>
   );
 };

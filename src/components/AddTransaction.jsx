@@ -59,7 +59,7 @@ const AddTransaction = () => {
       const payload = {
         userId: user._id,
         type,
-        amount: parseFloat(amount).toFixed(2), // Ensure amount is a number with two decimal places
+        amount: Number(parseFloat(amount).toFixed(2)), // Ensure amount is a number with two decimal places
         category,
         date: new Date(date).toISOString().split("T")[0],
         note,
