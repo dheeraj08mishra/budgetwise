@@ -1,114 +1,177 @@
-import React, { useRef, useState } from "react";
-import { checkValidation } from "../utils/Validate";
-import {
-  createUserWithEmailAndPassword,
-  updateProfile,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { auth } from "../utils/firebase";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import validator from "validator";
+import { toast } from "react-hot-toast";
+import { updateProfile } from "../utils/redux/profileSlice";
 
 const Login = () => {
   const [signUp, setSignUp] = useState(true);
-  const usernameRef = useRef(null);
-  const emailRef = useRef(null);
-  const passwordRef = useRef(null);
-  const navigate = useNavigate();
+  const [firstNameInput, setFirstNameInput] = useState("");
+  const [lastNameInput, setLastNameInput] = useState("");
+  const [emailInput, setEmailInput] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
+  const [phoneInput, setPhoneInput] = useState("");
 
-  const toggleSignup = () => {
-    setSignUp(!signUp);
-  };
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const toggleSignup = () => setSignUp(!signUp);
 
   const handleUserAuth = async () => {
-    const validationInfo = checkValidation(
-      emailRef.current.value,
-      passwordRef.current.value,
-      signUp ? usernameRef.current.value : null
-    );
-
-    if (validationInfo) {
-      console.log(validationInfo);
+    if (!validator.isEmail(emailInput)) {
+      toast.error("Please enter a valid email.");
       return;
     }
 
-    try {
-      if (signUp) {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          emailRef.current.value,
-          passwordRef.current.value
-        );
+    if (
+      !validator.isStrongPassword(passwordInput, {
+        minLength: 8,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 1,
+      })
+    ) {
+      toast.error(
+        "Weak password. Include uppercase, lowercase, numbers, and symbols."
+      );
+      return;
+    }
 
-        await updateProfile(userCredential.user, {
-          displayName: usernameRef.current.value,
-        });
-
-        // after successful signup
-        navigate("/");
-
-        console.log("Signed up & profile updated");
-      } else {
-        await signInWithEmailAndPassword(
-          auth,
-          emailRef.current.value,
-          passwordRef.current.value
-        );
-
-        console.log("Logged in");
-        navigate("/");
+    if (signUp) {
+      if (!firstNameInput || !lastNameInput || !phoneInput) {
+        toast.error("All fields are required.");
+        return;
       }
 
-      // redirect after login/signup
-    } catch (error) {
-      console.log("Auth Error:", error.code, error.message);
+      if (
+        !validator.isAlpha(firstNameInput) ||
+        !validator.isAlpha(lastNameInput)
+      ) {
+        toast.error("Names must contain only letters.");
+        return;
+      }
+
+      if (
+        !validator.isMobilePhone(phoneInput, "any", { strictMode: false }) ||
+        !validator.isLength(phoneInput, { min: 10, max: 10 })
+      ) {
+        toast.error("Invalid phone number.");
+        return;
+      }
+    }
+
+    const payload = {
+      firstName: firstNameInput,
+      lastName: lastNameInput,
+      email: emailInput,
+      password: passwordInput,
+      phoneNumber: phoneInput,
+    };
+
+    try {
+      const url = signUp
+        ? "http://localhost:3000/signup"
+        : "http://localhost:3000/login";
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(
+          signUp
+            ? payload
+            : { email: payload.email, password: payload.password }
+        ),
+        credentials: "include",
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success(data.message);
+        dispatch(updateProfile(data.user));
+        navigate("/");
+      } else {
+        toast.error(data.message || "Authentication failed.");
+      }
+    } catch (err) {
+      console.error("Auth Error:", err);
+      toast.error("Something went wrong.");
     }
   };
 
   return (
-    <div className="relative w-full h-screen flex items-center justify-center">
-      <div className="absolute inset-0 bg-black opacity-90"></div>
-      <form
-        onSubmit={(e) => e.preventDefault()}
-        className="relative bg-black bg-opacity-80 p-10 rounded-lg text-white flex flex-col items-center z-10 w-96 max-w-full mx-auto"
-      >
+    <div className="flex items-center justify-center min-h-screen bg-base-100">
+      <fieldset className="fieldset w-full max-w-sm bg-base-200 p-6 rounded-xl shadow-lg">
+        <legend className="text-xl font-semibold">
+          {signUp ? "Create Account" : "Login"}
+        </legend>
+
         {signUp && (
-          <input
-            type="text"
-            placeholder="Username"
-            ref={usernameRef}
-            className="w-full p-3 mb-4 rounded bg-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-red-500 outline-none"
-          />
+          <>
+            <label className="label">First Name</label>
+            <input
+              type="text"
+              className="input input-bordered input-neutral  rounded-lg mb-2"
+              value={firstNameInput}
+              onChange={(e) => setFirstNameInput(e.target.value)}
+              placeholder="John"
+            />
+            <label className="label">Last Name</label>
+            <input
+              type="text"
+              className="input input-bordered input-neutral rounded-lg mb-2"
+              value={lastNameInput}
+              onChange={(e) => setLastNameInput(e.target.value)}
+              placeholder="Doe"
+            />
+            <label className="label">Phone Number</label>
+            <input
+              type="tel"
+              className="input input-bordered input-neutral  rounded-lg mb-2"
+              value={phoneInput}
+              onChange={(e) => setPhoneInput(e.target.value)}
+              maxLength={10}
+              placeholder="1234567890"
+            />
+          </>
         )}
 
+        <label className="label">Email</label>
         <input
           type="email"
-          placeholder="Email"
-          ref={emailRef}
-          className="w-full p-3 mb-4 rounded bg-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-red-500 outline-none"
+          className="input input-bordered input-neutral rounded-lg mb-2"
+          value={emailInput}
+          onChange={(e) => setEmailInput(e.target.value)}
+          placeholder="email@example.com"
         />
+
+        <label className="label">Password</label>
         <input
           type="password"
-          placeholder="Password"
-          ref={passwordRef}
-          className="w-full p-3 mb-4 rounded bg-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-red-500 outline-none"
+          className="input input-bordered input-neutral rounded-lg mb-4"
+          value={passwordInput}
+          onChange={(e) => setPasswordInput(e.target.value)}
+          placeholder="••••••••"
         />
+
         <button
-          type="submit"
+          className="btn btn-primary w-full mb-2 rounded-4xl"
           onClick={handleUserAuth}
-          className="w-full bg-red-600 p-3 rounded font-bold hover:bg-red-700 transition cursor-pointer"
         >
-          {signUp ? "Sign Up" : "Login"}
+          {signUp ? "Sign Up" : "Sign In"}
         </button>
-        <p className="text-gray-400 mt-4">
-          {signUp ? "Already have an account?" : "New to Platform?"}
+
+        <p className="text-sm text-center text-gray-500">
+          {signUp ? "Already have an account?" : "New user?"}
           <span
             onClick={toggleSignup}
-            className="text-white cursor-pointer hover:underline ml-2"
+            className="text-primary ml-2  cursor-pointer hover:underline"
           >
-            {signUp ? "Sign in now." : "Sign up now."}
+            {signUp ? "Sign In" : "Sign Up"}
           </span>
         </p>
-      </form>
+      </fieldset>
     </div>
   );
 };

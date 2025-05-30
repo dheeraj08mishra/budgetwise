@@ -1,21 +1,27 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { logout } from "../utils/redux/userSlice";
-import { auth } from "../utils/firebase";
-import { signOut } from "firebase/auth";
-import { Menu, X } from "lucide-react"; // optional: install lucide-react for icons
+import { logout } from "../utils/redux/profileSlice";
+import { toast } from "react-hot-toast";
 
 const Header = () => {
-  const user = useSelector((store) => store.user.currentUser);
+  const user = useSelector((store) => store.profile.currentUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const logoutUser = async () => {
     if (user) {
       try {
-        await signOut(auth);
+        const response = await fetch("http://localhost:3000/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+        if (!response.ok) {
+          toast.error("Failed to log out. Please try again.");
+          return;
+        }
+        const data = await response.json();
+        toast.success(data.message);
         dispatch(logout());
         navigate("/");
       } catch (err) {
@@ -27,68 +33,65 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-gray-800 text-white p-4">
-      <div className="flex items-center justify-between max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold">Finance Tracker</h1>
-
-        {/* Hamburger icon for mobile */}
-        <button
-          className="md:hidden"
-          onClick={() => setMenuOpen((prev) => !prev)}
-        >
-          {menuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-
-        {/* Desktop nav */}
-        <nav className="hidden md:flex space-x-4">
-          <Link to="/">
-            <button className="bg-cyan-900 px-4 py-2 rounded hover:bg-cyan-700">
-              Home
-            </button>
-          </Link>
-          <Link to="/transactions">
-            <button className="bg-cyan-900 px-4 py-2 rounded hover:bg-cyan-700">
-              Add Transaction
-            </button>
-          </Link>
-        </nav>
-
-        {/* Desktop logout */}
-        <div className="hidden md:flex">
-          <button
-            onClick={logoutUser}
-            className="bg-cyan-900 px-4 py-2 rounded hover:bg-cyan-700"
+    <>
+      {/* <header className="bg-gray-800 text-white p-4"> */}
+      <div className="navbar bg-base-100 shadow-md sticky top-0 z-50">
+        <div className="flex-1">
+          <Link
+            to="/"
+            className="btn btn-ghost normal-case text-2xl text-white hover:underline to-blue-400"
           >
-            Logout
-          </button>
+            💰 Finance Tracker
+          </Link>
+        </div>
+        <div className="dropdown dropdown-end">
+          <div
+            tabIndex={0}
+            role="button"
+            className="btn btn-ghost btn-circle avatar hover:scale-105 transition-transform"
+          >
+            <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+              <img
+                alt="User avatar"
+                src={
+                  user.photo ||
+                  "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"
+                }
+              />
+            </div>
+          </div>
+          <ul
+            tabIndex={0}
+            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+          >
+            <li>
+              <Link to="/">🏠 Dashboard</Link>
+            </li>
+            <li>
+              <Link to="/profile">
+                👤 Profile <span className="badge badge-primary">New</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/transactions">➕ Add Transaction</Link>
+            </li>
+            <li>
+              <Link to="/history">📜 History</Link>
+            </li>
+            <li>
+              <button
+                onClick={logoutUser}
+                className="text-error hover:text-red-700"
+              >
+                🚪 Logout
+              </button>
+            </li>
+          </ul>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div className="md:hidden mt-4 space-y-4 text-center">
-          <Link to="/" onClick={() => setMenuOpen(false)}>
-            <button className="bg-cyan-900 px-4 py-2 rounded w-full">
-              Home
-            </button>
-          </Link>
-          <Link to="/transactions" onClick={() => setMenuOpen(false)}>
-            <button className="bg-cyan-900 px-4 py-2 rounded w-full">
-              Add Transaction
-            </button>
-          </Link>
-          <button
-            onClick={() => {
-              setMenuOpen(false);
-              logoutUser();
-            }}
-            className="bg-cyan-900 px-4 py-2 rounded w-full"
-          >
-            Logout
-          </button>
-        </div>
-      )}
-    </header>
+      {/* </header> */}
+    </>
   );
 };
 

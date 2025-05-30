@@ -5,15 +5,16 @@ import { useSelector } from "react-redux";
 import Header from "./Header";
 
 const Layout = () => {
-  const isLoggedIn = useSelector((store) => store.user.currentUser);
+  const isLoggedIn = useSelector((store) => store.profile.currentUser);
 
   if (!isLoggedIn) {
     return (
-      <div className="flex flex-col">
+      <div className="min-h-screen  bg-base-100 w-full">
         <Login />
       </div>
     );
   }
+
   return (
     <>
       <Header />
