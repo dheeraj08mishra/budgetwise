@@ -7,6 +7,7 @@ import { addTransaction } from "../utils/redux/transactionSlice";
 import { useDispatch } from "react-redux";
 import FilterByDate from "./FilterByDate";
 import SortingFilter from "./SortingFilter";
+import { BASE_URL } from "../utils/constants";
 const debounce = (func, delay) => {
   let timeoutId;
   return (...args) => {
@@ -28,7 +29,7 @@ const History = () => {
   const fetchTransactions = useCallback(
     debounce(async (note, cat, selectedFromDate, selectedToDate, sort) => {
       try {
-        const endPoint = "http://localhost:3000/filter?";
+        const endPoint = BASE_URL + "/filter?";
         let queryParams = [];
         if (note) {
           queryParams.push(`note=${encodeURIComponent(note)}`);
@@ -47,7 +48,7 @@ const History = () => {
         }
         const url = queryParams.length
           ? `${endPoint}${queryParams.join("&")}`
-          : "http://localhost:3000/user/transactions";
+          : BASE_URL + "/user/transactions";
         const response = await fetch(url, {
           method: "GET",
           headers: {

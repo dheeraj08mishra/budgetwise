@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addTransaction } from "../utils/redux/transactionSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+
 import {
   setSalary,
   setTotalExpenseAmount,
   setTotalIncomeAmount,
   setBalance,
 } from "../utils/redux/budgetSlice";
+import { setTotalTransactions } from "../utils/redux/transactionSlice";
+import { BASE_URL } from "../utils/constants"; // Adjust the import path as necessary
 
 const AddTransaction = () => {
   const [type, setType] = useState("expense");
@@ -66,22 +69,20 @@ const AddTransaction = () => {
       };
 
       try {
-        const response = await fetch(
-          "http://localhost:3000/user/addTransaction",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-            credentials: "include",
-          }
-        );
+        const response = await fetch(BASE_URL + "/user/addTransaction", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+          credentials: "include",
+        });
 
         const data = await response.json();
         console.log("Add Transaction Response:", data);
         if (response.ok) {
           dispatch(addTransaction([...transactions, data.data]));
+          dispatch(setTotalTransactions(transactions.length + 1));
           if (data.data.type === "income") {
             dispatch(setSalary(data.data.amount));
           }

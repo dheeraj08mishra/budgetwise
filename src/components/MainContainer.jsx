@@ -7,6 +7,7 @@ import { useEffect, useState, useMemo } from "react";
 import { addTransaction } from "../utils/redux/transactionSlice";
 import { toast } from "react-hot-toast";
 import { setSalary } from "../utils/redux/budgetSlice";
+import { BASE_URL } from "../utils/constants";
 
 // Map for month names to month numbers
 const monthsMap = {
@@ -50,14 +51,11 @@ const MainContainer = () => {
     const fetchMonthList = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(
-          "http://localhost:3000/user/transaction/dataMonthList",
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-          }
-        );
+        const res = await fetch(BASE_URL + "/user/transaction/dataMonthList", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
 
         if (!res.ok) throw new Error("Failed to fetch month list");
         const data = await res.json();
@@ -103,7 +101,8 @@ const MainContainer = () => {
 
       try {
         const res = await fetch(
-          `http://localhost:3000/user/transactions/monthly?month=${monthNumber}&year=${year}`,
+          BASE_URL +
+            `/user/transactions/monthly?month=${monthNumber}&year=${year}`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },

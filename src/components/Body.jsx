@@ -7,6 +7,7 @@ import AddTransaction from "./AddTransaction";
 import Profile from "./Profile";
 import History from "./History";
 import { useDispatch, useSelector } from "react-redux";
+import { BASE_URL } from "../utils/constants";
 import {
   addTransaction,
   setTotalTransactions,
@@ -24,19 +25,14 @@ const Body = () => {
   const fetchTransaction = async () => {
     try {
       if (user) {
-        const response = await fetch(
-          "http://localhost:3000/user/transactions",
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
+        const response = await fetch(BASE_URL + "/user/transactions", {
+          method: "GET",
+          credentials: "include",
+        });
         if (response.ok) {
           const data = await response.json();
           dispatch(addTransaction(data.data.transactions));
-          dispatch(
-            setTotalTransactions(data.data.pagination.totalTransactions)
-          );
+          dispatch(setTotalTransactions(data.data.transactions.length));
 
           data.data.transactions.forEach((transaction) => {
             if (transaction.type === "income") {

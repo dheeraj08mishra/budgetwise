@@ -13,6 +13,7 @@ import {
 } from "../utils/redux/budgetSlice";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { BASE_URL } from "../utils/constants";
 
 const RecentTransactionsList = ({ calledFrom }) => {
   const dispatch = useDispatch();
@@ -38,7 +39,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
     const fetchTransactions = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3000/user/transactions?limit=${totalTransactionsLimit}`,
+          BASE_URL + `/user/transactions?limit=${totalTransactionsLimit}`,
           { method: "GET", credentials: "include" }
         );
         const data = await res.json();
@@ -105,7 +106,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/user/update/transaction/${editData._id}`,
+        BASE_URL + `/user/update/transaction/${editData._id}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -134,10 +135,10 @@ const RecentTransactionsList = ({ calledFrom }) => {
 
   const deleteAddedTransaction = async (t) => {
     try {
-      const res = await fetch(
-        `http://localhost:3000/user/transaction/delete/${t._id}`,
-        { method: "DELETE", credentials: "include" }
-      );
+      const res = await fetch(BASE_URL + `/user/transaction/delete/${t._id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       const data = await res.json();
       if (res.ok) {
         dispatch(removeTransaction(t));

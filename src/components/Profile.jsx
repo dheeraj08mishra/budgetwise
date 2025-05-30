@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-hot-toast";
 import { updateProfile } from "../utils/redux/profileSlice";
+import { BASE_URL } from "../utils/constants";
 
 const Profile = () => {
   const user = useSelector((store) => store.profile.currentUser);
@@ -43,17 +44,14 @@ const Profile = () => {
     };
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/user/profile/update",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(BASE_URL + "/user/profile/update", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
 
       const data = await response.json();
       if (response.ok) {
