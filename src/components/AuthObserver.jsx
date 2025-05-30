@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { updateProfile } from "../utils/redux/profileSlice";
 import { useEffect } from "react";
+import { BASE_URL } from "../utils/constants";
 
 const AuthObserver = ({ children }) => {
   const dispatch = useDispatch();
@@ -9,7 +10,7 @@ const AuthObserver = ({ children }) => {
   useEffect(() => {
     const restoreUser = async () => {
       try {
-        const res = await fetch("http://localhost:3000/me", {
+        const res = await fetch(BASE_URL + "/me", {
           credentials: "include",
         });
         const data = await res.json();

@@ -2,6 +2,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../utils/redux/profileSlice";
 import { toast } from "react-hot-toast";
+import { BASE_URL } from "../utils/constants";
 
 const Header = () => {
   const user = useSelector((store) => store.profile.currentUser);
@@ -11,7 +12,7 @@ const Header = () => {
   const logoutUser = async () => {
     if (user) {
       try {
-        const response = await fetch("http://localhost:3000/logout", {
+        const response = await fetch("BASE_URL" + "/logout", {
           method: "POST",
           credentials: "include",
         });

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import validator from "validator";
 import { toast } from "react-hot-toast";
 import { updateProfile } from "../utils/redux/profileSlice";
+import { BASE_URL } from "../utils/constants";
 
 const Login = () => {
   const [signUp, setSignUp] = useState(true);
@@ -71,9 +72,7 @@ const Login = () => {
     };
 
     try {
-      const url = signUp
-        ? "http://localhost:3000/signup"
-        : "http://localhost:3000/login";
+      const url = signUp ? BASE_URL + "/signup" : BASE_URL + "/login";
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
