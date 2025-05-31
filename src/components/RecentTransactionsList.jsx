@@ -155,25 +155,25 @@ const RecentTransactionsList = ({ calledFrom }) => {
     <>
       <section className="w-full max-w-4xl mx-auto px-4">
         <div className="bg-base-200 p-6 rounded-box shadow-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
+            <h3 className="text-lg sm:text-xl font-bold">
               {calledFrom !== "history"
                 ? "📄 Recent 10 Transactions"
                 : "📋 All Transactions"}
             </h3>
-            <div className="flex items-center gap-3 flex-wrap">
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {calledFrom === "history" && (
                 <>
-                  <label className="label">
-                    <span className="label-text">Records per page:</span>
+                  <label className="label text-sm sm:text-base">
+                    Records per page:
                   </label>
-
                   <select
-                    className="select select-bordered select-lg select-neutral w-full max-w-xs"
+                    className="select select-sm sm:select-md select-bordered select-neutral w-full sm:w-auto"
                     value={recordPerPages}
                     onChange={(e) => {
                       setRecordPerPages(parseInt(e.target.value));
-                      setCurrentPage(1); // Reset to first page
+                      setCurrentPage(1);
                     }}
                   >
                     {[10, 25, 50, 100].map((num) => (
@@ -185,9 +185,10 @@ const RecentTransactionsList = ({ calledFrom }) => {
                 </>
               )}
             </div>
+
             <Link
               to={calledFrom !== "history" ? "/history" : "/"}
-              className="btn btn-link text-base"
+              className="btn btn-sm sm:btn-md btn-link text-base-content"
             >
               {calledFrom !== "history" ? "View All →" : "← Dashboard"}
             </Link>
@@ -209,15 +210,15 @@ const RecentTransactionsList = ({ calledFrom }) => {
                   className="mb-3"
                 >
                   <div className="card bg-base-100 shadow-md text-base-content">
-                    <div className="card-body flex-row items-center justify-between">
-                      <div className="flex items-start gap-4">
+                    <div className="card-body flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-8 p-4">
+                      <div className="flex items-start gap-3 sm:gap-4 w-full">
                         <div className="text-2xl">
                           {t.type === "income" ? "💰" : "💸"}
                         </div>
                         <div>
-                          <h4 className="font-medium">
+                          <h4 className="font-medium text-sm sm:text-base">
                             {t.note || "No Note"}{" "}
-                            <span className="text-sm text-gray-400">
+                            <span className="text-xs text-gray-400">
                               ({t.category})
                             </span>
                           </h4>
@@ -232,18 +233,18 @@ const RecentTransactionsList = ({ calledFrom }) => {
                         </div>
                       </div>
 
-                      <div className="text-right">
+                      <div className="w-full sm:w-auto flex flex-col sm:items-end gap-1">
                         <p
-                          className={`font-semibold text-lg ${
+                          className={`font-semibold text-sm sm:text-lg ${
                             t.type === "income" ? "text-success" : "text-error"
                           }`}
                         >
                           {t.type === "income" ? "+" : "-"} ₹{t.amount}
                         </p>
-                        <div className="flex justify-end  mt-1">
+                        <div className="flex gap-2 justify-end">
                           <button
                             onClick={() => openModalForEdit(t)}
-                            className="btn btn-xs  btn-ghost btn-info"
+                            className="btn btn-xs btn-ghost btn-info"
                           >
                             ✏️
                           </button>
@@ -276,9 +277,9 @@ const RecentTransactionsList = ({ calledFrom }) => {
               ✖️
             </button>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <select
-                className="select rounded-xl select-bordered w-full select-neutral outline-none"
+                className="select select-sm rounded-xl select-bordered w-full select-neutral outline-none"
                 value={form.type}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, type: e.target.value }))
@@ -294,7 +295,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
               <input
                 type="number"
                 placeholder="Amount"
-                className="input input-bordered w-full rounded-xl input-neutral outline-none"
+                className="input input-sm input-bordered w-full rounded-xl input-neutral outline-none"
                 min="0"
                 value={form.amount}
                 onChange={(e) =>
@@ -303,7 +304,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
               />
 
               <select
-                className="select rounded-xl select-bordered w-full select-neutral outline-none"
+                className="select select-sm rounded-xl select-bordered w-full select-neutral outline-none"
                 value={form.category}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, category: e.target.value }))
@@ -320,7 +321,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
 
               <input
                 type="date"
-                className="input input-bordered w-full rounded-xl input-neutral outline-none"
+                className="input input-sm input-bordered w-full rounded-xl input-neutral outline-none"
                 value={form.date}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, date: e.target.value }))
@@ -330,7 +331,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
               <input
                 type="text"
                 placeholder="Note"
-                className="input input-bordered w-full rounded-xl input-neutral outline-none"
+                className="input input-sm input-bordered w-full rounded-xl input-neutral outline-none"
                 value={form.note}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, note: e.target.value }))
