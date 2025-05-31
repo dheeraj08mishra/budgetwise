@@ -41,10 +41,10 @@ const Header = () => {
             to="/"
             className="btn btn-ghost normal-case text-lg sm:text-2xl text-white hover:underline to-blue-400 px-1 sm:px-4 min-h-0"
           >
-            <h1 className="text-3xl font-extrabold text-white">MoneyClarity</h1>
+            <h1 className="text-3xl font-extrabold text-white">Budget Wise</h1>
           </Link>
           <span className="hidden sm:inline text-sm text-muted-foreground mt-1 sm:mt-0">
-            Know where your money goes. Make smarter choices.
+            Smarter budgeting. Clearer insights.
           </span>
         </div>
         <div className="dropdown dropdown-end">
