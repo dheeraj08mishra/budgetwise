@@ -1,9 +1,10 @@
-# 💰 BudgetWise – Personal Finance Tracker
+## 💰 BudgetWise – Personal Finance Tracker 
 
 - BudgetWise is a comprehensive full-stack MERN web application that empowers users to efficiently manage their income, expenses, and budgets with clear, actionable insights.  
 - The platform features an intuitive dashboard for seamlessly adding, editing, and visualizing both expenses and incomes.  
-- Designed to be responsive and user-friendly, BudgetWise helps users gain a deeper understanding of their financial activity. With powerful tools for categorizing spending, 
- visualizing financial trends, and making smarter money decisions, BudgetWise makes personal finance management simple and effective.
+- Designed to be responsive and user-friendly, BudgetWise helps users gain a deeper understanding of their financial activity. With powerful tools for categorizing spending, visualizing financial trends, and making smarter money decisions, BudgetWise makes personal finance management simple and effective.
+
+**Live demo:** [https://www.budgetwiseapp.in/](https://www.budgetwiseapp.in/)
 
 ---
 
