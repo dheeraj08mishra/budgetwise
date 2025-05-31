@@ -12,7 +12,7 @@ const Header = () => {
   const logoutUser = async () => {
     if (user) {
       try {
-        const response = await fetch("BASE_URL" + "/logout", {
+        const response = await fetch(BASE_URL + "/logout", {
           method: "POST",
           credentials: "include",
         });
