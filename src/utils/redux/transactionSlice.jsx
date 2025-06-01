@@ -25,6 +25,10 @@ const transactionSlice = createSlice({
     setTotalTransactions: (state, action) => {
       state.totalTransactions = action.payload;
     },
+    removeAllTransactions: (state) => {
+      state.transactions = [];
+      state.totalTransactions = 0;
+    },
   },
 });
 export const {
@@ -32,5 +36,6 @@ export const {
   removeTransaction,
   updateTransaction,
   setTotalTransactions,
+  removeAllTransactions,
 } = transactionSlice.actions;
 export default transactionSlice.reducer;

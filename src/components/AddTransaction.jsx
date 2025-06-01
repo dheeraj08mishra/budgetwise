@@ -13,11 +13,20 @@ import {
 import { setTotalTransactions } from "../utils/redux/transactionSlice";
 import { BASE_URL } from "../utils/constants"; // Adjust the import path as necessary
 
+// Helper to get today's date in UTC (YYYY-MM-DD)
+const getTodayUTCDateString = () => {
+  const now = new Date();
+  const yyyy = now.getUTCFullYear();
+  const mm = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(now.getUTCDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 const AddTransaction = () => {
   const [type, setType] = useState("expense");
   const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState("need");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Default to today's date
+  const [date, setDate] = useState(getTodayUTCDateString()); // Default to today's UTC date
   const [note, setNote] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -31,11 +40,13 @@ const AddTransaction = () => {
   );
   const totalBalance = useSelector((store) => store.budget.balance);
 
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
+  // Get first of month in UTC
+  const todayUTC = new Date();
+  const yyyy = todayUTC.getUTCFullYear();
+  const mm = String(todayUTC.getUTCMonth() + 1).padStart(2, "0");
   const firstOfMonth = `${yyyy}-${mm}-01`;
 
+  // Validate all fields and date in UTC
   const checkFieldsValues = () => {
     if (!type || !amount || !category || !date) {
       toast.error("Please fill in all required fields.");
@@ -45,10 +56,18 @@ const AddTransaction = () => {
       toast.error("Amount must be a positive number.");
       return false;
     }
-    if (new Date(date) > new Date()) {
+    // Today in UTC (YYYY-MM-DD)
+    const todayStr = getTodayUTCDateString();
+
+    if (date > todayStr) {
       toast.error("Date cannot be in the future.");
       return false;
     }
+    if (date < firstOfMonth) {
+      toast.error("Date must be within the current month.");
+      return false;
+    }
+
     return { type, amount, category, date, note };
   };
 
@@ -64,7 +83,7 @@ const AddTransaction = () => {
         type,
         amount: Number(parseFloat(amount).toFixed(2)), // Ensure amount is a number with two decimal places
         category,
-        date: new Date(date).toISOString().split("T")[0],
+        date, // Already in UTC "YYYY-MM-DD" format
         note,
       };
 
@@ -98,7 +117,7 @@ const AddTransaction = () => {
             );
             dispatch(setBalance(totalBalance + data.data.amount));
           }
-          toast.success(response.message || "Transaction added successfully!");
+          toast.success(data.message || "Transaction added successfully!");
           setTimeout(() => {
             navigate("/");
           }, 2000);
@@ -110,7 +129,7 @@ const AddTransaction = () => {
         toast.error("Failed to add transaction. Please try again.");
       }
     } else {
-      setError("User not authenticated. Please log in.");
+      toast.error("User not authenticated. Please log in.");
     }
   };
 
@@ -118,7 +137,7 @@ const AddTransaction = () => {
     setType("expense");
     setAmount(0);
     setCategory("need");
-    setDate(new Date().toISOString().split("T")[0]);
+    setDate(getTodayUTCDateString());
     setNote("");
   };
 
@@ -183,14 +202,14 @@ const AddTransaction = () => {
           {/* Date */}
           <div>
             <label className="label">
-              <span className="label-text">Date</span>
+              <span className="label-text">Date (UTC)</span>
             </label>
             <input
               type="date"
               className="input input-bordered w-full rounded-xl"
               value={date}
               min={firstOfMonth}
-              max={new Date().toISOString().split("T")[0]}
+              max={getTodayUTCDateString()}
               onChange={(e) => setDate(e.target.value)}
             />
           </div>

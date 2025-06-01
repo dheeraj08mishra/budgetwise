@@ -6,48 +6,8 @@ import MainContainer from "./MainContainer";
 import AddTransaction from "./AddTransaction";
 import Profile from "./Profile";
 import History from "./History";
-import { useDispatch, useSelector } from "react-redux";
-import { BASE_URL } from "../utils/constants";
-import {
-  addTransaction,
-  setTotalTransactions,
-} from "../utils/redux/transactionSlice";
-import { setSalary } from "../utils/redux/budgetSlice";
 
 const Body = () => {
-  const dispatch = useDispatch();
-  const user = useSelector((store) => store.profile.currentUser);
-
-  useEffect(() => {
-    fetchTransaction();
-  }, [user]);
-
-  const fetchTransaction = async () => {
-    try {
-      if (user) {
-        const response = await fetch(BASE_URL + "/user/transactions", {
-          method: "GET",
-          credentials: "include",
-        });
-        if (response.ok) {
-          const data = await response.json();
-          dispatch(addTransaction(data.data.transactions));
-          dispatch(setTotalTransactions(data.data.transactions.length));
-
-          data.data.transactions.forEach((transaction) => {
-            if (transaction.type === "income") {
-              dispatch(setSalary(transaction.amount));
-            }
-          });
-        } else {
-          console.log("Failed to fetch transactions");
-        }
-      }
-    } catch (error) {
-      console.log("Error fetching transactions:", error);
-    }
-  };
-
   const router = createBrowserRouter([
     {
       path: "/",

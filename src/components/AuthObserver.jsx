@@ -1,7 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
-import { updateProfile } from "../utils/redux/profileSlice";
+import { updateProfile, logout } from "../utils/redux/profileSlice";
 import { useEffect } from "react";
 import { BASE_URL } from "../utils/constants";
+import { removeAllTransactions } from "../utils/redux/transactionSlice";
 
 const AuthObserver = ({ children }) => {
   const dispatch = useDispatch();
@@ -15,6 +16,8 @@ const AuthObserver = ({ children }) => {
         });
         const data = await res.json();
         if (res.ok) {
+          dispatch(logout());
+          dispatch(removeAllTransactions()); // clear previous transactions
           dispatch(updateProfile(data.user)); // restore into Redux
         }
       } catch (err) {

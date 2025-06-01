@@ -122,7 +122,6 @@ const MainContainer = () => {
             (record) => record.type === "income" && record.category === "other"
           )?.amount || 0;
         dispatch(setSalary(salary));
-        toast.success(`Fetched ${data.data.transactions.length} transactions`);
       } catch (err) {
         toast.error("Failed to fetch transactions. Please try again.");
       }
