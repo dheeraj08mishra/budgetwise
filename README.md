@@ -103,7 +103,7 @@ cd budgetwise
 npm install
 
 # 3. Start the development server
-npm run dev
+npm run start
 ```
 
 > **Note:**  
