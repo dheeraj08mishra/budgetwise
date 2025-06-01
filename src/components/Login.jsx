@@ -3,8 +3,9 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import validator from "validator";
 import { toast } from "react-hot-toast";
-import { updateProfile } from "../utils/redux/profileSlice";
+import { updateProfile, logout } from "../utils/redux/profileSlice";
 import { BASE_URL } from "../utils/constants";
+import { removeAllTransactions } from "../utils/redux/transactionSlice";
 
 const Login = () => {
   const [signUp, setSignUp] = useState(true);
@@ -88,7 +89,10 @@ const Login = () => {
 
       if (res.ok) {
         toast.success(data.message);
+        dispatch(logout());
+        dispatch(removeAllTransactions());
         dispatch(updateProfile(data.user));
+
         navigate("/");
       } else {
         toast.error(data.message || "Authentication failed.");

@@ -53,7 +53,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
         console.error("Error fetching transactions:", error);
       }
     };
-    fetchTransactions();
+    // fetchTransactions();
   }, [dispatch, totalTransactionsLimit]);
 
   useEffect(() => {
