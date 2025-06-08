@@ -357,7 +357,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
         </dialog>
       )}
 
-      {calledFrom === "history" && (
+      {calledFrom === "history" && totalPages > 0 && (
         <div className=" flex justify-center items-center join gap-4 p-4 mb-6">
           <button
             onClick={previousPage}
