@@ -23,11 +23,15 @@ const budgetSlice = createSlice({
     setTotalIncomeAmount: (state, action) => {
       state.totalIncomeAmount = action.payload;
     },
+    resetSalary: (state) => {
+      state.salary = 0;
+    },
   },
 });
 
 export const {
   setSalary,
+  resetSalary,
   setBalance,
   setTotalExpenseAmount,
   setTotalIncomeAmount,
