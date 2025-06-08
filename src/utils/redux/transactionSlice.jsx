@@ -3,11 +3,15 @@ const transactionSlice = createSlice({
   name: "transaction",
   initialState: {
     transactions: [],
+    recurringTransactions: [],
     totalTransactions: 0,
   },
   reducers: {
     addTransaction: (state, action) => {
       state.transactions = action.payload;
+    },
+    addRecurringTransaction: (state, action) => {
+      state.recurringTransactions = action.payload;
     },
     removeTransaction: (state, action) => {
       state.transactions = state.transactions.filter(
@@ -37,5 +41,6 @@ export const {
   updateTransaction,
   setTotalTransactions,
   removeAllTransactions,
+  addRecurringTransaction,
 } = transactionSlice.actions;
 export default transactionSlice.reducer;
