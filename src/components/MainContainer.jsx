@@ -136,31 +136,33 @@ const MainContainer = () => {
         <section className="w-full max-w-6xl space-y-6 mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-stretch gap-6 mb-6">
             {/* Dropdown */}
-            <div className="form-control w-full max-w-md">
-              <label className="label">
-                <span className="label-text text-sm font-semibold">
-                  Select data to view Dashboard
-                </span>
-              </label>
-              <select
-                value={selectedValue}
-                onChange={(e) => setSelectedValue(e.target.value)}
-                disabled={isLoading}
-                className="select select-bordered select-neutral w-full rounded-xl"
-              >
-                {isLoading ? (
-                  <option disabled>Loading...</option>
-                ) : records.length === 0 ? (
-                  <option disabled>No Data Available</option>
-                ) : (
-                  records.map((option, index) => (
-                    <option key={index} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
+            {records.length > 0 && (
+              <div className="form-control w-full max-w-md">
+                <label className="label">
+                  <span className="label-text text-sm font-semibold">
+                    Select data to view Dashboard
+                  </span>
+                </label>
+                <select
+                  value={selectedValue}
+                  onChange={(e) => setSelectedValue(e.target.value)}
+                  disabled={isLoading}
+                  className="select select-bordered select-neutral w-full rounded-xl"
+                >
+                  {isLoading ? (
+                    <option disabled>Loading...</option>
+                  ) : records.length === 0 ? (
+                    <option disabled>No Data Available</option>
+                  ) : (
+                    records.map((option, index) => (
+                      <option key={index} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+            )}
 
             {/* Balance Card */}
             <div className="card w-full max-w-md bg-base-100 shadow-xl">

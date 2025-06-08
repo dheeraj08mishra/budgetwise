@@ -22,19 +22,16 @@ const Budget = () => {
 
     let need = 0,
       want = 0,
-      investment = 0;
-    let other = 0;
+      investment = 0,
+      other = 0;
+
     transactions.forEach((transaction) => {
       if (transaction.userId === user._id && transaction.type === "expense") {
-        if (transaction.category === "need") {
-          need += transaction.amount;
-        } else if (transaction.category === "want") {
-          want += transaction.amount;
-        } else if (transaction.category === "investment") {
+        if (transaction.category === "need") need += transaction.amount;
+        else if (transaction.category === "want") want += transaction.amount;
+        else if (transaction.category === "investment")
           investment += transaction.amount;
-        } else if (transaction.category === "other") {
-          other += transaction.amount;
-        }
+        else if (transaction.category === "other") other += transaction.amount;
       }
     });
 
@@ -59,34 +56,43 @@ const Budget = () => {
 
   if (transactions.length === 0) {
     return (
-      <div className="bg-gray-700 p-6 rounded-xl flex-1 text-center">
-        <p>No Transaction found, please add Transactions</p>
-        <button
-          className="btn btn-primary mt-4"
-          onClick={() => navigate("/transactions")}
-        >
-          Transaction
-        </button>
+      <div className="card bg-base-100 shadow-md p-6">
+        <p className="text-lg text-center text-base-content">
+          No transactions found. Please add some!
+        </p>
+        <div className="flex justify-center mt-4">
+          <button
+            className="btn btn-primary rounded-full px-6"
+            onClick={() => navigate("/transactions")}
+          >
+            Add Transaction
+          </button>
+        </div>
       </div>
     );
   }
+
   if (salary === 0) {
     return (
-      <div className="bg-gray-700 p-6 rounded-xl flex-1 text-center">
-        <p>Please set your salary to track your budget.</p>
-        <button
-          className="btn btn-primary mt-4"
-          onClick={() => navigate("/transactions")}
-        >
-          Transaction
-        </button>
+      <div className="card bg-base-100 shadow-md p-6">
+        <p className="text-lg text-center text-base-content">
+          Please set your salary to track budget progress.
+        </p>
+        <div className="flex justify-center mt-4">
+          <button
+            className="btn btn-primary rounded-full px-6"
+            onClick={() => navigate("/transactions")}
+          >
+            Add Salary
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <>
-      <fieldset className="fieldset w-full p-4 border border-base-300 rounded-lg">
+    <div className="card bg-base-100 shadow-md p-6">
+      <fieldset className="w-full space-y-6">
         {[
           { label: "Need", value: needSpent, amount: needAmount },
           { label: "Want", value: wantSpent, amount: wantAmount },
@@ -95,19 +101,15 @@ const Budget = () => {
             value: investmentSpent,
             amount: investmentAmount,
           },
-          {
-            label: "Other",
-            value: otherSpent,
-            amount: otherAmount,
-          },
+          { label: "Other", value: otherSpent, amount: otherAmount },
         ].map((item) => (
-          <div key={item.label} className="mb-4">
-            <div className="flex justify-between mb-1 text-sm font-medium">
+          <div key={item.label}>
+            <div className="flex justify-between mb-1 text-sm font-medium text-base-content">
               <span>{item.label}</span>
               <span>{item.value}%</span>
             </div>
             <progress
-              className={`progress  w-full ${
+              className={`progress w-full ${
                 item.value <= 50
                   ? "progress-success"
                   : item.value <= 70
@@ -117,11 +119,13 @@ const Budget = () => {
               value={item.value}
               max="100"
             ></progress>
-            <p className="text-xs mt-1 text-gray-500">₹{item.amount} spent</p>
+            <p className="text-xs mt-1 text-muted">
+              ₹{item.amount.toLocaleString()} spent
+            </p>
           </div>
         ))}
       </fieldset>
-    </>
+    </div>
   );
 };
 

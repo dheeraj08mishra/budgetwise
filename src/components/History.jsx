@@ -79,7 +79,7 @@ const History = () => {
   return (
     <>
       <div className="flex flex-col items-center w-full p-4">
-        <h1 className="text-3xl font-bold mb-6 text-center text-neutral-content">
+        <h1 className="text-3xl font-bold mb-6 text-center text-content">
           Transaction History
         </h1>
 

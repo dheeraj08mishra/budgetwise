@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 import { updateProfile, logout } from "../utils/redux/profileSlice";
 import { BASE_URL } from "../utils/constants";
 import { removeAllTransactions } from "../utils/redux/transactionSlice";
+import { resetSalary } from "../utils/redux/budgetSlice";
 
 const Login = () => {
   const [signUp, setSignUp] = useState(true);
@@ -91,6 +92,7 @@ const Login = () => {
         toast.success(data.message);
         dispatch(logout());
         dispatch(removeAllTransactions());
+        dispatch(resetSalary());
         dispatch(updateProfile(data.user));
 
         navigate("/");
