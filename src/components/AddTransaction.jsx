@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addTransaction } from "../utils/redux/transactionSlice";
+import {
+  addTransaction,
+  addRecurringTransaction,
+} from "../utils/redux/transactionSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
@@ -28,9 +31,14 @@ const AddTransaction = () => {
   const [category, setCategory] = useState("need");
   const [date, setDate] = useState(getTodayUTCDateString()); // Default to today's UTC date
   const [note, setNote] = useState("");
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [frequency, setFrequency] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const transactions = useSelector((store) => store.transaction.transactions);
+  const recurringTransactions = useSelector(
+    (store) => store.transaction.recurringTransactions
+  );
   const user = useSelector((store) => store.profile);
   const totalExpenseAmount = useSelector(
     (store) => store.budget.totalExpenseAmount
@@ -68,14 +76,20 @@ const AddTransaction = () => {
       return false;
     }
 
-    return { type, amount, category, date, note };
+    if (isRecurring && !frequency) {
+      toast.error("Please select a frequency for recurring transactions.");
+      return false;
+    }
+
+    return { type, amount, category, date, note, isRecurring, frequency };
   };
 
   const addTransactionList = async (e) => {
     const values = checkFieldsValues();
     if (values === false) return;
 
-    const { type, amount, category, date, note } = values;
+    const { type, amount, category, date, note, isRecurring, frequency } =
+      values;
 
     if (user) {
       const payload = {
@@ -85,6 +99,8 @@ const AddTransaction = () => {
         category,
         date, // Already in UTC "YYYY-MM-DD" format
         note,
+        isRecurring,
+        frequency, // Include frequency if recurring
       };
 
       try {
@@ -101,6 +117,14 @@ const AddTransaction = () => {
         console.log("Add Transaction Response:", data);
         if (response.ok) {
           dispatch(addTransaction([...transactions, data.data]));
+          if (isRecurring) {
+            dispatch(
+              addRecurringTransaction([
+                ...recurringTransactions,
+                data.recurring,
+              ])
+            );
+          }
           dispatch(setTotalTransactions(transactions.length + 1));
           if (data.data.type === "income") {
             dispatch(setSalary(data.data.amount));
@@ -141,6 +165,15 @@ const AddTransaction = () => {
     setNote("");
   };
 
+  const updateRecurring = () => {
+    return (e) => {
+      setIsRecurring(e.target.checked);
+      if (!e.target.checked) {
+        setFrequency("");
+      }
+    };
+  };
+
   return (
     <div className="min-h-screen bg-base-100 flex items-center justify-center p-4">
       <div className="card w-full max-w-md bg-base-200 shadow-lg">
@@ -164,7 +197,41 @@ const AddTransaction = () => {
               <option value="expense">Expense</option>
             </select>
           </div>
+          {/* isRecurring check */}
 
+          <div className="form-control">
+            <label className="label cursor-pointer">
+              <span className="label-text">
+                Is this a recurring transaction?
+              </span>
+              <input
+                type="checkbox"
+                className="checkbox checkbox-primary"
+                checked={isRecurring}
+                onChange={updateRecurring()}
+              />
+            </label>
+
+            {isRecurring && (
+              <div>
+                <label className="label">
+                  <span className="label-text">Frequency</span>
+                </label>
+                <select
+                  className="select select-bordered w-full rounded-xl"
+                  value={frequency}
+                  onChange={(e) => setFrequency(e.target.value)}
+                >
+                  <option disabled value="">
+                    Select Frequency
+                  </option>
+                  <option value="monthly">Monthly</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+              </div>
+            )}
+          </div>
           {/* Amount */}
           <div>
             <label className="label">
@@ -202,7 +269,7 @@ const AddTransaction = () => {
           {/* Date */}
           <div>
             <label className="label">
-              <span className="label-text">Date (UTC)</span>
+              <span className="label-text">Date</span>
             </label>
             <input
               type="date"
