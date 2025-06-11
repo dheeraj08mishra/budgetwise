@@ -90,6 +90,47 @@ const MainContainer = () => {
     fetchMonthList();
   }, []);
 
+  const exportTransactionsExcel = async () => {
+    if (!selectedValue) {
+      toast.error("Please select a month to export transactions.");
+      return;
+    }
+    const [monthName, year] = selectedValue.split(" ");
+    const monthNumber = monthsMap[monthName];
+    if (!monthNumber || !year) {
+      toast.error("Invalid month or year selected.");
+      return;
+    }
+    try {
+      const res = await fetch(
+        BASE_URL +
+          `/user/transactions/export/excel?month=${monthNumber}&year=${year}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      if (!res.ok) {
+        toast.error("Failed to export transactions");
+        return;
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `transactions_${monthName}_${year}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success("Transactions exported successfully!");
+    } catch (error) {
+      toast.error("Failed to export transactions. Please try again.");
+      console.log("Export error:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchTransactions = async () => {
       if (!selectedValue) return;
@@ -134,34 +175,48 @@ const MainContainer = () => {
     <>
       <div className="flex flex-col items-center min-h-screen bg-base-200 text-base-content p-4 space-y-8">
         <section className="w-full max-w-6xl space-y-6 mx-auto">
-          <div className="flex flex-col sm:flex-row justify-between items-stretch gap-6 mb-6">
+          <div className="flex flex-col sm:flex-row md:flex-row justify-between items-stretch gap-6 mb-6">
             {/* Dropdown */}
             {records.length > 0 && (
-              <div className="form-control w-full max-w-md">
-                <label className="label">
-                  <span className="label-text text-sm font-semibold">
-                    Select data to view Dashboard
+              <>
+                <div className="form-control w-full max-w-md">
+                  {/* <div className="flex items-center mb-2"> */}
+                  <label className="label">
+                    <span className="label-text text-sm font-semibold">
+                      Select data to view Dashboard
+                    </span>
+                  </label>
+                  <select
+                    value={selectedValue}
+                    onChange={(e) => setSelectedValue(e.target.value)}
+                    disabled={isLoading}
+                    className="select select-bordered select-neutral w-full rounded-xl"
+                  >
+                    {isLoading ? (
+                      <option disabled>Loading...</option>
+                    ) : records.length === 0 ? (
+                      <option disabled>No Data Available</option>
+                    ) : (
+                      records.map((option, index) => (
+                        <option key={index} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                  {/* </div> */}
+                  <span className="form-control inline-block max-w-md p-6">
+                    <button
+                      className="btn btn-link text text-base-content rounded-4xl"
+                      onClick={() => {
+                        exportTransactionsExcel();
+                      }}
+                    >
+                      ⬇️ Export to Excel
+                    </button>
                   </span>
-                </label>
-                <select
-                  value={selectedValue}
-                  onChange={(e) => setSelectedValue(e.target.value)}
-                  disabled={isLoading}
-                  className="select select-bordered select-neutral w-full rounded-xl"
-                >
-                  {isLoading ? (
-                    <option disabled>Loading...</option>
-                  ) : records.length === 0 ? (
-                    <option disabled>No Data Available</option>
-                  ) : (
-                    records.map((option, index) => (
-                      <option key={index} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))
-                  )}
-                </select>
-              </div>
+                </div>
+              </>
             )}
 
             {/* Balance Card */}
