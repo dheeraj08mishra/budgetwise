@@ -3,6 +3,7 @@ import Login from "./Login";
 import { Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Header from "./Header";
+import Footer from "./Footer";
 
 const Layout = () => {
   const isLoggedIn = useSelector((store) => store.profile.currentUser);
@@ -19,6 +20,7 @@ const Layout = () => {
     <>
       <Header />
       <Outlet />
+      <Footer />
     </>
   );
 };
