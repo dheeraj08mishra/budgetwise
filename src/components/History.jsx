@@ -66,7 +66,7 @@ const History = () => {
       } catch (error) {
         toast.error("Failed to fetch transactions. Please try again.");
       }
-    }, 1000),
+    }, 300),
     [dispatch]
   );
 
