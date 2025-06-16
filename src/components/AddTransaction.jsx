@@ -14,22 +14,24 @@ import {
   setBalance,
 } from "../utils/redux/budgetSlice";
 import { setTotalTransactions } from "../utils/redux/transactionSlice";
-import { BASE_URL } from "../utils/constants"; // Adjust the import path as necessary
-
-// Helper to get today's date in UTC (YYYY-MM-DD)
+import { BASE_URL } from "../utils/constants";
+import {
+  isAfter,
+  isBefore,
+  startOfMonth,
+  endOfDay,
+  format,
+  parseISO,
+} from "date-fns";
 const getTodayUTCDateString = () => {
-  const now = new Date();
-  const yyyy = now.getUTCFullYear();
-  const mm = String(now.getUTCMonth() + 1).padStart(2, "0");
-  const dd = String(now.getUTCDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
+  return new Date().toISOString().slice(0, 10);
 };
 
 const AddTransaction = () => {
   const [type, setType] = useState("expense");
   const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState("need");
-  const [date, setDate] = useState(getTodayUTCDateString()); // Default to today's UTC date
+  const [date, setDate] = useState(getTodayUTCDateString());
   const [note, setNote] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
   const [frequency, setFrequency] = useState("");
@@ -48,30 +50,33 @@ const AddTransaction = () => {
   );
   const totalBalance = useSelector((store) => store.budget.balance);
 
-  // Get first of month in UTC
-  const todayUTC = new Date();
-  const yyyy = todayUTC.getUTCFullYear();
-  const mm = String(todayUTC.getUTCMonth() + 1).padStart(2, "0");
-  const firstOfMonth = `${yyyy}-${mm}-01`;
+  const today = new Date();
+  const firstOfMonthDate = startOfMonth(today);
+  const firstOfMonth = format(firstOfMonthDate, "yyyy-MM-dd");
 
-  // Validate all fields and date in UTC
   const checkFieldsValues = () => {
-    if (!type || !amount || !category || !date) {
+    if (!type || !category || !date) {
       toast.error("Please fill in all required fields.");
       return false;
     }
-    if (isNaN(amount) || parseFloat(amount) <= 0) {
+    if (amount === "" || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
       toast.error("Amount must be a positive number.");
       return false;
     }
-    // Today in UTC (YYYY-MM-DD)
-    const todayStr = getTodayUTCDateString();
+    if (parseFloat(amount) > 1000000) {
+      toast.error("Amount cannot exceed 1,000,000.");
+      return false;
+    }
 
-    if (date > todayStr) {
+    const dateValue = parseISO(date);
+    const todayValue = endOfDay(today);
+    const firstOfMonthValue = startOfMonth(today);
+
+    if (isAfter(dateValue, todayValue)) {
       toast.error("Date cannot be in the future.");
       return false;
     }
-    if (date < firstOfMonth) {
+    if (isBefore(dateValue, firstOfMonthValue)) {
       toast.error("Date must be within the current month.");
       return false;
     }
@@ -95,12 +100,12 @@ const AddTransaction = () => {
       const payload = {
         userId: user._id,
         type,
-        amount: Number(parseFloat(amount).toFixed(2)), // Ensure amount is a number with two decimal places
+        amount: parseFloat(amount).toFixed(2),
         category,
-        date, // Already in UTC "YYYY-MM-DD" format
+        date,
         note,
         isRecurring,
-        frequency, // Include frequency if recurring
+        frequency,
       };
 
       try {
@@ -114,7 +119,6 @@ const AddTransaction = () => {
         });
 
         const data = await response.json();
-        console.log("Add Transaction Response:", data);
         if (response.ok) {
           dispatch(addTransaction([...transactions, data.data]));
           if (isRecurring) {
@@ -186,7 +190,7 @@ const AddTransaction = () => {
               <span className="label-text">Transaction Type</span>
             </label>
             <select
-              className="select select-bordered w-full rounded-xl"
+              className="select select-neutral w-full rounded-xl"
               value={type}
               onChange={(e) => setType(e.target.value)}
             >
@@ -218,7 +222,7 @@ const AddTransaction = () => {
                   <span className="label-text">Frequency</span>
                 </label>
                 <select
-                  className="select select-bordered w-full rounded-xl"
+                  className="select select-neutral w-full rounded-xl"
                   value={frequency}
                   onChange={(e) => setFrequency(e.target.value)}
                 >
@@ -240,9 +244,19 @@ const AddTransaction = () => {
             <input
               type="number"
               placeholder="Enter amount"
-              className="input input-bordered w-full rounded-xl"
+              className="input input-neutral w-full rounded-xl"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              min="1"
+              max="1000000"
+              onChange={(e) => {
+                const val = e.target.value;
+                if (
+                  val === "" ||
+                  (/^\d+(\.\d{0,2})?$/.test(val) && parseFloat(val) <= 1000000)
+                ) {
+                  setAmount(val);
+                }
+              }}
             />
           </div>
 
@@ -252,7 +266,7 @@ const AddTransaction = () => {
               <span className="label-text">Category</span>
             </label>
             <select
-              className="select select-bordered w-full rounded-xl"
+              className="select select-neutral w-full rounded-xl"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
@@ -273,7 +287,7 @@ const AddTransaction = () => {
             </label>
             <input
               type="date"
-              className="input input-bordered w-full rounded-xl"
+              className="input input-neutral w-full rounded-xl"
               value={date}
               min={firstOfMonth}
               max={getTodayUTCDateString()}
@@ -289,7 +303,7 @@ const AddTransaction = () => {
             <input
               type="text"
               placeholder="Optional note"
-              className="input input-bordered w-full rounded-xl"
+              className="input input-neutral w-full rounded-xl"
               value={note}
               onChange={(e) => setNote(e.target.value)}
             />
