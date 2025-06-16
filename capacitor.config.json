@@ -1,0 +1,6 @@
+{
+  "appId": "in.budgetwiseapp",
+  "appName": "BudgetWise",
+  "webDir": "build",
+  "bundledWebRuntime": false
+}

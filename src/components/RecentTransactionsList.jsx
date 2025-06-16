@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import {
   removeTransaction,
   updateTransaction,
-  addTransaction,
 } from "../utils/redux/transactionSlice";
-import {
-  setTotalExpenseAmount,
-  setTotalIncomeAmount,
-  setBalance,
-} from "../utils/redux/budgetSlice";
+
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
+import {
+  isAfter,
+  isBefore,
+  startOfMonth,
+  endOfDay,
+  format,
+  parseISO,
+} from "date-fns";
 
 const RecentTransactionsList = ({ calledFrom }) => {
   const dispatch = useDispatch();
@@ -23,9 +26,6 @@ const RecentTransactionsList = ({ calledFrom }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const transactions = useSelector((store) => store.transaction.transactions);
-  const totalTransactionsLimit = useSelector(
-    (store) => store.transaction.totalTransactions
-  );
 
   const [form, setForm] = useState({
     type: "",
@@ -34,27 +34,6 @@ const RecentTransactionsList = ({ calledFrom }) => {
     date: "",
     note: "",
   });
-
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const res = await fetch(
-          BASE_URL + `/user/transactions?limit=${totalTransactionsLimit}`,
-          { method: "GET", credentials: "include" }
-        );
-        const data = await res.json();
-        if (res.ok) {
-          dispatch(setBalance(data.data.balance));
-          dispatch(addTransaction(data.data.transactions));
-          dispatch(setTotalExpenseAmount(data.data.totalExpenseAmount));
-          dispatch(setTotalIncomeAmount(data.data.totalIncomeAmount));
-        }
-      } catch (error) {
-        console.error("Error fetching transactions:", error);
-      }
-    };
-    // fetchTransactions();
-  }, [dispatch, totalTransactionsLimit]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -68,7 +47,9 @@ const RecentTransactionsList = ({ calledFrom }) => {
           (currentPage - 1) * recordPerPages,
           currentPage * recordPerPages
         )
-      : transactions.slice(0, 10);
+      : transactions
+          .slice(0, 10)
+          .sort((a, b) => new Date(b.createAt) - new Date(a.createdAt));
   const nextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage((prev) => Math.min(prev + 1, totalPages));
@@ -87,7 +68,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
       type: transaction.type,
       amount: transaction.amount,
       category: transaction.category,
-      date: new Date(transaction.date).toISOString().split("T")[0],
+      date: format(new Date(transaction.date), "yyyy-MM-dd"),
       note: transaction.note || "",
     });
   };
@@ -99,8 +80,22 @@ const RecentTransactionsList = ({ calledFrom }) => {
 
   const updateTransactionCall = async () => {
     const { type, amount, category, date, note } = form;
-    if (parseFloat(amount) <= 0) {
+
+    if (amount === "" || parseFloat(amount) <= 0) {
       toast.error("Amount must be a positive number.");
+      return;
+    }
+    if (parseFloat(amount) > 1000000) {
+      toast.error("Amount cannot exceed ₹1,000,000.");
+      return;
+    }
+
+    if (isAfter(parseISO(date), endOfDay(new Date()))) {
+      toast.error("Date cannot be in the future.");
+      return;
+    }
+    if (isBefore(parseISO(date), startOfMonth(new Date()))) {
+      toast.error("Date must be within the current month.");
       return;
     }
 
@@ -296,11 +291,18 @@ const RecentTransactionsList = ({ calledFrom }) => {
                 type="number"
                 placeholder="Amount"
                 className="input input-sm input-bordered w-full rounded-xl input-neutral outline-none"
-                min="0"
+                min="1"
+                max="1000000"
                 value={form.amount}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, amount: e.target.value }))
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (
+                    value === "" ||
+                    (/^\d+$/.test(value) && Number(value) <= 1000000)
+                  ) {
+                    setForm((prev) => ({ ...prev, amount: value }));
+                  }
+                }}
               />
 
               <select
@@ -323,6 +325,11 @@ const RecentTransactionsList = ({ calledFrom }) => {
                 type="date"
                 className="input input-sm input-bordered w-full rounded-xl input-neutral outline-none"
                 value={form.date}
+                min={format(startOfMonth(new Date()), "yyyy-MM-dd")}
+                max={format(
+                  new Date().toISOString().slice(0, 10),
+                  "yyyy-MM-dd"
+                )}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, date: e.target.value }))
                 }
