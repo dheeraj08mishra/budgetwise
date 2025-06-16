@@ -70,6 +70,11 @@ const Footer = () => {
       setLoading(false);
     }
   };
+  const openFeedbackModal = () => {
+    setShowFeedback(true);
+    setTextAreaValue("");
+    setFeedbackType("other");
+  };
 
   return (
     <>
@@ -101,7 +106,7 @@ const Footer = () => {
             </a>
             <button
               className="btn btn-primary btn-sm"
-              onClick={() => setShowFeedback(true)}
+              onClick={openFeedbackModal}
             >
               Feedback
             </button>
@@ -109,8 +114,8 @@ const Footer = () => {
         </div>
       </footer>
       {showFeedback && (
-        <div className="fixed inset-0 bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white dark:bg-base-200 rounded-xl p-6 w-full max-w-md shadow-lg relative">
+        <dialog id="my_modal_feedback" className="modal modal-open">
+          <div className="modal-box w-full max-w-md">
             <button
               className="absolute top-2 right-3 text-2xl font-semibold"
               onClick={() => setShowFeedback(false)}
@@ -149,7 +154,7 @@ const Footer = () => {
               </button>
             </form>
           </div>
-        </div>
+        </dialog>
       )}
     </>
   );
