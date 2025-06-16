@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addTransaction,
   addRecurringTransaction,
+  setTotalTransactions,
 } from "../utils/redux/transactionSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -13,7 +14,6 @@ import {
   setTotalIncomeAmount,
   setBalance,
 } from "../utils/redux/budgetSlice";
-import { setTotalTransactions } from "../utils/redux/transactionSlice";
 import { BASE_URL } from "../utils/constants";
 import {
   isAfter,
@@ -35,6 +35,8 @@ const AddTransaction = () => {
   const [note, setNote] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
   const [frequency, setFrequency] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const transactions = useSelector((store) => store.transaction.transactions);
@@ -90,8 +92,14 @@ const AddTransaction = () => {
   };
 
   const addTransactionList = async (e) => {
+    if (loading) return; // Prevent double submission
+    setLoading(true);
+
     const values = checkFieldsValues();
-    if (values === false) return;
+    if (values === false) {
+      setLoading(false);
+      return;
+    }
 
     const { type, amount, category, date, note, isRecurring, frequency } =
       values;
@@ -146,10 +154,8 @@ const AddTransaction = () => {
             dispatch(setBalance(totalBalance + data.data.amount));
           }
           toast.success(data.message || "Transaction added successfully!");
-          setTimeout(() => {
-            navigate("/");
-          }, 2000);
           resetForm();
+          navigate("/");
         } else {
           toast.error(data.message || "Failed to add transaction.");
         }
@@ -159,6 +165,7 @@ const AddTransaction = () => {
     } else {
       toast.error("User not authenticated. Please log in.");
     }
+    setLoading(false); // Re-enable button after request completes
   };
 
   const resetForm = () => {
@@ -193,6 +200,7 @@ const AddTransaction = () => {
               className="select select-neutral w-full rounded-xl"
               value={type}
               onChange={(e) => setType(e.target.value)}
+              disabled={loading}
             >
               <option disabled value="">
                 Select Type
@@ -213,6 +221,7 @@ const AddTransaction = () => {
                 className="checkbox checkbox-primary"
                 checked={isRecurring}
                 onChange={updateRecurring()}
+                disabled={loading}
               />
             </label>
 
@@ -225,6 +234,7 @@ const AddTransaction = () => {
                   className="select select-neutral w-full rounded-xl"
                   value={frequency}
                   onChange={(e) => setFrequency(e.target.value)}
+                  disabled={loading}
                 >
                   <option disabled value="">
                     Select Frequency
@@ -257,6 +267,7 @@ const AddTransaction = () => {
                   setAmount(val);
                 }
               }}
+              disabled={loading}
             />
           </div>
 
@@ -269,6 +280,7 @@ const AddTransaction = () => {
               className="select select-neutral w-full rounded-xl"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
+              disabled={loading}
             >
               <option disabled value="">
                 Select Category
@@ -292,6 +304,7 @@ const AddTransaction = () => {
               min={firstOfMonth}
               max={getTodayUTCDateString()}
               onChange={(e) => setDate(e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -306,6 +319,7 @@ const AddTransaction = () => {
               className="input input-neutral w-full rounded-xl"
               value={note}
               onChange={(e) => setNote(e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -314,12 +328,14 @@ const AddTransaction = () => {
             <button
               onClick={addTransactionList}
               className="btn btn-secondary rounded-xl w-[48%]"
+              disabled={loading}
             >
-              Add
+              {loading ? "Adding..." : "Add"}
             </button>
             <button
               onClick={resetForm}
               className="btn btn-outline btn-primary rounded-xl w-[48%]"
+              disabled={loading}
             >
               Reset
             </button>
