@@ -109,12 +109,20 @@ const Header = () => {
               className="py-2 flex items-center justify-between"
             >
               <span>👤 Profile</span>
-              <span className="badge badge-primary ml-2">New</span>
             </Link>
           </li>
           <li>
             <Link to="/transactions" className="py-2">
               ➕ Add Transaction
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/recurring"
+              className="py-2 flex items-center justify-between"
+            >
+              <span>🔁 Recurring</span>
+              <span className="badge badge-primary ml-2">New</span>
             </Link>
           </li>
           <li>

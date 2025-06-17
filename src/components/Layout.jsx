@@ -18,9 +18,13 @@ const Layout = () => {
 
   return (
     <>
-      <Header />
-      <Outlet />
-      <Footer />
+      <div className="min-h-screen bg-base-200 w-full flex flex-col">
+        <Header />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
     </>
   );
 };
