@@ -65,7 +65,6 @@ const Footer = () => {
       setTextAreaValue("");
     } catch (error) {
       toast.error("Error submitting feedback. Please try again later.");
-      console.error("Error submitting feedback:", error);
     } finally {
       setLoading(false);
     }
@@ -80,18 +79,30 @@ const Footer = () => {
     <>
       <footer className="footer footer-center flex flex-col items-center p-6 bg-base-200 text-base-content gap-4">
         <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-5xl">
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex flex-col sm:flex-row gap-2 items-center text-sm">
             <span>&copy; {new Date().getFullYear()} BudgetWise</span>
             <span className="hidden sm:inline">•</span>
             <span>All rights reserved.</span>
+            <span className="hidden sm:inline">•</span>
+            <span>
+              Made by{" "}
+              <a
+                href="https://linkedin.com/in/dheerajmishra462"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link link-hover font-medium text-primary"
+              >
+                Dheeraj Mishra
+              </a>
+            </span>
           </div>
-          <div className="flex gap-5 items-center mt-2 sm:mt-0">
+          <div className="flex gap-4 mt-2 sm:mt-0">
             <a
               href="https://github.com/dheeraj08mishra/budgetwise"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="GitHub"
               className="btn btn-ghost btn-sm"
+              aria-label="GitHub"
             >
               {githubIcon}
             </a>
@@ -99,8 +110,8 @@ const Footer = () => {
               href="https://linkedin.com/in/dheerajmishra462"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="LinkedIn"
               className="btn btn-ghost btn-sm"
+              aria-label="LinkedIn"
             >
               {linkedinIcon}
             </a>
@@ -113,8 +124,15 @@ const Footer = () => {
           </div>
         </div>
       </footer>
+
       {showFeedback && (
-        <dialog id="my_modal_feedback" className="modal modal-open">
+        <dialog
+          id="my_modal_feedback"
+          className="modal modal-open"
+          aria-modal="true"
+          role="dialog"
+          aria-labelledby="feedback-title"
+        >
           <div className="modal-box w-full max-w-md">
             <button
               className="absolute top-2 right-3 text-2xl font-semibold"

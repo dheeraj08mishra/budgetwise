@@ -16,6 +16,7 @@ const RecurringTransaction = () => {
   });
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState({});
 
   useEffect(() => {
     const fetchRecurringTransactions = async () => {
@@ -59,6 +60,48 @@ const RecurringTransaction = () => {
     }
   };
 
+  const updateTransactionState = async (transaction, event) => {
+    setActionLoading((prev) => ({ ...prev, [transaction._id]: true }));
+    if (event === "pause" && !transaction.isActive) {
+      toast.error("Transaction is already paused.");
+      setActionLoading((prev) => ({ ...prev, [transaction._id]: false }));
+      return;
+    }
+    if (event === "resume" && transaction.isActive) {
+      toast.success("Transaction is already active.");
+      setActionLoading((prev) => ({ ...prev, [transaction._id]: false }));
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${BASE_URL}/recurring/${event}Transaction/${transaction._id}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+      if (!response.ok) throw new Error(`Failed to ${event} transaction`);
+      const data = await response.json();
+      setRecurringTransactions((prev) =>
+        prev.map((t) =>
+          t._id === transaction._id
+            ? {
+                ...t,
+                isActive: data.data.isActive,
+                nextOccurrence: data.data.nextOccurrence,
+              }
+            : t
+        )
+      );
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(`Failed to ${event} transaction.`);
+    } finally {
+      setActionLoading((prev) => ({ ...prev, [transaction._id]: false }));
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h2 className="text-3xl font-bold mb-6 text-center">
@@ -81,13 +124,14 @@ const RecurringTransaction = () => {
                   <th>Start Date</th>
                   <th>Next Occurrence</th>
                   <th>Last Occurrence</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {recurringTransactions.map((transaction) => (
                   <tr
                     key={transaction._id}
-                    className={!transaction.isActive ? "opacity-60" : ""}
+                    className={!transaction.isActive ? "opacity-50" : ""}
                   >
                     <td className="capitalize flex items-center gap-1">
                       <span>{typeIcon(transaction.type)}</span>
@@ -143,6 +187,85 @@ const RecurringTransaction = () => {
                             transaction.lastOccurrence
                           ).toLocaleDateString()
                         : "N/A"}
+                    </td>
+                    <td>
+                      <div className="flex flex-row gap-1">
+                        {transaction.isActive ? (
+                          <div
+                            className="tooltip tooltip-info tooltip-left"
+                            data-tip="Pause"
+                          >
+                            <button
+                              className="btn btn-xs"
+                              aria-label="Pause transaction"
+                              disabled={actionLoading[transaction._id]}
+                              onClick={() => {
+                                updateTransactionState(transaction, "pause");
+                              }}
+                            >
+                              {/* Pause SVG */}
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="size-6"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M14.25 9v6m-4.5 0V9M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        ) : (
+                          <div
+                            className="tooltip tooltip-primary tooltip-left"
+                            data-tip="Resume"
+                          >
+                            <button
+                              className="btn btn-xs"
+                              aria-label="Resume transaction"
+                              disabled={actionLoading[transaction._id]}
+                              onClick={() => {
+                                updateTransactionState(transaction, "resume");
+                              }}
+                            >
+                              {/* Resume SVG */}
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="size-6"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
+
+                        {/* <div
+                          className="tooltip tooltip-error tooltip-left"
+                          data-tip="Delete"
+                        >
+                          <button
+                            className="btn btn-xs"
+                            aria-label="Delete transaction"
+                            disabled={actionLoading[transaction._id]}
+                            onClick={() => handleDelete(transaction)}
+                          >
+                            <svg ...>...</svg>
+                          </button>
+                        </div> */}
+                      </div>
                     </td>
                   </tr>
                 ))}
