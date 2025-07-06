@@ -1,4 +1,3 @@
-import React from "react";
 import Body from "./Body";
 import { Provider } from "react-redux";
 import appStore from "../utils/redux/appStore";
