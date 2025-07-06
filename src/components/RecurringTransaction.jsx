@@ -33,7 +33,11 @@ const RecurringTransaction = () => {
         if (!response.ok)
           throw new Error("Failed to fetch recurring transactions");
         const data = await response.json();
-        setRecurringTransactions(data.data || []);
+        setRecurringTransactions(
+          data.data.sort(
+            (a, b) => new Date(a.nextOccurrence) - new Date(b.nextOccurrence)
+          ) || []
+        );
         setPagination(data.pagination || {});
         if (data?.message) toast.success(data.message);
       } catch (err) {
