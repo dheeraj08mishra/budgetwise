@@ -212,18 +212,27 @@ const RecentTransactionsList = ({ calledFrom }) => {
                         </div>
                         <div>
                           <h4 className="font-medium text-sm sm:text-base">
-                            {t.note || "No Note"}{" "}
-                            <span className="text-xs text-gray-400">
-                              ({t.category})
-                            </span>
+                            {t.note || "No Note"}
+                            <span className="text-xs">({t.category})</span>
                           </h4>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs">
                             {new Date(t.date).toLocaleDateString("en-US", {
                               weekday: "short",
                               year: "numeric",
                               month: "short",
                               day: "numeric",
                             })}
+                          </p>
+                          <p className="text-sm mt-2">
+                            {t.tags &&
+                              t.tags.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="badge badge-info badge-soft badge-sm mr-1 mb-1"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
                           </p>
                         </div>
                       </div>

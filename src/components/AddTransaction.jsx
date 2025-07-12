@@ -153,6 +153,25 @@ const AddTransaction = () => {
             );
             dispatch(setBalance(totalBalance + data.data.amount));
           }
+
+          // will add transaction tags
+
+          const tagResponse = await fetch(
+            BASE_URL + `/extractTags/${data.data._id}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include",
+            }
+          );
+
+          const tagData = await tagResponse.json();
+          if (tagData.ok) {
+            dispatch(addTransaction([...transactions, data.data]));
+          }
+
           toast.success(data.message || "Transaction added successfully!");
           resetForm();
           navigate("/");
