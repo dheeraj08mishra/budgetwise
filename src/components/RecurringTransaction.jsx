@@ -255,20 +255,6 @@ const RecurringTransaction = () => {
                             </button>
                           </div>
                         )}
-
-                        {/* <div
-                          className="tooltip tooltip-error tooltip-left"
-                          data-tip="Delete"
-                        >
-                          <button
-                            className="btn btn-xs"
-                            aria-label="Delete transaction"
-                            disabled={actionLoading[transaction._id]}
-                            onClick={() => handleDelete(transaction)}
-                          >
-                            <svg ...>...</svg>
-                          </button>
-                        </div> */}
                       </div>
                     </td>
                   </tr>
