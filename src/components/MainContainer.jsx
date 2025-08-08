@@ -35,7 +35,7 @@ const MainContainer = () => {
 
   const { totalIncome, totalExpense, totalBalance } = useMemo(() => {
     const income = transactions
-      .filter((t) => t.type === "income")
+      .filter((t) => t.type === "income" || t.type === "credit")
       .reduce((acc, t) => acc + t.amount, 0);
     const expense = transactions
       .filter((t) => t.type === "expense")

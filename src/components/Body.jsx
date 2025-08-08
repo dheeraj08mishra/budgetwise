@@ -6,6 +6,7 @@ import AddTransaction from "./AddTransaction";
 import Profile from "./Profile";
 import History from "./History";
 import RecurringTransaction from "./RecurringTransaction";
+import Goal from "./Goal";
 
 const Body = () => {
   const router = createBrowserRouter([
@@ -33,6 +34,10 @@ const Body = () => {
         {
           path: "recurring",
           element: <RecurringTransaction />,
+        },
+        {
+          path: "goals",
+          element: <Goal />,
         },
       ],
     },
