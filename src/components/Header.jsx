@@ -122,6 +122,12 @@ const Header = () => {
               className="py-2 flex items-center justify-between"
             >
               <span>🔁 Recurring</span>
+            </Link>
+          </li>
+
+          <li>
+            <Link to="/goals" className="py-2 items-center justify-between">
+              🎯 Goals
               <span className="badge badge-primary ml-2">New</span>
             </Link>
           </li>

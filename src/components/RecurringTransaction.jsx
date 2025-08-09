@@ -106,11 +106,38 @@ const RecurringTransaction = () => {
     }
   };
 
+  const syncRecurringTxnList = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/sync`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to sync recurring transactions");
+      }
+      const data = await response.json();
+      if (data?.message) {
+        toast.success(data.message);
+      }
+    } catch (err) {
+      toast.error("Failed to sync recurring transactions.");
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold mb-6 text-center">
-        Recurring Transactions
-      </h2>
+      <div className="flex justify-around items-center mb-4">
+        <h2 className="text-3xl font-bold mb-6 text-center">
+          Recurring Transactions
+        </h2>
+        <button
+          className="badge badge-secondary badge-xl cursor-pointer float-right"
+          onClick={syncRecurringTxnList}
+        >
+          Sync
+        </button>
+      </div>
       {loading ? (
         <div className="text-center py-10">Loading...</div>
       ) : recurringTransactions.length > 0 ? (
