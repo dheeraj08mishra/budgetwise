@@ -8,6 +8,8 @@ import { addTransaction } from "../utils/redux/transactionSlice";
 import { toast } from "react-hot-toast";
 import { setSalary } from "../utils/redux/budgetSlice";
 import { BASE_URL } from "../utils/constants";
+import InsightSummaryAreaChart from "./InsightSummaryAreaChart";
+import { setInsights } from "../utils/redux/insightSlice";
 
 // Map for month names to month numbers
 const monthsMap = {
@@ -30,7 +32,9 @@ const MainContainer = () => {
   const transactions = useSelector((store) => store.transaction.transactions);
 
   const [selectedValue, setSelectedValue] = useState("");
+  const [insightsValue, setInsightsValue] = useState("");
   const [records, setRecords] = useState([]);
+  const [insightRecords, setInsightRecords] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const { totalIncome, totalExpense, totalBalance } = useMemo(() => {
@@ -45,7 +49,7 @@ const MainContainer = () => {
       totalExpense: expense,
       totalBalance: income - expense,
     };
-  }, [transactions]);
+  }, [transactions.length]);
 
   useEffect(() => {
     const fetchMonthList = async () => {
@@ -66,6 +70,19 @@ const MainContainer = () => {
         }));
 
         setRecords(monthList);
+        const uniqueYears = [...new Set(data.data.map(({ year }) => year))];
+        const insightMonthList = uniqueYears.map((year) => ({
+          label: year,
+          value: year,
+        }));
+        const currentYear = new Date().getFullYear().toString();
+        setInsightsValue(
+          insightMonthList.find((opt) => opt.value === currentYear)?.value ||
+            insightMonthList[0]?.value ||
+            ""
+        );
+
+        setInsightRecords(insightMonthList);
         const now = new Date();
         const currentMonthLabel = `${now.toLocaleString("default", {
           month: "long",
@@ -171,9 +188,69 @@ const MainContainer = () => {
     fetchTransactions();
   }, [selectedValue, dispatch]);
 
+  useEffect(() => {
+    if (!insightsValue) return;
+    const fetchInsights = async (year) => {
+      try {
+        const res = await fetch(BASE_URL + "/insights/monthlySummary", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ year }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch insights");
+        }
+
+        const data = await res.json();
+        dispatch(setInsights(data.summary));
+      } catch (err) {
+        toast.error("Failed to load yearly insights.");
+        setInsights([]); // clear stale data
+      }
+    };
+
+    fetchInsights(insightsValue);
+  }, [dispatch, insightsValue]);
+
   return (
     <>
       <div className="flex flex-col items-center min-h-screen bg-base-200 text-base-content p-4 space-y-8">
+        <section className="w-full max-w-6xl">
+          <div>
+            <label className="label">
+              <span className="label-text text-sm font-semibold">
+                Select Year to view Insights Chart
+              </span>
+            </label>
+            <select
+              value={insightsValue}
+              onChange={(e) => setInsightsValue(e.target.value)}
+              disabled={isLoading}
+              className="select select-bordered select-neutral w-full rounded-xl"
+            >
+              {isLoading ? (
+                <option disabled>Loading...</option>
+              ) : insightRecords.length === 0 ? (
+                <option disabled>No Data Available</option>
+              ) : (
+                insightRecords.map((option, index) => (
+                  <option key={index} value={option.value}>
+                    {option.label}
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <span className="loading loading-spinner loading-lg"></span>
+            </div>
+          ) : (
+            <InsightSummaryAreaChart />
+          )}
+        </section>
         <section className="w-full max-w-6xl space-y-6 mx-auto">
           <div className="flex flex-col sm:flex-row md:flex-row justify-between items-stretch gap-6 mb-6">
             {/* Dropdown */}
