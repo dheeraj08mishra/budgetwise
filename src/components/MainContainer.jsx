@@ -9,7 +9,7 @@ import { toast } from "react-hot-toast";
 import { setSalary } from "../utils/redux/budgetSlice";
 import { BASE_URL } from "../utils/constants";
 import InsightSummaryAreaChart from "./InsightSummaryAreaChart";
-import { setInsights } from "../utils/redux/insightSlice";
+import { setInsights, setAnomalies } from "../utils/redux/insightSlice";
 
 // Map for month names to month numbers
 const monthsMap = {
@@ -35,6 +35,8 @@ const MainContainer = () => {
   const [insightsValue, setInsightsValue] = useState("");
   const [records, setRecords] = useState([]);
   const [insightRecords, setInsightRecords] = useState([]);
+  const [anomalyDetectionMethod, setAnomalyDetectionMethod] =
+    useState("previous");
   const [isLoading, setIsLoading] = useState(true);
 
   const { totalIncome, totalExpense, totalBalance } = useMemo(() => {
@@ -214,35 +216,81 @@ const MainContainer = () => {
     fetchInsights(insightsValue);
   }, [dispatch, insightsValue]);
 
+  useEffect(() => {
+    if (!anomalyDetectionMethod) return;
+    if (!insightsValue) return;
+    const fetchAnomalyData = async (method, insightsValue) => {
+      try {
+        const res = await fetch(BASE_URL + `/insights/anomalyDetection`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ method: method, year: insightsValue }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch anomaly data");
+        }
+
+        const data = await res.json();
+        dispatch(setAnomalies(data.anomalies));
+      } catch (err) {
+        toast.error("Failed to load anomaly data.");
+        dispatch(setAnomalies([])); // clear stale data
+      }
+    };
+
+    fetchAnomalyData(anomalyDetectionMethod, insightsValue);
+  }, [anomalyDetectionMethod, insightsValue, dispatch]);
+
   return (
     <>
       <div className="flex flex-col items-center min-h-screen bg-base-200 text-base-content p-4 space-y-8">
         <section className="w-full max-w-6xl">
-          <div>
-            <label className="label">
-              <span className="label-text text-sm font-semibold">
-                Select Year to view Insights Chart
-              </span>
-            </label>
-            <select
-              value={insightsValue}
-              onChange={(e) => setInsightsValue(e.target.value)}
-              disabled={isLoading}
-              className="select select-bordered select-neutral w-full rounded-xl"
-            >
-              {isLoading ? (
-                <option disabled>Loading...</option>
-              ) : insightRecords.length === 0 ? (
-                <option disabled>No Data Available</option>
-              ) : (
-                insightRecords.map((option, index) => (
-                  <option key={index} value={option.value}>
-                    {option.label}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
+          <section className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="label">
+                <span className="label-text text-sm font-semibold">
+                  Select Year to view Insights Chart
+                </span>
+              </label>
+              <select
+                value={insightsValue}
+                onChange={(e) => setInsightsValue(e.target.value)}
+                disabled={isLoading}
+                className="select select-bordered select-neutral w-full rounded-xl"
+              >
+                {isLoading ? (
+                  <option disabled>Loading...</option>
+                ) : insightRecords.length === 0 ? (
+                  <option disabled>No Data Available</option>
+                ) : (
+                  insightRecords.map((option, index) => (
+                    <option key={index} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+            <div>
+              <label className="label">
+                <span className="label-text text-sm font-semibold">
+                  Select method to view Anomaly Detection
+                </span>
+              </label>
+              <select
+                value={anomalyDetectionMethod}
+                onChange={(e) => setAnomalyDetectionMethod(e.target.value)}
+                disabled={isLoading}
+                className="select select-bordered select-neutral w-full rounded-xl"
+              >
+                <option value="previous">Previous Month Comparison</option>
+                <option value="rollingAvg">Rolling Average</option>
+                <option value="zScore">Z-Score</option>
+              </select>
+            </div>
+          </section>
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
               <span className="loading loading-spinner loading-lg"></span>

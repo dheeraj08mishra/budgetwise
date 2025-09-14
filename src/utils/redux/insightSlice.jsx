@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   insights: [],
+  anomalies: [],
 };
 
 const insightSlice = createSlice({
@@ -11,9 +12,12 @@ const insightSlice = createSlice({
     setInsights: (state, action) => {
       state.insights = action.payload;
     },
+    setAnomalies: (state, action) => {
+      state.anomalies = action.payload;
+    },
   },
 });
 
-export const { setInsights } = insightSlice.actions;
+export const { setInsights, setAnomalies } = insightSlice.actions;
 
 export default insightSlice.reducer;
