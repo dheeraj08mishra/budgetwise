@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "parcel src/index.html",
-    "build": "parcel build src/index.html --dist-dir build --public-url ./",
+    "build": "parcel build src/index.html --dist-dir build --public-url /",
     "deploy": "npm run build && firebase deploy"
   },
   "keywords": [],
