@@ -79,3 +79,5 @@ jest.config.js
 .env
 .codeprocessor
 build/
+# local-only notes (server details)
+*.local.md
