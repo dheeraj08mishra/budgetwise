@@ -9,24 +9,23 @@ This repo is the **React frontend**. The API lives in [finance_tracker_server](h
 ## ✨ Features
 
 - **Accounts**: sign up / log in with an httpOnly session cookie
-- **Transactions**: add, edit, delete; notes are auto-tagged (OpenAI)
-- **Dashboard**: monthly balance, category pie chart, budget bars, day-wise spending trend
+- **Transactions**: add, edit, delete (with confirmation); search, filter by category and date, sort; grouped by day; notes are auto-tagged (OpenAI)
+- **Dashboard**: month at a glance (left, income, spending, saved vs last month), daily spending, 50/30/20 budget guide, category breakdown, upcoming payments, goals
 - **Insights**: income vs spending by month with anomaly detection (previous month, rolling average or z-score)
 - **Recurring transactions**: daily / weekly / monthly / yearly, with pause, resume and sync; email reminders
 - **Goals**: save towards a target; contributions are tracked as savings
-- **History**: search by note, filter by category and date range, sort, paginate
 - **Export** a month to Excel
-- Light / dark theme, responsive layout
+- Light / dark theme (follows your OS by default), desktop sidebar and mobile tab bar
 
 ## 🔧 Tech stack
 
 | | |
 |---|---|
-| UI | React 19, React Router 7, Tailwind CSS 4 + daisyUI 5, Framer Motion |
+| UI | React 19, React Router 7, Tailwind CSS 4 + daisyUI 5 (custom light/dark themes), Lucide icons, Inter |
 | State | Redux Toolkit |
 | Charts | Recharts |
 | Dates | date-fns |
-| Bundler | Parcel 2 |
+| Build | Vite 6 |
 
 ## 🛠️ Running locally
 
@@ -38,44 +37,36 @@ cd budgetwise
 npm install
 
 # API on port 3000 (default):
-npm start
+npm run dev
 
 # API on another port:
-API_URL=http://localhost:3001 npm start
+API_PROXY_TARGET=http://localhost:3001 npm run dev
 ```
 
-Open http://localhost:1234.
+Open http://localhost:1234. The dev server proxies `/api` to the Express server, the same way nginx does in production, so the app never needs CORS or a hard-coded API URL.
 
 ## 📦 Production build
 
 ```bash
 npm run build      # outputs to build/
+npm run preview    # serve the build locally (also proxies /api)
 ```
 
-In production the app calls the API at `/api` on the same domain (nginx proxies `/api` to the Express server). Set `API_URL` at build time to point somewhere else.
+In production the app calls the API at `/api` on the same domain (nginx proxies `/api` to the Express server). Set `VITE_API_URL` at build time to call an API elsewhere.
 
 ## 📁 Project layout
 
 ```
+index.html          entry page
 src/
-  components/     pages and UI pieces (Dashboard = MainContainer)
+  main.jsx          bootstraps React, theme and font
+  index.css         Tailwind + the two daisyUI themes (bw-light, bw-dark)
+  pages/            one lazily loaded file per route
+  components/       app shell, shared UI kit (ui.jsx), transaction list, charts/
   utils/
-    redux/        store and slices
-    constants.js  API base URL
-    dates.js      local "today" and UTC-safe date display
-  index.html, index.js, index.css
+    api.js          fetch wrapper (errors, expired sessions)
+    format.js       ₹ formatting
+    categories.js   category labels, icons, colours
+    dates.js        local "today" and UTC-safe date display
+    redux/          store and slices
 ```
-
-## 📸 Screenshots
-
-### Home
-![image](https://github.com/user-attachments/assets/e608f611-307a-488a-ae26-23103cefbde8)
-![image](https://github.com/user-attachments/assets/63fc38b0-9739-40c2-83c9-160564cd76bd)
-![image](https://github.com/user-attachments/assets/a8106ae0-36a3-4606-9de5-e290286e9566)
-
-### Add transaction
-![image](https://github.com/user-attachments/assets/06cb6d3a-9c9c-4eb1-a79f-9586c1c30b28)
-![image](https://github.com/user-attachments/assets/8eb2ae51-8d94-4763-ae76-7571d49a5101)
-
-### Login
-![image](https://github.com/user-attachments/assets/5e851466-3d8e-4319-b4d7-b05a3d40a882)
