@@ -1,2 +1,3 @@
 export const BASE_URL =
-  location.hostname === "localhost" ? "http://localhost:3000" : "/api";
+  process.env.API_URL ||
+  (location.hostname === "localhost" ? "http://localhost:3000" : "/api");
