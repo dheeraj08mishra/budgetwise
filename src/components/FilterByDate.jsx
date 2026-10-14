@@ -1,4 +1,5 @@
 import React from "react";
+import { todayString } from "../utils/dates";
 
 const FilterByDate = ({ fromDate, setFromDate, toDate, setToDate }) => {
   return (
@@ -25,7 +26,7 @@ const FilterByDate = ({ fromDate, setFromDate, toDate, setToDate }) => {
           className="input input-bordered input-neutral w-full rounded-xl"
           value={toDate}
           min={fromDate}
-          max={new Date().toISOString().split("T")[0]}
+          max={todayString()}
           onChange={(e) => setToDate(e.target.value)}
         />
       </div>

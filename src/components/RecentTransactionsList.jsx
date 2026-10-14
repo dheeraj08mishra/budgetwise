@@ -17,6 +17,7 @@ import {
   format,
   parseISO,
 } from "date-fns";
+import { todayString } from "../utils/dates";
 
 const RecentTransactionsList = ({ calledFrom }) => {
   const dispatch = useDispatch();
@@ -336,7 +337,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
                 value={form.date}
                 min={format(startOfMonth(new Date()), "yyyy-MM-dd")}
                 max={format(
-                  new Date().toISOString().slice(0, 10),
+                  todayString(),
                   "yyyy-MM-dd"
                 )}
                 onChange={(e) =>

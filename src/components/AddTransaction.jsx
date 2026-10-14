@@ -23,15 +23,13 @@ import {
   format,
   parseISO,
 } from "date-fns";
-const getTodayUTCDateString = () => {
-  return new Date().toISOString().slice(0, 10);
-};
+import { todayString } from "../utils/dates";
 
 const AddTransaction = () => {
   const [type, setType] = useState("expense");
   const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState("need");
-  const [date, setDate] = useState(getTodayUTCDateString());
+  const [date, setDate] = useState(todayString());
   const [note, setNote] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
   const [frequency, setFrequency] = useState("");
@@ -191,7 +189,7 @@ const AddTransaction = () => {
     setType("expense");
     setAmount(0);
     setCategory("need");
-    setDate(getTodayUTCDateString());
+    setDate(todayString());
     setNote("");
   };
 
@@ -321,7 +319,7 @@ const AddTransaction = () => {
               className="input input-neutral w-full rounded-xl"
               value={date}
               min={firstOfMonth}
-              max={getTodayUTCDateString()}
+              max={todayString()}
               onChange={(e) => setDate(e.target.value)}
               disabled={loading}
             />

@@ -94,16 +94,16 @@ const Goal = () => {
           body: JSON.stringify({ addAmount: Number(amount) }),
         }
       );
-      if (!response.ok) throw new Error("Failed to add amount");
       const data = await response.json();
+      if (!response.ok) {
+        toast.error(data.error || data.message || "Failed to add amount.");
+        return;
+      }
       toast.success(data.message);
+      // Use the server's goal: it caps the contribution at the target
       dispatch(
         setGoals(
-          goals.map((goal) =>
-            goal._id === activeGoal._id
-              ? { ...goal, currentAmount: goal.currentAmount + Number(amount) }
-              : goal
-          )
+          goals.map((goal) => (goal._id === activeGoal._id ? data.goal : goal))
         )
       );
       closeModal();

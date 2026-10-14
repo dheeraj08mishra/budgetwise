@@ -9,6 +9,7 @@ import FilterByDate from "./FilterByDate";
 import SortingFilter from "./SortingFilter";
 import { BASE_URL } from "../utils/constants";
 import Tags from "./Tags";
+import { todayString } from "../utils/dates";
 const debounce = (func, delay) => {
   let timeoutId;
   return (...args) => {
@@ -23,7 +24,7 @@ const History = () => {
   const [category, setCategory] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState(new Date().toISOString().split("T")[0]); // Default to today
+  const [toDate, setToDate] = useState(todayString()); // Default to today
   const [sortBy, setSortBy] = useState("");
   const dispatch = useDispatch();
   const [tags, setTags] = useState([]);
