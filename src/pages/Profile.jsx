@@ -197,7 +197,7 @@ export default function Profile() {
               </select>
             </Field>
             <div className="sm:col-span-2">
-              <Field label="Photo URL" hint="Link to an image (https://…). Without one, your initials are shown." error={errors.photo} htmlFor="p-photo">
+              <Field label="Photo URL" hint="Link to an image (https://…). Leave empty to show your initials." error={errors.photo} htmlFor="p-photo">
                 <input id="p-photo" type="url" className={`input w-full ${errors.photo ? "input-error" : ""}`} placeholder="https://…" value={form.photo} onChange={set("photo")} />
               </Field>
             </div>
