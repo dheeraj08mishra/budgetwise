@@ -1,10 +1,4 @@
-// API base URL.
-// - API_URL at build time wins (e.g. API_URL=http://localhost:3001)
-// - production build: same origin, nginx proxies /api to the server
-// - development: the API on port 3000 of whatever host served the page
-//   (works for localhost, 127.0.0.1 and LAN IPs alike)
-export const BASE_URL =
-  process.env.API_URL ||
-  (process.env.NODE_ENV === "production"
-    ? "/api"
-    : `${location.protocol}//${location.hostname}:3000`);
+// API base URL. The app always calls /api on its own origin: nginx proxies
+// it in production, the Vite dev server proxies it in development.
+// VITE_API_URL overrides it (e.g. to call a remote API directly).
+export const BASE_URL = import.meta.env.VITE_API_URL || "/api";
