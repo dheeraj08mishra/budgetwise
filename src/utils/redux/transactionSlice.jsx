@@ -13,6 +13,12 @@ const transactionSlice = createSlice({
     addRecurringTransaction: (state, action) => {
       state.recurringTransactions = action.payload;
     },
+    // "Load more": add the next page, skipping rows already shown (a row
+    // added elsewhere in the meantime shifts positions by one)
+    appendTransactions: (state, action) => {
+      const seen = new Set(state.transactions.map((t) => t._id));
+      state.transactions.push(...action.payload.filter((t) => !seen.has(t._id)));
+    },
     removeTransaction: (state, action) => {
       state.transactions = state.transactions.filter(
         (transaction) => transaction._id !== action.payload._id
@@ -42,5 +48,6 @@ export const {
   setTotalTransactions,
   removeAllTransactions,
   addRecurringTransaction,
+  appendTransactions,
 } = transactionSlice.actions;
 export default transactionSlice.reducer;

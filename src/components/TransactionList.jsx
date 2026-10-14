@@ -65,7 +65,7 @@ export const TransactionRow = ({ txn, onEdit, onDelete, showDate = false }) => {
   );
 };
 
-function EditModal({ txn, onClose }) {
+function EditModal({ txn, onClose, onChanged }) {
   const dispatch = useDispatch();
   const isGoal = txn.category === "goal";
   const [form, setForm] = useState({
@@ -91,6 +91,7 @@ function EditModal({ txn, onClose }) {
     setSaving(false);
     if (!ok) return toast.error(error);
     dispatch(updateTransaction(data.data));
+    onChanged?.(txn, data.data);
     toast.success("Transaction updated");
     onClose();
   };
@@ -173,7 +174,9 @@ export const sortTransactions = (list, order = "newest") => {
 };
 
 // Groups consecutive same-day rows and handles edit + confirmed delete
-export default function TransactionList({ transactions, groupByDay = true, limit, order = "newest" }) {
+// onChanged(before, after) fires after an edit (after = updated row) or a
+// delete (after = null), so a parent can keep its own totals in sync.
+export default function TransactionList({ transactions, groupByDay = true, limit, order = "newest", onChanged }) {
   const dispatch = useDispatch();
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
@@ -188,6 +191,7 @@ export default function TransactionList({ transactions, groupByDay = true, limit
     setBusy(false);
     if (!ok) return toast.error(error);
     dispatch(removeTransaction(deleting));
+    onChanged?.(deleting, null);
     toast.success("Transaction deleted");
     setDeleting(null);
   };
@@ -223,7 +227,7 @@ export default function TransactionList({ transactions, groupByDay = true, limit
         })}
       </div>
 
-      {editing && <EditModal txn={editing} onClose={() => setEditing(null)} />}
+      {editing && <EditModal txn={editing} onClose={() => setEditing(null)} onChanged={onChanged} />}
       <ConfirmDialog
         open={!!deleting}
         title="Delete transaction?"

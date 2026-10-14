@@ -2,15 +2,96 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Mail, Phone, ShieldCheck, LogOut } from "lucide-react";
+import { Mail, Phone, ShieldCheck, LogOut, KeyRound, Eye, EyeOff } from "lucide-react";
 import { updateProfile, logout } from "../utils/redux/profileSlice";
 import { removeAllTransactions } from "../utils/redux/transactionSlice";
 import { api } from "../utils/api";
 import { capitalize } from "../utils/format";
-import { Card, CardHeader, PageHeader, Field } from "../components/ui";
+import { Card, CardHeader, PageHeader, Field, Modal } from "../components/ui";
+import PasswordStrength, { isStrongPassword } from "../components/PasswordStrength";
 import { Avatar } from "../components/AppShell";
 
 const NAME_RE = /^[a-zA-Z ]{3,20}$/;
+
+function ChangePasswordModal({ open, onClose }) {
+  const empty = { current: "", next: "", confirm: "" };
+  const [form, setForm] = useState(empty);
+  const [show, setShow] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const close = () => {
+    setForm(empty);
+    setErrors({});
+    setShow(false);
+    onClose();
+  };
+
+  const submit = async (ev) => {
+    ev.preventDefault();
+    const e = {};
+    if (!form.current) e.current = "Enter your current password.";
+    if (!isStrongPassword(form.next)) e.next = "Doesn't meet all the rules below.";
+    else if (form.next !== form.next.trim()) e.next = "Can't start or end with a space.";
+    else if (form.next === form.current) e.next = "Must be different from the current password.";
+    if (form.confirm !== form.next) e.confirm = "Passwords don't match.";
+    setErrors(e);
+    if (Object.keys(e).length) return;
+
+    setSaving(true);
+    const { ok, status, data, error } = await api("/user/password", {
+      method: "PATCH",
+      body: { currentPassword: form.current, newPassword: form.next },
+    });
+    setSaving(false);
+    if (!ok) {
+      if (status === 403) return setErrors({ current: error });
+      // 400s are about the new password (rules, reuse of a recent one)
+      if (status === 400) return setErrors({ next: error });
+      return toast.error(error);
+    }
+    toast.success(data.message);
+    close();
+  };
+
+  const type = show ? "text" : "password";
+  return (
+    <Modal
+      open={open}
+      onClose={close}
+      title="Change password"
+      footer={
+        <>
+          <button className="btn btn-ghost" onClick={close}>Cancel</button>
+          <button className="btn btn-primary" form="change-password" disabled={saving}>
+            {saving && <span className="loading loading-spinner loading-sm" />}
+            Change password
+          </button>
+        </>
+      }
+    >
+      <form id="change-password" onSubmit={submit} className="flex flex-col gap-4" noValidate>
+        <Field label="Current password" error={errors.current} htmlFor="pw-current">
+          <input id="pw-current" type={type} autoComplete="current-password" className={`input w-full ${errors.current ? "input-error" : ""}`} value={form.current} onChange={set("current")} />
+        </Field>
+        <Field label="New password" hint="Can't be one of your last 3 passwords." error={errors.next} htmlFor="pw-new">
+          <label className={`input w-full ${errors.next ? "input-error" : ""}`}>
+            <input id="pw-new" type={type} autoComplete="new-password" value={form.next} onChange={set("next")} />
+            <button type="button" className="text-base-content/50 hover:text-base-content" onClick={() => setShow((v) => !v)} aria-label={show ? "Hide passwords" : "Show passwords"}>
+              {show ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </label>
+          <PasswordStrength password={form.next} />
+        </Field>
+        <Field label="Confirm new password" error={errors.confirm} htmlFor="pw-confirm">
+          <input id="pw-confirm" type={type} autoComplete="new-password" className={`input w-full ${errors.confirm ? "input-error" : ""}`} value={form.confirm} onChange={set("confirm")} />
+        </Field>
+        <p className="text-xs text-base-content/55">You'll stay signed in here. Every other device is signed out.</p>
+      </form>
+    </Modal>
+  );
+}
 
 export default function Profile() {
   const user = useSelector((s) => s.profile.currentUser);
@@ -25,6 +106,7 @@ export default function Profile() {
   });
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const validate = () => {
@@ -84,6 +166,9 @@ export default function Profile() {
                 <ShieldCheck size={18} className="mt-0.5 shrink-0 text-success" />
                 Your session is kept in a secure, http-only cookie and ends automatically after a day.
               </p>
+              <button className="btn btn-sm w-full" onClick={() => setChangingPassword(true)}>
+                <KeyRound size={16} /> Change password
+              </button>
               <button className="btn btn-outline btn-error btn-sm w-full" onClick={signOut}>
                 <LogOut size={16} /> Sign out
               </button>
@@ -125,6 +210,7 @@ export default function Profile() {
           </form>
         </Card>
       </div>
+      <ChangePasswordModal open={changingPassword} onClose={() => setChangingPassword(false)} />
     </div>
   );
 }

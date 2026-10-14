@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { Search, Plus, Inbox, X } from "lucide-react";
-import { addTransaction } from "../utils/redux/transactionSlice";
+import { addTransaction, appendTransactions } from "../utils/redux/transactionSlice";
 import { api } from "../utils/api";
 import { EXPENSE_CATEGORIES, CATEGORIES, isIncome } from "../utils/categories";
 import { money } from "../utils/format";
 import { todayString } from "../utils/dates";
 import { Card, PageHeader, EmptyState, Skeleton } from "../components/ui";
-import TransactionList, { sortTransactions } from "../components/TransactionList";
+import TransactionList from "../components/TransactionList";
 
 const PAGE = 25;
 const SORTS = [
@@ -18,6 +18,7 @@ const SORTS = [
   { value: "highestToLowest", label: "Highest amount" },
   { value: "lowestToHighest", label: "Lowest amount" },
 ];
+const signed = (t) => (isIncome(t) ? t.amount : -t.amount);
 
 export default function Transactions() {
   const dispatch = useDispatch();
@@ -28,39 +29,63 @@ export default function Transactions() {
   const [toDate, setToDate] = useState("");
   const [sort, setSort] = useState("");
   const [loading, setLoading] = useState(true);
-  const [shown, setShown] = useState(PAGE);
+  const [loadingMore, setLoadingMore] = useState(false);
+  // Totals for everything that matches, not just the loaded rows
+  const [total, setTotal] = useState(0);
+  const [net, setNet] = useState(0);
 
   const filtersActive = query || category || fromDate || toDate || sort;
 
-  // Debounced fetch whenever a filter changes
+  const params = (offset) => {
+    const p = new URLSearchParams({ limit: PAGE, offset });
+    if (query.trim()) p.set("note", query.trim());
+    if (category) p.set("category", category);
+    if (fromDate) p.set("fromDate", fromDate);
+    if (toDate) p.set("toDate", toDate);
+    if (sort) p.set("sort", sort);
+    return p;
+  };
+
+  // First page whenever a filter changes (debounced while typing)
   useEffect(() => {
     let alive = true;
     const t = setTimeout(async () => {
-      setLoading(true);
       const note = query.trim();
       if (note && !/^[a-zA-Z0-9\s]+$/.test(note)) {
-        setLoading(false);
         return toast.error("Search supports letters, numbers and spaces.", { id: "search" });
       }
-      const params = new URLSearchParams();
-      if (note) params.set("note", note);
-      if (category) params.set("category", category);
-      if (fromDate) params.set("fromDate", fromDate);
-      if (toDate) params.set("toDate", toDate);
-      if (sort) params.set("sort", sort);
-      const path = params.toString() ? `/filter?${params}` : "/user/transactions";
-      const { ok, data, error } = await api(path);
+      setLoading(true);
+      const { ok, data, error } = await api(`/filter?${params(0)}`);
       if (!alive) return;
       if (!ok) toast.error(error, { id: "filter" });
       dispatch(addTransaction(ok ? data.data.transactions : []));
-      setShown(PAGE);
+      setTotal(ok ? data.pagination.totalTransactions : 0);
+      setNet(ok ? data.pagination.net : 0);
       setLoading(false);
     }, 300);
     return () => {
       alive = false;
       clearTimeout(t);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, category, fromDate, toDate, sort, dispatch]);
+
+  const loadMore = async () => {
+    setLoadingMore(true);
+    // offset = rows on screen, so deletes don't make the next page skip one
+    const { ok, data, error } = await api(`/filter?${params(transactions.length)}`);
+    setLoadingMore(false);
+    if (!ok) return toast.error(error);
+    dispatch(appendTransactions(data.data.transactions));
+    setTotal(data.pagination.totalTransactions);
+    setNet(data.pagination.net);
+  };
+
+  // Keep count and net exact after an edit or delete, without refetching
+  const onChanged = (before, after) => {
+    setNet((n) => n - signed(before) + (after ? signed(after) : 0));
+    if (!after) setTotal((c) => c - 1);
+  };
 
   const clear = () => {
     setQuery("");
@@ -70,11 +95,9 @@ export default function Transactions() {
     setSort("");
   };
 
-  const net = transactions.reduce((s, t) => s + (isIncome(t) ? t.amount : -t.amount), 0);
-  // Date orders are grouped by day; amount sorts keep the server order, flat.
-  // Sort before paging so "Show more" continues in the same order.
-  const order = !sort ? "newest" : sort === "oldestToNewest" ? "oldest" : "server";
-  const visible = sortTransactions(transactions, order).slice(0, shown);
+  // Date orders are grouped by day; amount sorts are a flat list
+  const grouped = !sort || sort === "oldestToNewest";
+  const remaining = total - transactions.length;
 
   return (
     <div>
@@ -104,8 +127,8 @@ export default function Transactions() {
           <span className="text-base-content/60">
             {loading ? "Loading…" : (
               <>
-                <span className="font-medium text-base-content">{transactions.length}</span> transaction{transactions.length === 1 ? "" : "s"}
-                {transactions.length > 0 && <> · net <span className={`num font-medium ${net >= 0 ? "text-success" : "text-error"}`}>{net >= 0 ? "+" : "−"}{money(Math.abs(net))}</span></>}
+                <span className="font-medium text-base-content">{total}</span> transaction{total === 1 ? "" : "s"}
+                {total > 0 && <> · net <span className={`num font-medium ${net >= 0 ? "text-success" : "text-error"}`}>{net >= 0 ? "+" : "−"}{money(Math.abs(net), { exact: true })}</span></>}
               </>
             )}
           </span>
@@ -127,11 +150,13 @@ export default function Transactions() {
           />
         ) : (
           <>
-            <TransactionList transactions={visible} groupByDay={order !== "server"} order="server" />
-            {shown < transactions.length && (
+            {/* The server already sorted these; keep its order */}
+            <TransactionList transactions={transactions} groupByDay={grouped} order="server" onChanged={onChanged} />
+            {remaining > 0 && (
               <div className="border-t border-base-300 p-4 text-center">
-                <button className="btn btn-sm" onClick={() => setShown((n) => n + PAGE)}>
-                  Show more ({transactions.length - shown} left)
+                <button className="btn btn-sm" onClick={loadMore} disabled={loadingMore}>
+                  {loadingMore && <span className="loading loading-spinner loading-xs" />}
+                  Load more ({remaining} left)
                 </button>
               </div>
             )}
