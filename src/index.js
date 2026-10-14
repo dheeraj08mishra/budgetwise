@@ -3,9 +3,10 @@ import { createRoot } from "react-dom/client";
 import App from "./components/App";
 
 const container = document.getElementById("root");
-const root = createRoot(container); // createRoot(container!) if you use TypeScript
+const root = createRoot(container);
+// StrictMode (development only) double-runs effects to surface bugs
 root.render(
-  // <React.StrictMode>
-  <App />
-  // </React.StrictMode>
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
 );

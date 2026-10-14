@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Only the two themes the header toggle switches between */
 @plugin "daisyui" {
-    themes: all;
+    themes: light, dark --default;
 }

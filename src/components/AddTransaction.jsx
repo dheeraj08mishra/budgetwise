@@ -1,33 +1,12 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addTransaction,
-  addRecurringTransaction,
-  setTotalTransactions,
-} from "../utils/redux/transactionSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-
-import {
-  setSalary,
-  setTotalExpenseAmount,
-  setTotalIncomeAmount,
-  setBalance,
-} from "../utils/redux/budgetSlice";
 import { BASE_URL } from "../utils/constants";
-import {
-  isAfter,
-  isBefore,
-  startOfMonth,
-  endOfDay,
-  format,
-  parseISO,
-} from "date-fns";
-import { todayString } from "../utils/dates";
+import { todayString, firstOfMonthString } from "../utils/dates";
 
 const AddTransaction = () => {
   const [type, setType] = useState("expense");
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("need");
   const [date, setDate] = useState(todayString());
   const [note, setNote] = useState("");
@@ -35,24 +14,8 @@ const AddTransaction = () => {
   const [frequency, setFrequency] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const transactions = useSelector((store) => store.transaction.transactions);
-  const recurringTransactions = useSelector(
-    (store) => store.transaction.recurringTransactions
-  );
-  const user = useSelector((store) => store.profile);
-  const totalExpenseAmount = useSelector(
-    (store) => store.budget.totalExpenseAmount
-  );
-  const totalIncomeAmount = useSelector(
-    (store) => store.budget.totalIncomeAmount
-  );
-  const totalBalance = useSelector((store) => store.budget.balance);
-
-  const today = new Date();
-  const firstOfMonthDate = startOfMonth(today);
-  const firstOfMonth = format(firstOfMonthDate, "yyyy-MM-dd");
+  const firstOfMonth = firstOfMonthString();
 
   const checkFieldsValues = () => {
     if (!type || !category || !date) {
@@ -67,130 +30,75 @@ const AddTransaction = () => {
       toast.error("Amount cannot exceed 1,000,000.");
       return false;
     }
-
-    const dateValue = parseISO(date);
-    const todayValue = endOfDay(today);
-    const firstOfMonthValue = startOfMonth(today);
-
-    if (isAfter(dateValue, todayValue)) {
+    // "YYYY-MM-DD" strings compare correctly as text
+    if (date > todayString()) {
       toast.error("Date cannot be in the future.");
       return false;
     }
-    if (isBefore(dateValue, firstOfMonthValue)) {
+    if (date < firstOfMonth) {
       toast.error("Date must be within the current month.");
       return false;
     }
-
     if (isRecurring && !frequency) {
       toast.error("Please select a frequency for recurring transactions.");
       return false;
     }
-
-    return { type, amount, category, date, note, isRecurring, frequency };
+    return true;
   };
 
-  const addTransactionList = async (e) => {
+  const addTransactionList = async () => {
     if (loading) return; // Prevent double submission
+    if (!checkFieldsValues()) return;
     setLoading(true);
 
-    const values = checkFieldsValues();
-    if (values === false) {
-      setLoading(false);
-      return;
-    }
-
-    const { type, amount, category, date, note, isRecurring, frequency } =
-      values;
-
-    if (user) {
-      const payload = {
-        userId: user._id,
-        type,
-        amount: parseFloat(amount).toFixed(2),
-        category,
-        date,
-        note,
-        isRecurring,
-        frequency,
-      };
-
-      try {
-        const response = await fetch(BASE_URL + "/user/addTransaction", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-          credentials: "include",
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          dispatch(addTransaction([...transactions, data.data]));
-          if (isRecurring) {
-            dispatch(
-              addRecurringTransaction([
-                ...recurringTransactions,
-                data.recurring,
-              ])
-            );
-          }
-          dispatch(setTotalTransactions(transactions.length + 1));
-          if (data.data.type === "income") {
-            dispatch(setSalary(data.data.amount));
-          }
-          if (data.data.type === "expense") {
-            dispatch(
-              setTotalExpenseAmount(totalExpenseAmount + data.data.amount)
-            );
-            dispatch(setBalance(totalBalance - data.data.amount));
-          }
-          if (data.data.type === "income") {
-            dispatch(
-              setTotalIncomeAmount(totalIncomeAmount + data.data.amount)
-            );
-            dispatch(setBalance(totalBalance + data.data.amount));
-          }
-
-          // will add transaction tags
-
-          const tagResponse = await fetch(
-            BASE_URL + `/extractTags/${data.data._id}`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              credentials: "include",
-            }
-          );
-
-          const tagData = await tagResponse.json();
-          if (tagData.ok) {
-            dispatch(addTransaction([...transactions, data.data]));
-          }
-
-          toast.success(data.message || "Transaction added successfully!");
-          resetForm();
-          navigate("/");
-        } else {
-          toast.error(data.message || "Failed to add transaction.");
-        }
-      } catch (error) {
-        toast.error("Failed to add transaction. Please try again.");
+    try {
+      const response = await fetch(BASE_URL + "/user/addTransaction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          amount: Number(parseFloat(amount).toFixed(2)),
+          category,
+          date,
+          note,
+          isRecurring,
+          ...(isRecurring && { frequency }),
+        }),
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        toast.error(data.message || "Failed to add transaction.");
+        return;
       }
-    } else {
-      toast.error("User not authenticated. Please log in.");
+
+      // Tagging calls OpenAI and can be slow: run it in the background.
+      // The dashboard reloads the month when we navigate back.
+      if (note.trim()) {
+        fetch(BASE_URL + `/extractTags/${data.data._id}`, {
+          method: "POST",
+          credentials: "include",
+        }).catch(() => {});
+      }
+
+      toast.success(data.message || "Transaction added successfully!");
+      resetForm();
+      navigate("/");
+    } catch (error) {
+      toast.error("Failed to add transaction. Please try again.");
+    } finally {
+      setLoading(false); // Re-enable button after request completes
     }
-    setLoading(false); // Re-enable button after request completes
   };
 
   const resetForm = () => {
     setType("expense");
-    setAmount(0);
+    setAmount("");
     setCategory("need");
     setDate(todayString());
     setNote("");
+    setIsRecurring(false);
+    setFrequency("");
   };
 
   const updateRecurring = () => {

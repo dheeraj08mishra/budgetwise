@@ -11,7 +11,6 @@ const Profile = () => {
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [phone, setPhone] = useState(user?.phoneNumber || "");
   const [photo, setPhoto] = useState(user?.photo || "");
-  const [age, setAge] = useState(user?.age || "");
   const [gender, setGender] = useState(user?.gender || "");
   const dispatch = useDispatch();
 
@@ -38,7 +37,6 @@ const Profile = () => {
       lastName,
       phoneNumber: phone,
       photo,
-      age,
       gender: gender ? gender.toLowerCase() : "male",
       email: user.email,
     };
@@ -97,16 +95,6 @@ const Profile = () => {
             disabled
             className="input input-bordered input-neutral w-full rounded-2xl"
           />
-          {/* <label className="label">Age</label>
-          <input
-            type="number"
-            className="input input-bordered input-neutral w-full rounded-2xl"
-            placeholder="Age"
-            value={age}
-            max={100}
-            min={0}
-            onChange={(e) => setAge(e.target.value)}
-          /> */}
           <label className="label">
             <span className="label-text">Gender</span>
           </label>
@@ -170,8 +158,6 @@ const Profile = () => {
                 <span className="truncate">{user?.email}</span>
                 <span className="font-semibold text-right">Phone:</span>
                 <span>{phone}</span>
-                {/* <span className="font-semibold text-right">Age:</span> */}
-                {/* <span>{age}</span> */}
                 <span className="font-semibold text-right">Gender:</span>
                 <span className="capitalize">{gender}</span>
               </div>

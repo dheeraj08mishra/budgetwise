@@ -51,7 +51,7 @@ const MainContainer = () => {
       totalExpense: expense,
       totalBalance: income - expense,
     };
-  }, [transactions.length]);
+  }, [transactions]); // recompute on edits too, not only when the count changes
 
   useEffect(() => {
     const fetchMonthList = async () => {
@@ -177,11 +177,11 @@ const MainContainer = () => {
 
         const data = await res.json();
         dispatch(addTransaction(data.data.transactions));
-        const salary =
-          data.data.transactions.find(
-            (record) => record.type === "income" && record.category === "other"
-          )?.amount || 0;
-        dispatch(setSalary(salary));
+        // Budget percentages are measured against the month's total income
+        const monthIncome = data.data.transactions
+          .filter((t) => t.type === "income" || t.type === "credit")
+          .reduce((sum, t) => sum + t.amount, 0);
+        dispatch(setSalary(monthIncome));
       } catch (err) {
         toast.error("Failed to fetch transactions. Please try again.");
       }
@@ -209,7 +209,7 @@ const MainContainer = () => {
         dispatch(setInsights(data.summary));
       } catch (err) {
         toast.error("Failed to load yearly insights.");
-        setInsights([]); // clear stale data
+        dispatch(setInsights([])); // clear stale data
       }
     };
 

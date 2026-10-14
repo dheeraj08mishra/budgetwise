@@ -1,10 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// `salary` = total income of the month shown on the dashboard; budget
+// percentages are measured against it.
 const initialState = {
   salary: 0,
-  totalExpenseAmount: 0,
-  totalIncomeAmount: 0,
-  balance: 0,
 };
 
 const budgetSlice = createSlice({
@@ -14,27 +13,12 @@ const budgetSlice = createSlice({
     setSalary: (state, action) => {
       state.salary = action.payload;
     },
-    setBalance: (state, action) => {
-      state.balance = action.payload;
-    },
-    setTotalExpenseAmount: (state, action) => {
-      state.totalExpenseAmount = action.payload;
-    },
-    setTotalIncomeAmount: (state, action) => {
-      state.totalIncomeAmount = action.payload;
-    },
     resetSalary: (state) => {
       state.salary = 0;
     },
   },
 });
 
-export const {
-  setSalary,
-  resetSalary,
-  setBalance,
-  setTotalExpenseAmount,
-  setTotalIncomeAmount,
-} = budgetSlice.actions;
+export const { setSalary, resetSalary } = budgetSlice.actions;
 
 export default budgetSlice.reducer;

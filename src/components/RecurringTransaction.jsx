@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { BASE_URL } from "../utils/constants";
+import { formatDay } from "../utils/dates";
 
 const PAGE_SIZE = 10;
 
@@ -17,6 +18,8 @@ const RecurringTransaction = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState({});
+  const [refreshKey, setRefreshKey] = useState(0); // bump to reload the list
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     const fetchRecurringTransactions = async () => {
@@ -33,13 +36,9 @@ const RecurringTransaction = () => {
         if (!response.ok)
           throw new Error("Failed to fetch recurring transactions");
         const data = await response.json();
-        setRecurringTransactions(
-          data.data.sort(
-            (a, b) => new Date(a.nextOccurrence) - new Date(b.nextOccurrence)
-          ) || []
-        );
+        // Server order: active first, then by next date
+        setRecurringTransactions(data.data || []);
         setPagination(data.pagination || {});
-        if (data?.message) toast.success(data.message);
       } catch (err) {
         toast.error("Could not fetch recurring transactions.");
       } finally {
@@ -47,7 +46,7 @@ const RecurringTransaction = () => {
       }
     };
     fetchRecurringTransactions();
-  }, [page]);
+  }, [page, refreshKey]);
 
   const typeIcon = (type) => {
     switch (type) {
@@ -85,8 +84,11 @@ const RecurringTransaction = () => {
           credentials: "include",
         }
       );
-      if (!response.ok) throw new Error(`Failed to ${event} transaction`);
       const data = await response.json();
+      if (!response.ok) {
+        toast.error(data.error || `Failed to ${event} transaction.`);
+        return;
+      }
       setRecurringTransactions((prev) =>
         prev.map((t) =>
           t._id === transaction._id
@@ -107,6 +109,8 @@ const RecurringTransaction = () => {
   };
 
   const syncRecurringTxnList = async () => {
+    if (syncing) return;
+    setSyncing(true);
     try {
       const response = await fetch(`${BASE_URL}/sync`, {
         method: "POST",
@@ -120,8 +124,11 @@ const RecurringTransaction = () => {
       if (data?.message) {
         toast.success(data.message);
       }
+      setRefreshKey((k) => k + 1); // show updated next dates
     } catch (err) {
       toast.error("Failed to sync recurring transactions.");
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -134,8 +141,9 @@ const RecurringTransaction = () => {
         <button
           className="badge badge-secondary badge-xl cursor-pointer float-right"
           onClick={syncRecurringTxnList}
+          disabled={syncing}
         >
-          Sync
+          {syncing ? "Syncing..." : "Sync"}
         </button>
       </div>
       {loading ? (
@@ -197,26 +205,22 @@ const RecurringTransaction = () => {
                           transaction.isActive ? "badge-success" : "badge-error"
                         }`}
                       >
-                        {transaction.isActive ? "Active" : "Inactive"}
+                        {transaction.isActive ? "Active" : "Paused"}
                       </span>
                     </td>
                     <td>
                       {transaction.startDate
-                        ? new Date(transaction.startDate).toLocaleDateString()
+                        ? formatDay(transaction.startDate)
                         : "N/A"}
                     </td>
                     <td>
                       {transaction.nextOccurrence
-                        ? new Date(
-                            transaction.nextOccurrence
-                          ).toLocaleDateString()
+                        ? formatDay(transaction.nextOccurrence)
                         : "N/A"}
                     </td>
                     <td>
                       {transaction.lastOccurrence
-                        ? new Date(
-                            transaction.lastOccurrence
-                          ).toLocaleDateString()
+                        ? formatDay(transaction.lastOccurrence)
                         : "N/A"}
                     </td>
                     <td>

@@ -26,7 +26,7 @@ const Budget = () => {
       other = 0;
 
     transactions.forEach((transaction) => {
-      if (transaction.userId === user._id && transaction.type === "expense") {
+      if (transaction.type === "expense") {
         if (transaction.category === "need") need += transaction.amount;
         else if (transaction.category === "want") want += transaction.amount;
         else if (transaction.category === "investment")
@@ -52,7 +52,7 @@ const Budget = () => {
     setWantSpent(Math.round((want / salary) * 100));
     setInvestmentSpent(Math.round((investment / salary) * 100));
     setOtherSpent(Math.round((other / salary) * 100));
-  }, [transactions]);
+  }, [transactions, salary, user]);
 
   if (transactions.length === 0) {
     return (
@@ -76,14 +76,14 @@ const Budget = () => {
     return (
       <div className="card bg-base-100 shadow-md p-6">
         <p className="text-lg text-center text-base-content">
-          Please set your salary to track budget progress.
+          Add this month's income to track budget progress.
         </p>
         <div className="flex justify-center mt-4">
           <button
             className="btn btn-primary rounded-full px-6"
             onClick={() => navigate("/transactions")}
           >
-            Add Salary
+            Add Income
           </button>
         </div>
       </div>

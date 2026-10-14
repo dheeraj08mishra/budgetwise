@@ -9,7 +9,7 @@ import {
   Legend,
 } from "recharts";
 import { useSelector } from "react-redux";
-import dayjs from "dayjs";
+import { dayKey, formatDay } from "../utils/dates";
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -31,24 +31,22 @@ const CustomTooltip = ({ active, payload, label }) => {
 const BarChartTrends = () => {
   const transactions = useSelector((store) => store.transaction.transactions);
 
+  // Daily expense totals, sorted by the real date (not the "Oct 5" label)
   const data = useMemo(() => {
     const grouped = {};
     for (const t of transactions) {
-      if (!t || t.type === "income") continue;
-      const date = dayjs(t.date).format("MMM D");
-      if (!grouped[date])
-        grouped[date] = {
+      if (!t || t.type !== "expense") continue;
+      const key = dayKey(t.date);
+      if (!grouped[key]) {
+        grouped[key] = {
+          key,
           amount: 0,
-          date,
-          type: t.type,
-          category: t.category,
-          note: t.note,
+          date: formatDay(t.date, { year: undefined }),
         };
-      grouped[date].amount += t.amount;
+      }
+      grouped[key].amount += t.amount;
     }
-    return Object.values(grouped).sort((a, b) =>
-      dayjs(a.date, "MMM D").diff(dayjs(b.date, "MMM D"))
-    );
+    return Object.values(grouped).sort((a, b) => a.key.localeCompare(b.key));
   }, [transactions]);
 
   const minBars = 5;

@@ -72,11 +72,12 @@ const Login = () => {
         return;
       }
 
-      if (
-        !validator.isAlpha(firstNameInput) ||
-        !validator.isAlpha(lastNameInput)
-      ) {
-        errorWithCooldown("Names must contain only letters.");
+      // Same rules as the server: 3-20 letters, spaces allowed
+      const validName = (name) =>
+        validator.isLength(name.trim(), { min: 3, max: 20 }) &&
+        validator.isAlpha(name.trim(), "en-US", { ignore: " " });
+      if (!validName(firstNameInput) || !validName(lastNameInput)) {
+        errorWithCooldown("Names must be 3-20 letters (spaces allowed).");
         return;
       }
 
@@ -96,19 +97,7 @@ const Login = () => {
       password: passwordInput,
       phoneNumber: phoneInput,
     };
-    if (
-      !validator.isStrongPassword(passwordInput, {
-        minLength: 8,
-        minLowercase: 1,
-        minUppercase: 1,
-        minNumbers: 1,
-        minSymbols: 1,
-      })
-    ) {
-      errorWithCooldown("Invalid Password ");
-      return;
-    }
-
+    // Strength rules apply when creating a password, not when logging in
     try {
       const url = signUp ? BASE_URL + "/signup" : BASE_URL + "/login";
       const res = await fetch(url, {

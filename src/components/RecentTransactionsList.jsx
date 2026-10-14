@@ -10,14 +10,11 @@ import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import {
-  isAfter,
-  isBefore,
-  startOfMonth,
-  endOfDay,
-  format,
-  parseISO,
-} from "date-fns";
-import { todayString } from "../utils/dates";
+  todayString,
+  dayKey,
+  formatDay,
+  firstOfMonthString,
+} from "../utils/dates";
 
 const RecentTransactionsList = ({ calledFrom }) => {
   const dispatch = useDispatch();
@@ -48,9 +45,14 @@ const RecentTransactionsList = ({ calledFrom }) => {
           (currentPage - 1) * recordPerPages,
           currentPage * recordPerPages
         )
-      : transactions
-          .slice(0, 10)
-          .sort((a, b) => new Date(b.createAt) - new Date(a.createdAt));
+      : // Newest first by transaction date, then by when it was added
+        [...transactions]
+          .sort(
+            (a, b) =>
+              dayKey(b.date).localeCompare(dayKey(a.date)) ||
+              new Date(b.createdAt) - new Date(a.createdAt)
+          )
+          .slice(0, 10);
   const nextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage((prev) => Math.min(prev + 1, totalPages));
@@ -69,7 +71,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
       type: transaction.type,
       amount: transaction.amount,
       category: transaction.category,
-      date: format(new Date(transaction.date), "yyyy-MM-dd"),
+      date: dayKey(transaction.date),
       note: transaction.note || "",
     });
   };
@@ -82,7 +84,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
   const updateTransactionCall = async () => {
     const { type, amount, category, date, note } = form;
 
-    if (amount === "" || parseFloat(amount) <= 0) {
+    if (amount === "" || !(parseFloat(amount) > 0)) {
       toast.error("Amount must be a positive number.");
       return;
     }
@@ -90,12 +92,12 @@ const RecentTransactionsList = ({ calledFrom }) => {
       toast.error("Amount cannot exceed ₹1,000,000.");
       return;
     }
-
-    if (isAfter(parseISO(date), endOfDay(new Date()))) {
+    // "YYYY-MM-DD" strings compare correctly as text
+    if (date > todayString()) {
       toast.error("Date cannot be in the future.");
       return;
     }
-    if (isBefore(parseISO(date), startOfMonth(new Date()))) {
+    if (date < firstOfMonthString()) {
       toast.error("Date must be within the current month.");
       return;
     }
@@ -155,7 +157,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
             <h3 className="text-lg sm:text-xl font-bold">
               {calledFrom !== "history"
                 ? "📄 Recent 10 Transactions"
-                : "📋 All Transactions"}
+                : `📋 Transactions (${transactions.length})`}
             </h3>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
@@ -217,12 +219,7 @@ const RecentTransactionsList = ({ calledFrom }) => {
                             <span className="text-xs">({t.category})</span>
                           </h4>
                           <p className="text-xs">
-                            {new Date(t.date).toLocaleDateString("en-US", {
-                              weekday: "short",
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            })}
+                            {formatDay(t.date, { weekday: "short" })}
                           </p>
                           <p className="text-sm mt-2">
                             {t.tags &&
@@ -308,7 +305,8 @@ const RecentTransactionsList = ({ calledFrom }) => {
                   const value = e.target.value;
                   if (
                     value === "" ||
-                    (/^\d+$/.test(value) && Number(value) <= 1000000)
+                    (/^\d+(\.\d{0,2})?$/.test(value) &&
+                      Number(value) <= 1000000)
                   ) {
                     setForm((prev) => ({ ...prev, amount: value }));
                   }
@@ -335,11 +333,8 @@ const RecentTransactionsList = ({ calledFrom }) => {
                 type="date"
                 className="input input-sm input-bordered w-full rounded-xl input-neutral outline-none"
                 value={form.date}
-                min={format(startOfMonth(new Date()), "yyyy-MM-dd")}
-                max={format(
-                  todayString(),
-                  "yyyy-MM-dd"
-                )}
+                min={firstOfMonthString()}
+                max={todayString()}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, date: e.target.value }))
                 }

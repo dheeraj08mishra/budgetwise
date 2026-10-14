@@ -8,7 +8,6 @@ import { useDispatch } from "react-redux";
 import FilterByDate from "./FilterByDate";
 import SortingFilter from "./SortingFilter";
 import { BASE_URL } from "../utils/constants";
-import Tags from "./Tags";
 import { todayString } from "../utils/dates";
 const debounce = (func, delay) => {
   let timeoutId;
@@ -61,7 +60,6 @@ const History = () => {
         });
         const data = await response.json();
         if (response.ok) {
-          toast.success(`Found ${data.data.transactions.length} transactions`);
           dispatch(addTransaction(data.data.transactions));
         } else {
           toast.error(data.message || "Failed to fetch transactions");
