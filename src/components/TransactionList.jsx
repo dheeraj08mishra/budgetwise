@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { Pencil, Trash2, Repeat } from "lucide-react";
@@ -21,6 +21,7 @@ import {
   firstOfMonthString,
 } from "../utils/dates";
 import { ConfirmDialog, Modal, Field, Segmented } from "./ui";
+import TagEditor from "./TagEditor";
 import { sortTransactions } from "../utils/transactions";
 
 export { sortTransactions };
@@ -38,7 +39,13 @@ export const CategoryIcon = ({ txn, size = "size-10" }) => {
   );
 };
 
-export const TransactionRow = ({ txn, onEdit, onDelete, showDate = false }) => {
+export const TransactionRow = ({
+  txn,
+  onEdit,
+  onDelete,
+  onTagClick,
+  showDate = false,
+}) => {
   const income = isIncome(txn);
   const meta = categoryMeta(txn);
   return (
@@ -58,14 +65,26 @@ export const TransactionRow = ({ txn, onEdit, onDelete, showDate = false }) => {
         <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-base-content/55">
           <span>{meta.label}</span>
           {showDate && <span>· {formatDay(txn.date)}</span>}
-          {txn.tags?.slice(0, 3).map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full bg-base-200 px-2 py-0.5 text-[11px] text-base-content/60"
-            >
-              {tag}
-            </span>
-          ))}
+          {txn.tags?.slice(0, 3).map((tag) =>
+            onTagClick ? (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => onTagClick(tag)}
+                className="rounded-full bg-base-200 px-2 py-0.5 text-[11px] text-base-content/60 hover:bg-primary/10 hover:text-primary"
+                aria-label={`Show transactions tagged ${tag}`}
+              >
+                {tag}
+              </button>
+            ) : (
+              <span
+                key={tag}
+                className="rounded-full bg-base-200 px-2 py-0.5 text-[11px] text-base-content/60"
+              >
+                {tag}
+              </span>
+            )
+          )}
         </p>
       </div>
       <p
@@ -100,38 +119,76 @@ export const TransactionRow = ({ txn, onEdit, onDelete, showDate = false }) => {
   );
 };
 
+const sameTags = (a = [], b = []) =>
+  a.length === b.length && a.every((t, i) => t === b[i]);
+
 function EditModal({ txn, onClose, onChanged }) {
   const dispatch = useDispatch();
   const isGoal = txn.category === "goal";
-  const [form, setForm] = useState({
+  // Money fields are editable this month only; tags can always change
+  const pastMonth = dayKey(txn.date) < firstOfMonthString();
+  const original = {
     type: txn.type === "credit" ? "income" : txn.type,
     amount: String(txn.amount),
     category: txn.category,
     date: dayKey(txn.date),
     note: txn.note || "",
-  });
+  };
+  const [form, setForm] = useState(original);
+  const [tags, setTags] = useState(txn.tags || []);
+  const [suggestions, setSuggestions] = useState([]);
   const [saving, setSaving] = useState(false);
   const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
 
+  useEffect(() => {
+    api("/allTags").then(({ ok, data }) => ok && setSuggestions(data.data));
+  }, []);
+
   const save = async () => {
-    const amount = parseFloat(form.amount);
-    if (!(amount > 0)) return toast.error("Amount must be a positive number.");
-    if (form.date > todayString())
-      return toast.error("Date can't be in the future.");
-    if (form.date < firstOfMonthString())
-      return toast.error("Only this month's transactions can be edited.");
+    const fieldsChanged =
+      !pastMonth && Object.keys(original).some((k) => form[k] !== original[k]);
+    const tagsChanged = !sameTags(tags, txn.tags || []);
+    if (!fieldsChanged && !tagsChanged) return onClose();
+
+    let latest = txn;
     setSaving(true);
-    const { ok, data, error } = await api(
-      `/user/update/transaction/${txn._id}`,
-      {
+    if (fieldsChanged) {
+      const amount = parseFloat(form.amount);
+      const problem = !(amount > 0)
+        ? "Amount must be a positive number."
+        : form.date > todayString()
+          ? "Date can't be in the future."
+          : form.date < firstOfMonthString()
+            ? "Only this month's transactions can be edited."
+            : null;
+      if (problem) {
+        setSaving(false);
+        return toast.error(problem);
+      }
+      const r = await api(`/user/update/transaction/${txn._id}`, {
         method: "PATCH",
         body: { ...form, amount: Math.round(amount * 100) / 100 },
+      });
+      if (!r.ok) {
+        setSaving(false);
+        return toast.error(r.error);
       }
-    );
+      latest = r.data.data;
+    }
+    if (tagsChanged) {
+      const r = await api(`/user/transaction/${txn._id}/tags`, {
+        method: "PATCH",
+        body: { tags },
+      });
+      if (!r.ok) {
+        setSaving(false);
+        return toast.error(r.error);
+      }
+      latest = r.data.data;
+    }
     setSaving(false);
-    if (!ok) return toast.error(error);
-    dispatch(updateTransaction(data.data));
-    onChanged?.(txn, data.data);
+    dispatch(updateTransaction(latest));
+    onChanged?.(txn, latest);
     toast.success("Transaction updated");
     onClose();
   };
@@ -154,71 +211,90 @@ function EditModal({ txn, onClose, onChanged }) {
       }
     >
       <div className="flex flex-col gap-4">
-        {!isGoal && (
-          <Segmented
-            label="Type"
-            options={[
-              { value: "expense", label: "Expense" },
-              { value: "income", label: "Income" },
-            ]}
-            value={form.type}
-            onChange={set("type")}
-          />
+        {pastMonth && (
+          <p className="rounded-field bg-base-200 px-3 py-2 text-xs text-base-content/70">
+            This is from a past month, so only its tags can be changed.
+          </p>
         )}
-        <Field label="Amount" htmlFor="edit-amount">
-          <label className="input w-full">
-            <span className="text-base-content/50">₹</span>
-            <input
-              id="edit-amount"
-              type="text"
-              inputMode="decimal"
-              className="num"
-              value={form.amount}
-              onChange={(e) =>
-                /^\d*(\.\d{0,2})?$/.test(e.target.value) &&
-                set("amount")(e.target.value)
-              }
+        <fieldset disabled={pastMonth} className="flex flex-col gap-4">
+          {!isGoal && (
+            <Segmented
+              label="Type"
+              options={[
+                { value: "expense", label: "Expense" },
+                { value: "income", label: "Income" },
+              ]}
+              value={form.type}
+              onChange={set("type")}
             />
-          </label>
-        </Field>
-        {!isGoal && form.type === "expense" && (
-          <Field label="Category" htmlFor="edit-category">
-            <select
-              id="edit-category"
-              className="select w-full"
-              value={form.category}
-              onChange={(e) => set("category")(e.target.value)}
-            >
-              {EXPENSE_CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {CATEGORIES[c].label}
-                </option>
-              ))}
-            </select>
+          )}
+          <Field label="Amount" htmlFor="edit-amount">
+            <label className="input w-full">
+              <span className="text-base-content/50">₹</span>
+              <input
+                id="edit-amount"
+                type="text"
+                inputMode="decimal"
+                className="num"
+                value={form.amount}
+                onChange={(e) =>
+                  /^\d*(\.\d{0,2})?$/.test(e.target.value) &&
+                  set("amount")(e.target.value)
+                }
+              />
+            </label>
           </Field>
-        )}
-        <Field
-          label="Date"
-          hint="Transactions from this month can be edited"
-          htmlFor="edit-date"
-        >
-          <input
-            id="edit-date"
-            type="date"
-            className="input w-full"
-            value={form.date}
-            min={firstOfMonthString()}
-            max={todayString()}
-            onChange={(e) => set("date")(e.target.value)}
-          />
-        </Field>
-        <Field label="Note" htmlFor="edit-note">
-          <input
-            id="edit-note"
-            className="input w-full"
-            maxLength={200}
-            value={form.note}
-            onChange={(e) => set("note")(e.target.value)}
+          {!isGoal && form.type === "expense" && (
+            <Field label="Category" htmlFor="edit-category">
+              <select
+                id="edit-category"
+                className="select w-full"
+                value={form.category}
+                onChange={(e) => set("category")(e.target.value)}
+              >
+                {EXPENSE_CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {CATEGORIES[c].label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          )}
+          <Field
+            label="Date"
+            hint={
+              pastMonth
+                ? undefined
+                : "Transactions from this month can be edited"
+            }
+            htmlFor="edit-date"
+          >
+            <input
+              id="edit-date"
+              type="date"
+              className="input w-full"
+              value={form.date}
+              min={pastMonth ? undefined : firstOfMonthString()}
+              max={todayString()}
+              onChange={(e) => set("date")(e.target.value)}
+            />
+          </Field>
+          <Field label="Note" htmlFor="edit-note">
+            <input
+              id="edit-note"
+              className="input w-full"
+              maxLength={200}
+              value={form.note}
+              onChange={(e) => set("note")(e.target.value)}
+            />
+          </Field>
+        </fieldset>
+        <Field label="Tags" htmlFor="edit-tags">
+          <TagEditor
+            id="edit-tags"
+            tags={tags}
+            onChange={setTags}
+            suggestions={suggestions}
           />
         </Field>
       </div>
@@ -235,6 +311,7 @@ export default function TransactionList({
   limit,
   order = "newest",
   onChanged,
+  onTagClick,
 }) {
   const dispatch = useDispatch();
   const [editing, setEditing] = useState(null);
@@ -295,6 +372,7 @@ export default function TransactionList({
                 <TransactionRow
                   key={txn._id}
                   txn={txn}
+                  onTagClick={onTagClick}
                   onEdit={setEditing}
                   onDelete={setDeleting}
                   showDate={!groupByDay}

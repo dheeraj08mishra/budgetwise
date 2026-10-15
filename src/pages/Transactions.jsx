@@ -31,13 +31,21 @@ export default function Transactions() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [sort, setSort] = useState("");
+  const [tag, setTag] = useState("");
+  const [allTags, setAllTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   // Totals for everything that matches, not just the loaded rows
   const [total, setTotal] = useState(0);
   const [net, setNet] = useState(0);
 
-  const filtersActive = query || category || fromDate || toDate || sort;
+  const filtersActive = query || category || fromDate || toDate || sort || tag;
+
+  // Tag choices for the filter; refreshed after any edit (tags may change)
+  const [tagsVersion, setTagsVersion] = useState(0);
+  useEffect(() => {
+    api("/allTags").then(({ ok, data }) => ok && setAllTags(data.data));
+  }, [tagsVersion]);
 
   const params = (offset) => {
     const p = new URLSearchParams({ limit: PAGE, offset });
@@ -46,6 +54,7 @@ export default function Transactions() {
     if (fromDate) p.set("fromDate", fromDate);
     if (toDate) p.set("toDate", toDate);
     if (sort) p.set("sort", sort);
+    if (tag) p.set("tag", tag);
     return p;
   };
 
@@ -73,7 +82,7 @@ export default function Transactions() {
       clearTimeout(t);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, category, fromDate, toDate, sort, dispatch]);
+  }, [query, category, fromDate, toDate, sort, tag, dispatch]);
 
   const loadMore = async () => {
     setLoadingMore(true);
@@ -90,6 +99,7 @@ export default function Transactions() {
 
   // Keep count and net exact after an edit or delete, without refetching
   const onChanged = (before, after) => {
+    setTagsVersion((v) => v + 1);
     setNet((n) => n - signed(before) + (after ? signed(after) : 0));
     if (!after) setTotal((c) => c - 1);
   };
@@ -100,6 +110,7 @@ export default function Transactions() {
     setFromDate("");
     setToDate("");
     setSort("");
+    setTag("");
   };
 
   // Date orders are grouped by day; amount sorts are a flat list
@@ -119,7 +130,7 @@ export default function Transactions() {
       />
 
       <Card className="mb-4 p-4">
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto_auto_auto_auto]">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto_auto] xl:grid-cols-[1fr_auto_auto_auto_auto_auto]">
           <label className="input w-full">
             <Search size={16} className="text-base-content/40" />
             <input
@@ -141,6 +152,19 @@ export default function Transactions() {
             {EXPENSE_CATEGORIES.map((c) => (
               <option key={c} value={c}>
                 {CATEGORIES[c].label}
+              </option>
+            ))}
+          </select>
+          <select
+            className="select"
+            value={tag}
+            onChange={(e) => setTag(e.target.value)}
+            aria-label="Tag"
+          >
+            <option value="">All tags</option>
+            {[...new Set([...allTags, ...(tag ? [tag] : [])])].map((t) => (
+              <option key={t} value={t}>
+                #{t}
               </option>
             ))}
           </select>
@@ -243,6 +267,10 @@ export default function Transactions() {
               groupByDay={grouped}
               order="server"
               onChanged={onChanged}
+              onTagClick={(t) => {
+                setTag(t);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
             />
             {remaining > 0 && (
               <div className="border-t border-base-300 p-4 text-center">

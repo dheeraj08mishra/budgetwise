@@ -194,6 +194,55 @@ await step("deleting from a paged list keeps the count exact", async () => {
   if (t2 !== total - 1) throw new Error(`${total} -> ${t2}`);
 });
 
+await step(
+  "tags: add one in the edit dialog, then filter by clicking it",
+  async () => {
+    await page.goto(APP + "/transactions", { waitUntil: "networkidle" });
+    await clickText("button", /^Edit Electricity bill$/);
+    await waitText(/Edit transaction/);
+    await page.fill("#edit-tags", "bills to check");
+    await page.keyboard.press("Enter");
+    await clickText("button", /^Save changes$/);
+    await waitText(/Transaction updated/);
+    await clickText("button", /^Show transactions tagged bills to check$/);
+    await waitText(/^[\s\S]*\b1 transaction\b/);
+    const tagFilter = await page.$eval(
+      'select[aria-label="Tag"]',
+      (s) => s.value
+    );
+    if (tagFilter !== "bills to check")
+      throw new Error(`tag filter is "${tagFilter}"`);
+    await clickText("button", /Clear filters/);
+  }
+);
+
+await step("past months: only tags can be edited", async () => {
+  const d = new Date();
+  const lastOfPrev = new Date(
+    d.getFullYear(),
+    d.getMonth(),
+    0
+  ).toLocaleDateString("en-CA");
+  await page.goto(APP + "/transactions", { waitUntil: "networkidle" });
+  await page.fill('input[aria-label="To date"]', lastOfPrev);
+  await wait(800);
+  await page.evaluate(() =>
+    document.querySelector('button[aria-label^="Edit "]').click()
+  );
+  await waitText(/only its tags can be changed/);
+  // a <fieldset disabled> locks its inputs without setting .disabled on them
+  if (!(await page.$eval("#edit-amount", (i) => i.matches(":disabled"))))
+    throw new Error("amount editable");
+  await page.fill("#edit-tags", "archive");
+  await page.keyboard.press("Enter");
+  await clickText("button", /^Save changes$/);
+  await waitText(/Transaction updated/);
+  await clickText("button", /Clear filters/);
+  await page.selectOption('select[aria-label="Tag"]', "archive");
+  await waitText(/^[\s\S]*\b1 transaction\b/);
+  await clickText("button", /Clear filters/);
+});
+
 await step("Escape closes a dialog", async () => {
   await page.goto(APP + "/goals", { waitUntil: "networkidle" });
   await clickText("button", /^New goal$/);

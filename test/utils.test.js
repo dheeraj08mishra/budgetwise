@@ -135,3 +135,16 @@ test("frequency labels and monthly amounts", async () => {
     433
   );
 });
+
+test("tags: same rules as the server", async () => {
+  const { normalizeTag, isValidTag, MAX_TAGS } =
+    await import("../src/utils/tags.js");
+  assert.equal(normalizeTag("  Eating   Out "), "eating out");
+  assert.equal(isValidTag("food"), true);
+  assert.equal(isValidTag("dal & roti"), true);
+  assert.equal(isValidTag("दिवाली"), true, "any language");
+  assert.equal(isValidTag("-dash"), false);
+  assert.equal(isValidTag("<b>"), false);
+  assert.equal(isValidTag("x".repeat(21)), false);
+  assert.equal(MAX_TAGS, 10);
+});
