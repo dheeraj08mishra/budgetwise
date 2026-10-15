@@ -20,6 +20,7 @@ import PasswordStrength, {
   isStrongPassword,
 } from "../components/PasswordStrength";
 import { Avatar } from "../components/AppShell";
+import NotificationSettings from "../components/NotificationSettings";
 
 const NAME_RE = /^[a-zA-Z ]{3,20}$/;
 
@@ -261,6 +262,7 @@ export default function Profile() {
               </button>
             </div>
           </Card>
+          <NotificationSettings />
         </div>
 
         <Card className="lg:col-span-2">

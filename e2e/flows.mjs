@@ -268,6 +268,32 @@ await step(
   }
 );
 
+await step(
+  "email settings on Profile persist; the budget alert was emailed",
+  async () => {
+    await page.goto(APP + "/profile", { waitUntil: "networkidle" });
+    await waitText(/Email notifications/);
+    const box = 'input[aria-label="Monthly summary"]';
+    if (!(await page.isChecked(box))) throw new Error("should start on");
+    await page.click(box);
+    await waitText(/Turned off/);
+    await page.reload({ waitUntil: "networkidle" });
+    if (await page.isChecked(box)) throw new Error("setting not saved");
+    await page.click(box); // back on
+    await waitText(/Turned on/);
+
+    if (process.env.E2E_SERVER_LOG) {
+      const log = readFileSync(process.env.E2E_SERVER_LOG, "utf8");
+      if (
+        !/\[EMAIL\] to=demo@budgetwise\.app subject="You're over your Wants budget/.test(
+          log
+        )
+      )
+        throw new Error("over-budget email not found in the server log");
+    }
+  }
+);
+
 await step("Escape closes a dialog", async () => {
   await page.goto(APP + "/goals", { waitUntil: "networkidle" });
   await clickText("button", /^New goal$/);
