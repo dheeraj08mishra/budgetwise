@@ -544,6 +544,13 @@ await step(
     await page.click(radio("Theme", "Match system"));
     if (await page.evaluate(() => localStorage.getItem("theme")))
       throw new Error("system choice should clear the saved theme");
+    // and it survives a reload (loading the page must not save a theme)
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForSelector(
+      radio("Theme", "Match system") + '[aria-checked="true"]'
+    );
+    if (await page.evaluate(() => localStorage.getItem("theme")))
+      throw new Error("page load saved a theme");
 
     // put the demo back
     await page.click(radio("Default category", "Needs"));

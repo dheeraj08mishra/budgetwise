@@ -33,6 +33,11 @@ const show = (theme) => {
   window.dispatchEvent(new CustomEvent(EVENT, { detail: theme }));
 };
 
+// On page load: show the chosen (or OS) theme without saving anything,
+// so "Match system" stays "Match system"
+export const startTheme = () =>
+  document.documentElement.setAttribute("data-theme", initialTheme());
+
 // Shows and saves an explicit theme (the light/dark toggle)
 export function applyTheme(theme) {
   try {
