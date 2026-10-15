@@ -48,40 +48,40 @@ Sizes: **S** = a day or two · **M** = about a week · **L** = two weeks or more
 
 ### v2 Phase 1 list (core improvements)
 
-| Feature                                     | Your list | Real status | Notes                                                                                                                                                |
-| ------------------------------------------- | --------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Backend date validation fix                 | done      | ✅          | Timezone-safe; IST users can add "today" after midnight                                                                                              |
-| Date validation with an npm date library    | done      | ✅          | date-fns on both sides                                                                                                                               |
-| Export to Excel                             | done      | ✅          | Dashboard → Export, per month                                                                                                                        |
-| Debounced search                            | done      | ✅          | 300 ms on Transactions                                                                                                                               |
-| Feedback form                               | done      | ✅          | "Send feedback" in the sidebar / account menu                                                                                                        |
-| Backend pagination / infinite scroll        | done      | ✅          | Server paging with "Load more"                                                                                                                       |
-| Email service (Amazon SES)                  | done      | ✅          | SES client and mailer set up                                                                                                                         |
-| Stop recurring transactions                 | done      | 🟡          | Pause / resume works. **Missing:** delete a rule, set an end date from the UI                                                                        |
-| Email notifications                         | done      | 🟡          | **Only** "payment due tomorrow" reminders. Overspending alerts and monthly summaries are **not built**                                               |
-| Recurring options (daily → yearly)          | done      | 🟡          | Daily, weekly, monthly, yearly only. **Biweekly, quarterly, half-yearly are not built**                                                              |
-| Footer component                            | done      | ⚠️          | Removed in the redesign (feedback moved to the sidebar)                                                                                              |
-| Social media links (GitHub, LinkedIn)       | done      | ⚠️          | Were in the footer, so also gone; needs a new home                                                                                                   |
-| Goal-based budgeting                        | pending   | ✅          | Goals page: targets, contributions, progress, completion                                                                                             |
-| Edit recurring transactions with validation | pending   | 🟡          | Editing the **first** transaction updates the rule's amount, category and note. **Missing:** editing frequency or dates, and skipping one occurrence |
-| Custom labels for transactions              | pending   | 🟡          | Tags exist (auto-tagged from the note by OpenAI) and show on rows. **Missing:** add or edit tags yourself, filter by tag                             |
-| Category budget warning notifications       | pending   | 🟡          | The budget guide turns amber when Needs or Wants go over the guideline. **Missing:** a budget per category, and alerts                               |
-| CSV / Excel import                          | pending   | ⬜          |                                                                                                                                                      |
-| Export to PDF                               | pending   | ⬜          |                                                                                                                                                      |
-| User settings panel                         | pending   | 🟡          | Profile and theme exist. **Missing:** notification settings, budgets, default category, currency                                                     |
-| Multi-user groundwork (shared wallets)      | pending   | ⬜          |                                                                                                                                                      |
-| Password-protected export                   | pending   | ⬜          | See section 4: the proposed password scheme isn't safe                                                                                               |
-| Admin role                                  | pending   | ⬜          | Only a commented-out "all feedback" route exists                                                                                                     |
+| Feature                                     | Your list | Real status | Notes                                                                                                                    |
+| ------------------------------------------- | --------- | ----------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Backend date validation fix                 | done      | ✅          | Timezone-safe; IST users can add "today" after midnight                                                                  |
+| Date validation with an npm date library    | done      | ✅          | date-fns on both sides                                                                                                   |
+| Export to Excel                             | done      | ✅          | Dashboard → Export, per month                                                                                            |
+| Debounced search                            | done      | ✅          | 300 ms on Transactions                                                                                                   |
+| Feedback form                               | done      | ✅          | "Send feedback" in the sidebar / account menu                                                                            |
+| Backend pagination / infinite scroll        | done      | ✅          | Server paging with "Load more"                                                                                           |
+| Email service (Amazon SES)                  | done      | ✅          | SES client and mailer set up                                                                                             |
+| Stop recurring transactions                 | done      | ✅          | Pause / resume, delete a series (past transactions kept), optional end date                                              |
+| Email notifications                         | done      | 🟡          | **Only** "payment due tomorrow" reminders. Overspending alerts and monthly summaries are **not built**                   |
+| Recurring options (daily → yearly)          | done      | ✅          | Daily, weekly, every 2 weeks, monthly, quarterly, every 6 months, yearly                                                 |
+| Footer component                            | done      | ✅          | Back on every page and the login screen                                                                                  |
+| Social media links (GitHub, LinkedIn)       | done      | ✅          | In the footer                                                                                                            |
+| Goal-based budgeting                        | pending   | ✅          | Goals page: targets, contributions, progress, completion                                                                 |
+| Edit recurring transactions with validation | pending   | ✅          | Edit amount, type, category, note, frequency, end date (future only, no back-fill); skip next payment                    |
+| Custom labels for transactions              | pending   | 🟡          | Tags exist (auto-tagged from the note by OpenAI) and show on rows. **Missing:** add or edit tags yourself, filter by tag |
+| Category budget warning notifications       | pending   | 🟡          | The budget guide turns amber when Needs or Wants go over the guideline. **Missing:** a budget per category, and alerts   |
+| CSV / Excel import                          | pending   | ⬜          |                                                                                                                          |
+| Export to PDF                               | pending   | ⬜          |                                                                                                                          |
+| User settings panel                         | pending   | 🟡          | Profile and theme exist. **Missing:** notification settings, budgets, default category, currency                         |
+| Multi-user groundwork (shared wallets)      | pending   | ⬜          |                                                                                                                          |
+| Password-protected export                   | pending   | ⬜          | See section 4: the proposed password scheme isn't safe                                                                   |
+| Admin role                                  | pending   | ⬜          | Only a commented-out "all feedback" route exists                                                                         |
 
 ### v2 Phase 2 list (intelligence and insights)
 
-| Feature                         | Real status | Notes                                                                                                              |
-| ------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------ |
-| Yearly dashboard + compare      | 🟡          | Insights page shows a full year by month. **Missing:** year-vs-year compare                                        |
-| Smart trend advisor (spikes)    | 🟡          | Spike/drop detection with 3 methods and plain-language alerts. **Missing:** suggestions ("dining is up 40%, try…") |
-| Recurring transaction dashboard | 🟡          | Recurring page: list, monthly in/out totals, pause, resume, sync. **Missing:** skip once, edit, delete             |
-| Savings forecasting             | ⬜          |                                                                                                                    |
-| Insights module (premium)       | ⬜          | Needs a pricing decision first                                                                                     |
+| Feature                         | Real status | Notes                                                                                                                                              |
+| ------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Yearly dashboard + compare      | 🟡          | Insights page shows a full year by month. **Missing:** year-vs-year compare                                                                        |
+| Smart trend advisor (spikes)    | 🟡          | Spike/drop detection with 3 methods and plain-language alerts. **Missing:** suggestions ("dining is up 40%, try…")                                 |
+| Recurring transaction dashboard | 🟡          | Recurring page: list, monthly in/out totals, pause, resume, sync, edit, skip next, delete. **Missing:** price-change and upcoming-30-days insights |
+| Savings forecasting             | ⬜          |                                                                                                                                                    |
+| Insights module (premium)       | ⬜          | Needs a pricing decision first                                                                                                                     |
 
 ### v2 Phase 3 and stretch
 
@@ -166,9 +166,9 @@ Security hardening (secrets removed, rate limits, secure cookies, 0 vulnerabilit
 
 | Order | Item                                                                 | Size |
 | ----- | -------------------------------------------------------------------- | ---- |
-| 1     | Edit recurring (amount, frequency, end date), skip once, delete      | M    |
-| 1     | Biweekly, quarterly, half-yearly frequencies                         | S    |
-| 1     | Footer / social links back                                           | S    |
+| 1     | Edit recurring (amount, frequency, end date), skip once, delete ✅   | M    |
+| 1     | Biweekly, quarterly, half-yearly frequencies ✅                      | S    |
+| 1     | Footer / social links back ✅                                        | S    |
 | 2     | Forgot password (SES email reset link)                               | M    |
 | 2     | Tags: add / edit / remove, filter by tag                             | S    |
 | 2     | Admin role (read-only feedback and stats)                            | S    |
