@@ -13,34 +13,36 @@ Sizes: **S** = a day or two · **M** = about a week · **L** = two weeks or more
 
 ## Status at a glance
 
-| Part                              | Done                                          | On hold                                                         | Still to do                                                    |
-| --------------------------------- | --------------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------- |
-| Audit fixes (Phases 0–4)          | All 5 phases                                  |                                                                 |                                                                |
-| Part 0: Release foundation        | 5 engineering items                           |                                                                 | Release work (yours): keys, deploy, Node 22, HTTPS, monitoring |
-| Part 1: Core improvements         | All 9                                         |                                                                 |                                                                |
-| Part 2: Intelligence and insights | 3: year compare, recurring insights, Settings | 4: trend advisor, CSV import, PDF export, weekly email          |                                                                |
-| Part 3: Growth                    | 4: devices, receipts, installable app, worker | 4: accounts, debt tracker, two-factor login, push notifications | Database rename (at deploy)                                    |
+| Part                              | Done                                              | On hold                                                         | Still to do                                                    |
+| --------------------------------- | ------------------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------- |
+| Audit fixes (Phases 0–4)          | All 5 phases                                      |                                                                 |                                                                |
+| Part 0: Release foundation        | 5 engineering items                               |                                                                 | Release work (yours): keys, deploy, Node 22, HTTPS, monitoring |
+| Part 1: Core improvements         | All 9                                             |                                                                 |                                                                |
+| Part 2: Intelligence and insights | 3: year compare, recurring insights, Settings     | 4: trend advisor, CSV import, PDF export, weekly email          |                                                                |
+| Part 3: Growth                    | 4: devices, receipts, installable app, worker     | 4: accounts, debt tracker, two-factor login, push notifications | Database rename (at deploy)                                    |
+| Mobile apps (Android + iPhone)    | 2 groundwork items: delete account, token sign-in |                                                                 | Store apps (Capacitor shell + native features), see section 2  |
 
-**Tests:** server 108 (API, in-memory MongoDB) · app 12 unit · 33 end-to-end browser flows · 6 installable-app checks. All passing.
+**Tests:** server 116 (API, in-memory MongoDB) · app 12 unit · 34 end-to-end browser flows · 6 installable-app checks. All passing.
 
 ---
 
 ## What the app does today
 
-| Area                    | Features                                                                                                                                                                                                                                                                                                                              |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Accounts & security** | Sign up (strength meter) · sign in, session restored on refresh · forgot password (emailed reset link, 30 min, single use) · change password (last 3 can't be reused, other devices signed out) · **signed-in devices**: see each browser/phone, sign out one or all others · rate-limited login, no "is this email registered" leaks |
-| **Dashboard**           | Month picker · Excel export · left this month, income and spending vs last month, saved to goals · **month-end forecast** · daily spending chart · **category budgets** (bars, banner, warning on add) or the 50/30/20 guide · where it went · upcoming payments · recent activity · goal progress                                    |
-| **Transactions**        | Grouped by day · search · filter by category, dates and **tag** · sort · count and net for all matches · 25 at a time with Load more · edit (current month; tags and receipt any month) · delete with confirmation · **receipts** (photo or PDF, 📎 on the row)                                                                       |
-| **Add transaction**     | Expense / income · amount · category (default from Settings) · date · note · tags · repeat daily → yearly (7 options) with optional end date · **attach a receipt**                                                                                                                                                                   |
-| **Recurring**           | All rules · pause / resume / sync · **edit** (future only), **skip next**, **delete series** · created daily, missed dates included, never duplicated · **committed per month** (all rules) · **next 30 days** · **price-change alerts** · email reminder the day before                                                              |
-| **Goals**               | Create · add money (capped at the target) · progress · completed badge · delete · contributions count as savings                                                                                                                                                                                                                      |
-| **Insights**            | Year picker · income, spending, average, savings rate · monthly chart · spikes and drops (3 methods) · **compare with another year** (finished months both years have, by month and by category)                                                                                                                                      |
-| **Settings**            | Theme (light / dark / match system) · defaults for new transactions · email notifications (budget alerts, monthly summary, reminders) · budgets · **install the app**                                                                                                                                                                 |
-| **Installable app**     | Add to home screen (Chrome, Edge, Android; Share menu on iPhone) · opens offline with the last-loaded data, read-only · "new version ready, Reload" after a deploy · offline data wiped on sign-in and sign-out                                                                                                                       |
-| **Admin**               | Admins land on the Admin page: stats, weekly sign-ups, monthly active users · users list (search, last sign-in, transaction count; no amounts) · feedback triage (new / seen / done + private note)                                                                                                                                   |
-| **General**             | Light / dark redesign · desktop sidebar, phone tab bar · footer with GitHub / LinkedIn · feedback form · not-found page                                                                                                                                                                                                               |
-| **Behind the scenes**   | Scheduled jobs can run in a separate worker (`npm run worker`), and each runs once per day or month however many servers run · `/health` · graceful shutdown · CI on Node 20 and 22                                                                                                                                                   |
+| Area                    | Features                                                                                                                                                                                                                                                                                                                                                                                          |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Accounts & security** | Sign up (strength meter) · sign in, session restored on refresh · forgot password (emailed reset link, 30 min, single use) · change password (last 3 can't be reused, other devices signed out) · **signed-in devices**: see each browser/phone, sign out one or all others · **delete account** (password confirm, removes everything) · rate-limited login, no "is this email registered" leaks |
+| **Dashboard**           | Month picker · Excel export · left this month, income and spending vs last month, saved to goals · **month-end forecast** · daily spending chart · **category budgets** (bars, banner, warning on add) or the 50/30/20 guide · where it went · upcoming payments · recent activity · goal progress                                                                                                |
+| **Transactions**        | Grouped by day · search · filter by category, dates and **tag** · sort · count and net for all matches · 25 at a time with Load more · edit (current month; tags and receipt any month) · delete with confirmation · **receipts** (photo or PDF, 📎 on the row)                                                                                                                                   |
+| **Add transaction**     | Expense / income · amount · category (default from Settings) · date · note · tags · repeat daily → yearly (7 options) with optional end date · **attach a receipt**                                                                                                                                                                                                                               |
+| **Recurring**           | All rules · pause / resume / sync · **edit** (future only), **skip next**, **delete series** · created daily, missed dates included, never duplicated · **committed per month** (all rules) · **next 30 days** · **price-change alerts** · email reminder the day before                                                                                                                          |
+| **Goals**               | Create · add money (capped at the target) · progress · completed badge · delete · contributions count as savings                                                                                                                                                                                                                                                                                  |
+| **Insights**            | Year picker · income, spending, average, savings rate · monthly chart · spikes and drops (3 methods) · **compare with another year** (finished months both years have, by month and by category)                                                                                                                                                                                                  |
+| **Settings**            | Theme (light / dark / match system) · defaults for new transactions · email notifications (budget alerts, monthly summary, reminders) · budgets · **install the app**                                                                                                                                                                                                                             |
+| **Installable app**     | Add to home screen (Chrome, Edge, Android; Share menu on iPhone) · opens offline with the last-loaded data, read-only · "new version ready, Reload" after a deploy · offline data wiped on sign-in and sign-out                                                                                                                                                                                   |
+| **Admin**               | Admins land on the Admin page: stats, weekly sign-ups, monthly active users · users list (search, last sign-in, transaction count; no amounts) · feedback triage (new / seen / done + private note)                                                                                                                                                                                               |
+| **General**             | Light / dark redesign · desktop sidebar, phone tab bar · footer with GitHub / LinkedIn · feedback form · not-found page                                                                                                                                                                                                                                                                           |
+| **Mobile-ready API**    | Token sign-in for a native app (15-minute access token + rotating refresh token, stolen-token detection), described in `finance_tracker_server/MOBILE_AUTH.md`                                                                                                                                                                                                                                    |
+| **Behind the scenes**   | Scheduled jobs can run in a separate worker (`npm run worker`), and each runs once per day or month however many servers run · `/health` · graceful shutdown · CI on Node 20 and 22                                                                                                                                                                                                               |
 
 ---
 
@@ -97,9 +99,32 @@ Sizes: **S** = a day or two · **M** = about a week · **L** = two weeks or more
 | Installable app: install, offline read-only, update prompt ✅                                    | M    |
 | Separate worker for scheduled jobs; each job runs once per period (safe with several servers) ✅ | M    |
 
+### Mobile apps: groundwork
+
+| Item                                                                                    | Size |
+| --------------------------------------------------------------------------------------- | ---- |
+| Delete account in the app (required by Apple; removes every record and receipt file) ✅ | S    |
+| Token sign-in for native apps; website keeps its cookie ✅                              | S–M  |
+
 ---
 
 ## 2. Pending
+
+### Mobile apps (Android + iPhone)
+
+Plan: wrap the existing React app with **Capacitor** (same code in a native shell), about 6–9 weeks for one developer in total. The two groundwork items above are done.
+
+| Item                                                                                        | Size      | Notes                                                                   |
+| ------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------------------- |
+| Capacitor project, app icons, splash, safe areas, status bar, keyboard, Android back button | 3–5 days  |                                                                         |
+| App-side token sign-in (secure storage, refresh one request at a time)                      | 2–3 days  | Server side done; see `MOBILE_AUTH.md`                                  |
+| Excel export and receipts through the phone's Files / Share sheet                           | 2 days    | Browser downloads don't work inside an app                              |
+| Password-reset links open the app (Universal Links / App Links)                             | 2 days    |                                                                         |
+| Push notifications (FCM + APNs) for budget alerts and reminders                             | 5–7 days  | Also covers "email not set up yet"                                      |
+| Camera for receipts                                                                         | 1–2 days  |                                                                         |
+| Fingerprint / Face ID lock                                                                  | 2–3 days  |                                                                         |
+| Device testing, store listings, privacy forms, review rounds                                | 8–12 days | Apple Developer $99/year, Google Play $25 once; a Mac for iPhone builds |
+| Minimum-app-version check                                                                   | 1 day     | Old app versions stay installed; the API must stay compatible           |
 
 ### Release work (yours, outside the code)
 
