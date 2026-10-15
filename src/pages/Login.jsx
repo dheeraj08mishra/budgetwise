@@ -21,6 +21,7 @@ import { removeAllTransactions } from "../utils/redux/transactionSlice";
 import { resetSalary } from "../utils/redux/budgetSlice";
 import { api } from "../utils/api";
 import { Segmented, Field } from "../components/ui";
+import SiteFooter from "../components/SiteFooter";
 import PasswordStrength, {
   isStrongPassword,
 } from "../components/PasswordStrength";
@@ -274,6 +275,7 @@ export default function Login() {
               {signup ? "Sign in" : "Create an account"}
             </button>
           </p>
+          <SiteFooter className="mt-10 border-t border-base-300 pt-6" />
         </div>
       </main>
     </div>

@@ -21,6 +21,7 @@ import { removeAllTransactions } from "../utils/redux/transactionSlice";
 import { api } from "../utils/api";
 import { THEMES, applyTheme, initialTheme } from "../utils/theme";
 import FeedbackModal from "./FeedbackModal";
+import SiteFooter from "./SiteFooter";
 import { capitalize } from "../utils/format";
 
 const NAV = [
@@ -206,6 +207,7 @@ const AppShell = () => {
 
       <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-12 lg:pt-8">
         <Outlet />
+        <SiteFooter className="mt-12 border-t border-base-300 pt-6" />
       </main>
 
       {/* Mobile bottom tab bar */}

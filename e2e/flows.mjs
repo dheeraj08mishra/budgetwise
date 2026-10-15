@@ -74,6 +74,26 @@ await step("sign in via the form", async () => {
 });
 
 const note = `UI test ${Date.now() % 100000}`;
+await step("footer with GitHub and LinkedIn links on every page", async () => {
+  for (const path of ["/", "/transactions", "/goals"]) {
+    await page.goto(APP + path, { waitUntil: "networkidle" });
+    const links = await page.$$eval("footer a", (as) =>
+      as.map((a) => [
+        a.getAttribute("aria-label") || a.textContent,
+        a.href,
+        a.rel,
+      ])
+    );
+    const hrefs = links.map((l) => l[1]).join(" ");
+    if (!hrefs.includes("github.com/dheeraj08mishra/budgetwise"))
+      throw new Error(`${path}: no GitHub link`);
+    if (!hrefs.includes("linkedin.com/in/dheerajmishra462"))
+      throw new Error(`${path}: no LinkedIn link`);
+    if (!links.every((l) => l[2].includes("noopener")))
+      throw new Error("external links need rel=noopener");
+  }
+});
+
 await step("add an expense (amount, category chip, note)", async () => {
   await clickText("a", /^Add transaction$/);
   await waitText(/Record money coming in/);
