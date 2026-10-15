@@ -30,6 +30,7 @@ import {
   PageHeader,
 } from "../components/ui";
 import TransactionList from "../components/TransactionList";
+import { BudgetBars, BudgetAlerts, BudgetsModal } from "../components/Budgets";
 import SpendingTrend from "../components/charts/SpendingTrend";
 import CategoryDonut from "../components/charts/CategoryDonut";
 
@@ -189,6 +190,21 @@ export default function Dashboard() {
     };
   }, [selected, year, month, dispatch]);
 
+  // Category budgets for the month shown (refreshed when transactions change)
+  const [budgets, setBudgets] = useState(null);
+  const [editingBudgets, setEditingBudgets] = useState(false);
+  useEffect(() => {
+    if (!selected) return;
+    let alive = true;
+    api(`/budgets?year=${year}&month=${month}`).then(
+      ({ ok, data }) => alive && ok && setBudgets(data.data)
+    );
+    return () => {
+      alive = false;
+    };
+  }, [selected, year, month, transactions]);
+  const hasBudgets = budgets?.some((b) => b.limit);
+
   const totals = useMemo(() => {
     const sum = (fn, filter) =>
       transactions.filter(filter).reduce((s, t) => s + fn(t), 0);
@@ -290,6 +306,8 @@ export default function Dashboard() {
         }
       />
 
+      {isCurrent && budgets && <BudgetAlerts rows={budgets} />}
+
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           label="Left this month"
@@ -367,14 +385,35 @@ export default function Dashboard() {
               </div>
             </Card>
             <Card>
-              <CardHeader title="Budget guide" subtitle="50 / 30 / 20 rule" />
+              <CardHeader
+                title={hasBudgets ? "Budgets" : "Budget guide"}
+                subtitle={
+                  hasBudgets
+                    ? `${monthLabel} spending vs your limits`
+                    : "50 / 30 / 20 rule"
+                }
+                action={
+                  budgets && (
+                    <button
+                      className="btn btn-ghost btn-xs"
+                      onClick={() => setEditingBudgets(true)}
+                    >
+                      {hasBudgets ? "Edit" : "Set budgets"}
+                    </button>
+                  )
+                }
+              />
               <div className="pt-5">
-                <BudgetGuide
-                  income={totals.income}
-                  needs={totals.needs}
-                  wants={totals.wants}
-                  saved={totals.saved + totals.invested}
-                />
+                {hasBudgets ? (
+                  <BudgetBars rows={budgets} />
+                ) : (
+                  <BudgetGuide
+                    income={totals.income}
+                    needs={totals.needs}
+                    wants={totals.wants}
+                    saved={totals.saved + totals.invested}
+                  />
+                )}
               </div>
             </Card>
           </div>
@@ -508,6 +547,23 @@ export default function Dashboard() {
             </Card>
           </div>
         </>
+      )}
+      {editingBudgets && (
+        <BudgetsModal
+          open
+          rows={budgets}
+          income={totals.income}
+          onClose={() => setEditingBudgets(false)}
+          onSaved={(rows) => {
+            // saved rows are for the current month; refetch if another is shown
+            if (isCurrent) setBudgets(rows);
+            else
+              api(`/budgets?year=${year}&month=${month}`).then(
+                ({ ok, data }) => ok && setBudgets(data.data)
+              );
+            setEditingBudgets(false);
+          }}
+        />
       )}
     </div>
   );

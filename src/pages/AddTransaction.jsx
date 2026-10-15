@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Repeat } from "lucide-react";
 import { api } from "../utils/api";
+import { money } from "../utils/format";
 import { CATEGORIES, EXPENSE_CATEGORIES } from "../utils/categories";
 import { todayString, firstOfMonthString } from "../utils/dates";
 import { Card, PageHeader, Segmented, Field } from "../components/ui";
@@ -58,6 +59,17 @@ export default function AddTransaction() {
     // Tagging calls OpenAI and can be slow: fire and forget
     if (note.trim()) api(`/extractTags/${data.data._id}`, { method: "POST" });
     toast.success(type === "income" ? "Income added" : "Expense added");
+    // This expense took its category to 80%+ of the monthly budget
+    const alert = data.budgetAlert;
+    if (alert) {
+      const label = CATEGORIES[alert.category].label;
+      toast(
+        alert.level === "over"
+          ? `${label} is over budget: ${money(alert.spent)} of ${money(alert.limit)} (${alert.percent}%).`
+          : `You've used ${alert.percent}% of your ${label} budget (${money(alert.limit)}).`,
+        { icon: "⚠️", duration: 7000 }
+      );
+    }
     navigate("/");
   };
 

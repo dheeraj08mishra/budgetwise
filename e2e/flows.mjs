@@ -243,6 +243,31 @@ await step("past months: only tags can be edited", async () => {
   await clickText("button", /Clear filters/);
 });
 
+await step(
+  "budgets: set them, see the bars, banner and add-time warning",
+  async () => {
+    await page.goto(APP, { waitUntil: "networkidle" });
+    await clickText("button", /^Set budgets$/);
+    await waitText(/Monthly budgets/);
+    await clickText("button", /Suggest from income/);
+    if (!(await page.inputValue("#budget-need")))
+      throw new Error("no suggestion filled");
+    await page.fill("#budget-want", "2000"); // demo wants this month are higher
+    await clickText("button", /^Save budgets$/);
+    await waitText(/Budgets saved/);
+    await waitText(/Over budget this month/);
+    await waitText(/Wants: \d+% of ₹2,000/);
+    if (!(await page.$('progress[aria-label^="Wants:"]')))
+      throw new Error("no Wants bar");
+
+    await page.goto(APP + "/add", { waitUntil: "networkidle" });
+    await page.fill("#amount", "150");
+    await clickText("button", /^Wants$/);
+    await clickText("button", /^Save expense$/);
+    await waitText(/Wants is over budget/);
+  }
+);
+
 await step("Escape closes a dialog", async () => {
   await page.goto(APP + "/goals", { waitUntil: "networkidle" });
   await clickText("button", /^New goal$/);
