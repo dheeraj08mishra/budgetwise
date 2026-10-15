@@ -346,6 +346,16 @@ await step("add money to a goal updates its progress", async () => {
   if (before === (await text())) throw new Error("page did not change");
 });
 
+await step("recurring insights: price change and next 30 days", async () => {
+  await page.goto(APP + "/recurring", { waitUntil: "networkidle" });
+  // the demo's Netflix went from ₹499 to ₹649 in August
+  await waitText(
+    /Netflix subscription went up from ₹499 to ₹649 \(\+30%\) on 7 Aug/
+  );
+  await waitText(/Next 30 days/);
+  await waitText(/\d+ payments? · ₹[\d,]+ going out/);
+});
+
 await step("pause (with confirm) and resume a recurring payment", async () => {
   await page.goto(APP + "/recurring", { waitUntil: "networkidle" });
   await clickText("button", /^Pause Netflix subscription$/);
@@ -398,6 +408,10 @@ await step("edit a recurring series (amount + end date)", async () => {
   const t = await text();
   if (!t.includes("₹23,000")) throw new Error("new amount not shown");
   if (!/until 31 Dec/.test(t)) throw new Error("end date not shown");
+  // the next payment will cost more than the last one
+  await waitText(
+    /House rent will be ₹23,000 from \d+ \w{3}, was ₹22,000 \(\+5%\)/
+  );
 });
 
 await step("skip the next payment of a series", async () => {

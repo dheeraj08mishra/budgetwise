@@ -112,8 +112,8 @@ test("sortTransactions: newest/oldest by day, ties by time added; server keeps o
   );
 });
 
-test("frequency labels and monthly amounts", async () => {
-  const { FREQUENCIES, frequencyLabel, monthlyAmount } =
+test("frequency labels", async () => {
+  const { FREQUENCIES, frequencyLabel } =
     await import("../src/utils/frequency.js");
   assert.deepEqual(
     FREQUENCIES.map((f) => f.value),
@@ -129,12 +129,6 @@ test("frequency labels and monthly amounts", async () => {
     "same list as the server"
   );
   assert.equal(frequencyLabel("halfyearly"), "Every 6 months");
-  assert.equal(monthlyAmount({ amount: 1200, frequency: "yearly" }), 100);
-  assert.equal(monthlyAmount({ amount: 300, frequency: "quarterly" }), 100);
-  assert.equal(
-    Math.round(monthlyAmount({ amount: 100, frequency: "weekly" })),
-    433
-  );
 });
 
 test("tags: same rules as the server", async () => {

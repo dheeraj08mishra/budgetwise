@@ -79,7 +79,7 @@ Sizes: **S** = a day or two · **M** = about a week · **L** = two weeks or more
 | ------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Yearly dashboard + compare      | ✅          | Insights: full year by month, plus "2026 vs 2025" (totals over finished months both years have, month-by-month chart, spending by category)              |
 | Smart trend advisor (spikes)    | 🟡          | Spike/drop detection with 3 methods and plain-language alerts. **Missing:** suggestions ("dining is up 40%, try…")                                       |
-| Recurring transaction dashboard | 🟡          | Recurring page: list, monthly in/out totals, pause, resume, sync, edit, skip next, delete. **Missing:** price-change and upcoming-30-days insights       |
+| Recurring transaction dashboard | ✅          | Recurring page: list, pause, resume, sync, edit, skip next, delete, monthly in/out over all rules, next 30 days, price-change alerts (went up / will be) |
 | Savings forecasting             | ✅          | Month-end forecast on the Dashboard: income + recurring income still due − spending − everyday pace × days left − recurring payments still due − savings |
 | Insights module (premium)       | ⬜          | Needs a pricing decision first                                                                                                                           |
 
@@ -180,15 +180,17 @@ Security hardening (secrets removed, rate limits, secure cookies, 0 vulnerabilit
 
 ### Part 2: Intelligence and insights
 
-| Item                                                                           | Size |
-| ------------------------------------------------------------------------------ | ---- |
-| Year-vs-year compare on Insights ✅                                            | S    |
-| Trend advisor: category trends + suggestions ("dining up 40% over 3 months")   | M    |
-| Recurring insights: total committed per month, upcoming 30 days, price changes | S    |
-| CSV / Excel import with column mapping and duplicate detection                 | L    |
-| Export to PDF (monthly report)                                                 | M    |
-| User settings panel (notifications, budgets, defaults)                         | M    |
-| Weekly summary email                                                           | S    |
+⏸ = on hold (your call, 15 Oct 2026): not needed for now.
+
+| Item                                                                              | Size |
+| --------------------------------------------------------------------------------- | ---- |
+| Year-vs-year compare on Insights ✅                                               | S    |
+| Trend advisor: category trends + suggestions ("dining up 40% over 3 months") ⏸    | M    |
+| Recurring insights: total committed per month, upcoming 30 days, price changes ✅ | S    |
+| CSV / Excel import with column mapping and duplicate detection ⏸                  | L    |
+| Export to PDF (monthly report) ⏸                                                  | M    |
+| User settings panel (notifications, budgets, defaults)                            | M    |
+| Weekly summary email ⏸                                                            | S    |
 
 ### Part 3: Growth
 

@@ -13,12 +13,15 @@ import {
   Pencil,
   SkipForward,
   Trash2,
+  TrendingUp,
+  TrendingDown,
+  CalendarClock,
 } from "lucide-react";
 import { api } from "../utils/api";
 import { money } from "../utils/format";
 import { formatDay, todayString } from "../utils/dates";
 import { EXPENSE_CATEGORIES, CATEGORIES } from "../utils/categories";
-import { frequencyLabel, monthlyAmount } from "../utils/frequency";
+import { frequencyLabel } from "../utils/frequency";
 import {
   Card,
   PageHeader,
@@ -191,6 +194,127 @@ function EditRuleModal({ rule, onClose, onSaved }) {
   );
 }
 
+const shortDay = (d) => formatDay(d, { year: undefined });
+
+// "Netflix went up from ₹499 to ₹649 (+30%) on 7 Aug"
+function PriceChanges({ changes }) {
+  if (!changes?.length) return null;
+  return (
+    <ul className="mb-6 space-y-2" aria-label="Price changes">
+      {changes.map((c) => {
+        const up = c.to > c.from;
+        // paying more is bad news; earning more is good news
+        const good = up === (c.type === "income");
+        const Icon = up ? TrendingUp : TrendingDown;
+        const pct =
+          c.percent !== null
+            ? ` (${up ? "+" : "−"}${Math.round(Math.abs(c.percent))}%)`
+            : "";
+        const name = c.note || "A recurring payment";
+        return (
+          <li
+            key={c.ruleId}
+            className={`flex items-start gap-3 rounded-box border px-4 py-3 text-sm ${good ? "border-success/30 bg-success/10" : "border-warning/40 bg-warning/10"}`}
+          >
+            <Icon
+              size={18}
+              className={`mt-0.5 shrink-0 ${good ? "text-success" : "text-warning"}`}
+              aria-hidden
+            />
+            <p>
+              {c.kind === "upcoming" ? (
+                <>
+                  <span className="font-medium">{name}</span> will be{" "}
+                  <span className="num font-medium">{money(c.to)}</span> from{" "}
+                  {shortDay(c.date)}, was{" "}
+                  <span className="num">{money(c.from)}</span>
+                  {pct}.
+                </>
+              ) : (
+                <>
+                  <span className="font-medium">{name}</span> went{" "}
+                  {up ? "up" : "down"} from{" "}
+                  <span className="num">{money(c.from)}</span> to{" "}
+                  <span className="num font-medium">{money(c.to)}</span>
+                  {pct} on {shortDay(c.date)}.
+                </>
+              )}
+            </p>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+const UPCOMING_SHOWN = 6;
+
+// Every payment due in the next 30 days, soonest first
+function Upcoming({ upcoming }) {
+  const [all, setAll] = useState(false);
+  if (!upcoming) return null;
+  const items = all ? upcoming.items : upcoming.items.slice(0, UPCOMING_SHOWN);
+  const totals = [
+    upcoming.expense > 0 && `${money(upcoming.expense)} going out`,
+    upcoming.income > 0 && `${money(upcoming.income)} coming in`,
+  ].filter(Boolean);
+  return (
+    <Card className="mb-6">
+      <div className="flex items-start justify-between gap-3 px-5 pt-5">
+        <div>
+          <h2 className="text-base font-semibold">Next {upcoming.days} days</h2>
+          <p className="label-muted mt-0.5">
+            {upcoming.count === 0
+              ? "Nothing due."
+              : `${upcoming.count} payment${upcoming.count === 1 ? "" : "s"} · ${totals.join(" · ")}`}
+          </p>
+        </div>
+        <CalendarClock size={20} className="text-base-content/40" aria-hidden />
+      </div>
+      {upcoming.count > 0 && (
+        <ul className="mt-3 divide-y divide-base-300">
+          {items.map((u) => (
+            <li
+              key={`${u.ruleId}-${u.date}`}
+              className="flex items-center gap-3 px-5 py-3"
+            >
+              <span className="w-14 shrink-0 text-xs font-medium text-base-content/60">
+                {shortDay(u.date)}
+              </span>
+              <CategoryIcon txn={u} />
+              <span className="min-w-0 flex-1 truncate text-sm">
+                {u.note || "Recurring transaction"}
+              </span>
+              <span
+                className={`num text-sm font-semibold ${u.type === "income" ? "text-success" : ""}`}
+              >
+                {u.type === "income" ? "+" : "−"}
+                {money(u.amount, { exact: true })}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {upcoming.items.length > UPCOMING_SHOWN && (
+        <div className="border-t border-base-300 px-5 py-2">
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => setAll((v) => !v)}
+          >
+            {all ? "Show fewer" : `Show all ${upcoming.items.length}`}
+          </button>
+          {all && upcoming.count > upcoming.items.length && (
+            <span className="text-xs text-base-content/55">
+              Showing the first {upcoming.items.length}.
+            </span>
+          )}
+        </div>
+      )}
+      {upcoming.count === 0 && <div className="pb-5" />}
+    </Card>
+  );
+}
+
 export default function Recurring() {
   const [rules, setRules] = useState([]);
   const [pagination, setPagination] = useState({});
@@ -204,6 +328,20 @@ export default function Recurring() {
   const [skipping, setSkipping] = useState(null);
   const [deleting, setDeleting] = useState(null);
   const [editing, setEditing] = useState(null);
+  // totals, next 30 days and price changes cover every rule, not one page
+  const [insights, setInsights] = useState(null);
+  const [insightsKey, setInsightsKey] = useState(0);
+  const refreshInsights = () => setInsightsKey((k) => k + 1);
+
+  useEffect(() => {
+    let alive = true;
+    api("/recurring/insights").then(({ ok, data }) => {
+      if (alive) setInsights(ok ? data : null);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [refreshKey, insightsKey]);
 
   useEffect(() => {
     let alive = true;
@@ -239,6 +377,7 @@ export default function Recurring() {
     setSkipping(null);
     if (!ok) return toast.error(error);
     replaceRule(data.data);
+    refreshInsights();
     const short = (d) => formatDay(d, { year: undefined });
     toast.success(
       action === "pause"
@@ -273,11 +412,7 @@ export default function Recurring() {
     setRefreshKey((k) => k + 1);
   };
 
-  const active = rules.filter((r) => r.isActive);
-  const sum = (type) =>
-    active
-      .filter((r) => r.type === type)
-      .reduce((s, r) => s + monthlyAmount(r), 0);
+  const committed = insights?.committed;
   const today = todayString();
   const upcomingSkips = (r) =>
     (r.skipDates || []).map(dayOf).filter((d) => d >= today);
@@ -299,32 +434,35 @@ export default function Recurring() {
         }
       />
 
-      {!loading && rules.length > 0 && (
+      {committed?.total > 0 && (
         <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
           <Card className="p-4">
             <p className="label-muted">Active</p>
             <p className="num mt-1 text-xl font-semibold">
-              {active.length}
+              {committed.active}
               <span className="text-sm font-normal text-base-content/50">
                 {" "}
-                / {pagination.totalCount ?? rules.length}
+                / {committed.total}
               </span>
             </p>
           </Card>
           <Card className="p-4">
             <p className="label-muted">Going out / month</p>
             <p className="num mt-1 text-xl font-semibold">
-              ≈ {money(sum("expense"))}
+              ≈ {money(committed.expense)}
             </p>
           </Card>
           <Card className="col-span-2 p-4 sm:col-span-1">
             <p className="label-muted">Coming in / month</p>
             <p className="num mt-1 text-xl font-semibold text-success">
-              ≈ {money(sum("income"))}
+              ≈ {money(committed.income)}
             </p>
           </Card>
         </div>
       )}
+
+      <PriceChanges changes={insights?.priceChanges} />
+      {committed?.active > 0 && <Upcoming upcoming={insights.upcoming} />}
 
       <Card>
         {loading ? (
@@ -496,6 +634,7 @@ export default function Recurring() {
           onClose={() => setEditing(null)}
           onSaved={(updated) => {
             replaceRule(updated);
+            refreshInsights();
             setEditing(null);
           }}
         />
