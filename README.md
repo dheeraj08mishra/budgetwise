@@ -2,7 +2,7 @@
 
 A personal finance tracker: record income and expenses, see where the money goes, keep budgets, automate recurring payments and save towards goals.
 
-This repo is the **React frontend**. The API lives in [finance_tracker_server](https://github.com/dheeraj08mishra/finance_tracker_server) (Express + MongoDB).
+This repo is the **React frontend**. What's planned next: [ROADMAP.md](ROADMAP.md). The API lives in [finance_tracker_server](https://github.com/dheeraj08mishra/finance_tracker_server) (Express + MongoDB).
 
 ---
 
