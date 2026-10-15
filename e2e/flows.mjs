@@ -591,31 +591,56 @@ await step(
 );
 
 await step(
-  "admin: stats and feedback for admins, hidden from users",
+  "admin: lands on Admin; overview, users and feedback triage",
   async () => {
-    const signIn = async (email, password) => {
+    const signIn = async (email, password, landing) => {
       await context.clearCookies();
       await page.goto(APP, { waitUntil: "networkidle" });
       await page.fill("#email", email);
       await page.fill("#password", password);
       await page.keyboard.press("Enter");
-      await waitText(/Good (morning|afternoon|evening)/);
+      await waitText(landing);
     };
-    // a regular user: no Admin link, and the page says so
-    await signIn(DEMO.email, DEMO.password);
+    // a regular user: Dashboard, no Admin link, and /admin says so
+    await signIn(DEMO.email, DEMO.password, /Good (morning|afternoon|evening)/);
     if (await page.$('nav a[href="/admin"]'))
       throw new Error("Admin link shown to a user");
     await page.goto(APP + "/admin", { waitUntil: "networkidle" });
     await waitText(/Admins only/);
 
-    await signIn("admin@budgetwise.app", "Admin@1234");
-    await clickText("a", /^Admin$/);
-    await waitText(/Read-only overview/);
+    // the admin lands straight on the Admin page
+    await signIn(
+      "admin@budgetwise.app",
+      "Admin@1234",
+      /How BudgetWise is being used/
+    );
+    if (!page.url().endsWith("/admin"))
+      throw new Error(`landed on ${page.url()}`);
+    await waitText(/Sign-ups/);
+    await waitText(/Users with budgets/);
+
+    await clickText("button", /^Users$/);
+    await page.fill('input[aria-label="Search users"]', "demo@budgetwise.app");
+    await waitText(/^[\s\S]*\b1 users\b/);
+
+    await clickText("button", /^Feedback \(\d+ new\)$/);
     await waitText(/Would love budgets per category/);
-    await clickText("button", /^Bugs \(\d+\)$/);
-    await waitText(/Export took a while/);
-    if ((await text()).includes("Would love budgets"))
-      throw new Error("filter didn't apply");
+    await page.fill('input[aria-label="Admin note"]', "Shipped in Part 1");
+    await clickText("button", /^Save note$/);
+    await waitText(/Note saved/);
+    await page.click('button[aria-label="Mark as done"]');
+    await waitText(/Marked as done/);
+    await page.click('[role="radio"]:text-is("Done")'); // the status filter
+    // the note is an input value (not page text), so read it directly
+    await page.waitForFunction(
+      () =>
+        [...document.querySelectorAll('input[aria-label="Admin note"]')].some(
+          (i) => i.value === "Shipped in Part 1"
+        ),
+      null,
+      { timeout: 6000 }
+    );
+    await waitText(/Feedback \(\d+ new\)/);
   }
 );
 

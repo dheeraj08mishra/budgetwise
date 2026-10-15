@@ -81,7 +81,8 @@ export default function Login() {
     dispatch(resetSalary());
     dispatch(updateProfile(data.user));
     toast.success(data.message);
-    navigate("/");
+    // Admins start on the Admin page; everyone else on their Dashboard
+    navigate(data.user.role === "admin" ? "/admin" : "/");
   };
 
   const switchMode = (m) => {
