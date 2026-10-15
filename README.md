@@ -63,7 +63,7 @@ npm test               # unit tests for the helpers (node:test)
 npm run test:e2e       # 17 end-to-end flows in Chrome (Playwright)
 ```
 
-`test:e2e` drives the real app, so it needs the local stack running: the API with a local MongoDB and the demo account (`npm run seed:demo` in the server repo), plus `npm run dev` here. It changes the demo data, so re-seed afterwards. GitHub Actions runs lint, format check, unit tests and the build on every push.
+`test:e2e` drives the real app, so it needs the local stack running: the API with a local MongoDB and the demo account (`npm run seed:demo` in the server repo), plus `npm run dev` here. Start the API with high rate limits for test runs (`AUTH_RATE_LIMIT=500 API_RATE_LIMIT=10000`), and set `E2E_SERVER_LOG` to the API's log file so the forgot-password flow can read the reset link the server prints locally. The flows change the demo data, so re-seed afterwards. GitHub Actions runs lint, format check, unit tests and the build on every push.
 
 ## 📁 Project layout
 

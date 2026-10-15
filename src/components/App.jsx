@@ -22,6 +22,8 @@ const Recurring = lazy(() => import("../pages/Recurring"));
 const Goals = lazy(() => import("../pages/Goals"));
 const Insights = lazy(() => import("../pages/Insights"));
 const Profile = lazy(() => import("../pages/Profile"));
+const ForgotPassword = lazy(() => import("../pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("../pages/ResetPassword"));
 
 const page = (Component) => (
   <Suspense fallback={<Spinner />}>
@@ -51,6 +53,9 @@ function Gate() {
 }
 
 const router = createBrowserRouter([
+  // Public: reached from the login page or the reset email while signed out
+  { path: "/forgot-password", element: page(ForgotPassword) },
+  { path: "/reset-password", element: page(ResetPassword) },
   {
     path: "/",
     element: <Gate />,

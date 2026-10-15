@@ -5,8 +5,11 @@
 //   app:    API_PROXY_TARGET=http://localhost:3001 npm run dev
 // Then:     npm run test:e2e
 // E2E_URL (default http://localhost:1234) and CHROME_PATH can be overridden.
+// E2E_SERVER_LOG = the API's log file: lets the forgot-password flow read the
+// reset link the server prints locally (that flow is skipped without it).
 // It changes the demo account's data: re-run `npm run seed:demo` afterwards.
 import { chromium } from "playwright-core";
+import { readFileSync } from "node:fs";
 
 const APP = process.env.E2E_URL || "http://localhost:1234";
 const DEMO = { email: "demo@budgetwise.app", password: "Demo@1234" };
@@ -405,6 +408,73 @@ await step("sign out", async () => {
   await clickText("button", /^Sign out$/);
   await waitText(/Welcome back/);
 });
+
+await step(
+  "forgot password: request a link, reset, sign in with the new password",
+  async () => {
+    // a fresh account, created through the API
+    await context.clearCookies();
+    const email = `reset_${Date.now()}@example.com`;
+    const signup = await context.request.post(`${APP}/api/signup`, {
+      data: {
+        firstName: "Reset",
+        lastName: "Flow",
+        email,
+        password: "OldPass1@",
+        phoneNumber: String(9500000000 + Math.floor(Math.random() * 499999999)),
+      },
+    });
+    if (!signup.ok()) throw new Error(`signup ${signup.status()}`);
+    await context.clearCookies();
+
+    await page.goto(APP, { waitUntil: "networkidle" });
+    await clickText("a", /^Forgot password\?$/);
+    await waitText(/Forgot your password\?/);
+    await page.fill("#forgot-email", email);
+    await clickText("button", /^Send reset link$/);
+    await waitText(/Check your email/);
+
+    // a broken link explains itself
+    await page.goto(`${APP}/reset-password?token=nope`, {
+      waitUntil: "networkidle",
+    });
+    await waitText(/This link has expired/);
+
+    if (!process.env.E2E_SERVER_LOG) {
+      console.log("      (E2E_SERVER_LOG not set: skipping the reset itself)");
+      return;
+    }
+    const line = readFileSync(process.env.E2E_SERVER_LOG, "utf8")
+      .split("\n")
+      .reverse()
+      .find((l) => l.includes(`reset link for ${email}`));
+    if (!line) throw new Error("reset link not found in the server log");
+    const token = line.match(/token=([a-f0-9]{64})/)[1];
+
+    await page.goto(`${APP}/reset-password?token=${token}`, {
+      waitUntil: "networkidle",
+    });
+    await waitText(/Choose a new password/);
+    await page.fill("#reset-new", "NewPass9@");
+    await page.fill("#reset-confirm", "NewPass9@");
+    await clickText("button", /^Reset password$/);
+    await waitText(/Password reset\. Sign in with your new password/);
+
+    await page.fill("#email", email);
+    await page.fill("#password", "NewPass9@");
+    await page.keyboard.press("Enter");
+    await waitText(/Good (morning|afternoon|evening)/);
+
+    // the link can't be used twice
+    await page.goto(`${APP}/reset-password?token=${token}`, {
+      waitUntil: "networkidle",
+    });
+    await page.fill("#reset-new", "Other#Pass7");
+    await page.fill("#reset-confirm", "Other#Pass7");
+    await clickText("button", /^Reset password$/);
+    await waitText(/This link has expired/);
+  }
+);
 
 await browser.close();
 console.log(
