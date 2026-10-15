@@ -18,13 +18,19 @@ export async function api(path, { method = "GET", body, signal } = {}) {
     res = await fetch(BASE_URL + path, {
       method,
       credentials: "include",
-      headers: body !== undefined ? { "Content-Type": "application/json" } : undefined,
+      headers:
+        body !== undefined ? { "Content-Type": "application/json" } : undefined,
       body: body !== undefined ? JSON.stringify(body) : undefined,
       signal,
     });
   } catch (err) {
     if (err.name === "AbortError") throw err;
-    return { ok: false, status: 0, data: null, error: "Can't reach the server. Check your connection." };
+    return {
+      ok: false,
+      status: 0,
+      data: null,
+      error: "Can't reach the server. Check your connection.",
+    };
   }
 
   const isJson = res.headers.get("content-type")?.includes("application/json");
@@ -37,13 +43,17 @@ export async function api(path, { method = "GET", body, signal } = {}) {
   ) {
     store.dispatch(logout());
     store.dispatch(removeAllTransactions());
-    toast.error("Your session expired. Please sign in again.", { id: "session-expired" });
+    toast.error("Your session expired. Please sign in again.", {
+      id: "session-expired",
+    });
   }
 
   const error = res.ok
     ? null
     : res.status === 429
       ? data?.message || "Too many requests. Please wait a moment."
-      : data?.message || data?.error || "Something went wrong. Please try again.";
+      : data?.message ||
+        data?.error ||
+        "Something went wrong. Please try again.";
   return { ok: res.ok, status: res.status, data, error, res };
 }

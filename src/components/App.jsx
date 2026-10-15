@@ -1,6 +1,11 @@
 import { lazy, Suspense } from "react";
 import { Provider, useSelector } from "react-redux";
-import { createBrowserRouter, RouterProvider, Navigate, Link } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+  Link,
+} from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import appStore from "../utils/redux/appStore";
 import AuthObserver from "./AuthObserver";
@@ -26,7 +31,16 @@ const page = (Component) => (
 
 const NotFound = () => (
   <Card>
-    <EmptyState icon={Compass} title="Page not found" text="That page doesn't exist." action={<Link to="/" className="btn btn-primary btn-sm">Go to dashboard</Link>} />
+    <EmptyState
+      icon={Compass}
+      title="Page not found"
+      text="That page doesn't exist."
+      action={
+        <Link to="/" className="btn btn-primary btn-sm">
+          Go to dashboard
+        </Link>
+      }
+    />
   </Card>
 );
 
@@ -59,7 +73,8 @@ const App = () => (
     <Toaster
       position="top-center"
       toastOptions={{
-        className: "!bg-base-100 !text-base-content !border !border-base-300 !shadow-lg !rounded-xl !text-sm",
+        className:
+          "!bg-base-100 !text-base-content !border !border-base-300 !shadow-lg !rounded-xl !text-sm",
       }}
     />
     <AuthObserver>

@@ -13,16 +13,16 @@ Sizes: **S** = a day or two · **M** = about a week · **L** = two weeks or more
 
 ## What the app does today
 
-| Area | Features |
-|---|---|
+| Area                    | Features                                                                                                                                                                                                                                                                                                                                      |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Accounts & security** | Sign up (strength meter, show/hide password) · sign in, session kept for a day and restored on refresh · expired session signs you out with a message · change password (signs out other devices, last 3 can't be reused) · profile (name, phone, gender, photo, initials fallback) · rate-limited login, no "is this email registered" leaks |
-| **Dashboard** | Month picker · Excel export · left this month, income and spending vs last month, saved to goals · daily spending chart · 50/30/20 budget guide · where it went (by category) · upcoming recurring payments · recent activity with edit/delete · goal progress |
-| **Transactions** | Grouped by day with daily totals · search by note · filter by category and dates · sort by date or amount · count and net for all matches · 25 at a time with Load more · edit (current month) · delete with confirmation · auto-tags shown |
-| **Add transaction** | Expense / income · amount · category · date · note · repeat daily / weekly / monthly / yearly · auto-tags from the note (OpenAI) |
-| **Recurring** | All rules, active and paused · monthly in / out estimate · pause (confirm) / resume · sync now · created automatically every day, missed dates included, never duplicated · email reminder the day before |
-| **Goals** | Create · add money (quick amounts, capped at the target) · progress · completed badge · delete with confirmation · contributions count as savings |
-| **Insights** | Year picker · income, spending, average, savings rate · monthly chart · spikes and drops highlighted (3 methods) · plain-language alerts |
-| **General** | Light / dark theme (follows the OS) · desktop sidebar, phone tab bar · feedback form · not-found page |
+| **Dashboard**           | Month picker · Excel export · left this month, income and spending vs last month, saved to goals · daily spending chart · 50/30/20 budget guide · where it went (by category) · upcoming recurring payments · recent activity with edit/delete · goal progress                                                                                |
+| **Transactions**        | Grouped by day with daily totals · search by note · filter by category and dates · sort by date or amount · count and net for all matches · 25 at a time with Load more · edit (current month) · delete with confirmation · auto-tags shown                                                                                                   |
+| **Add transaction**     | Expense / income · amount · category · date · note · repeat daily / weekly / monthly / yearly · auto-tags from the note (OpenAI)                                                                                                                                                                                                              |
+| **Recurring**           | All rules, active and paused · monthly in / out estimate · pause (confirm) / resume · sync now · created automatically every day, missed dates included, never duplicated · email reminder the day before                                                                                                                                     |
+| **Goals**               | Create · add money (quick amounts, capped at the target) · progress · completed badge · delete with confirmation · contributions count as savings                                                                                                                                                                                             |
+| **Insights**            | Year picker · income, spending, average, savings rate · monthly chart · spikes and drops highlighted (3 methods) · plain-language alerts                                                                                                                                                                                                      |
+| **General**             | Light / dark theme (follows the OS) · desktop sidebar, phone tab bar · feedback form · not-found page                                                                                                                                                                                                                                         |
 
 ---
 
@@ -30,69 +30,69 @@ Sizes: **S** = a day or two · **M** = about a week · **L** = two weeks or more
 
 ### v1 features (confirmed existing)
 
-| Feature | Status | Where it is now |
-|---|---|---|
-| Live transaction updates | ✅ | Dashboard and Transactions refresh after every change |
-| Edit and delete controls | ✅ | Edit dialog; delete asks for confirmation |
-| Add recurring transactions | ✅ | "Repeat automatically" on Add transaction |
-| Monthly dashboard from history | ✅ | Month picker on the Dashboard |
-| Profile management | ✅ | Profile page, plus change password |
-| JWT auth | ✅ | httpOnly cookie, secure flags, rate limits, session expiry |
-| Responsive UI | ✅ | Desktop sidebar, phone tab bar |
-| Search and sort | ✅ | Transactions toolbar |
-| Filterable history | ✅ | Category, date range, sort; loads 25 at a time |
-| Budget tracker section | ✅ | 50/30/20 budget guide on the Dashboard |
-| Category-wise and day-wise charts | ✅ | "Where it went" donut, daily spending chart |
-| Income vs expense breakdown | ✅ | Dashboard cards and the Insights page |
-| Transaction management | ✅ | Add, edit, delete, export |
+| Feature                           | Status | Where it is now                                            |
+| --------------------------------- | ------ | ---------------------------------------------------------- |
+| Live transaction updates          | ✅     | Dashboard and Transactions refresh after every change      |
+| Edit and delete controls          | ✅     | Edit dialog; delete asks for confirmation                  |
+| Add recurring transactions        | ✅     | "Repeat automatically" on Add transaction                  |
+| Monthly dashboard from history    | ✅     | Month picker on the Dashboard                              |
+| Profile management                | ✅     | Profile page, plus change password                         |
+| JWT auth                          | ✅     | httpOnly cookie, secure flags, rate limits, session expiry |
+| Responsive UI                     | ✅     | Desktop sidebar, phone tab bar                             |
+| Search and sort                   | ✅     | Transactions toolbar                                       |
+| Filterable history                | ✅     | Category, date range, sort; loads 25 at a time             |
+| Budget tracker section            | ✅     | 50/30/20 budget guide on the Dashboard                     |
+| Category-wise and day-wise charts | ✅     | "Where it went" donut, daily spending chart                |
+| Income vs expense breakdown       | ✅     | Dashboard cards and the Insights page                      |
+| Transaction management            | ✅     | Add, edit, delete, export                                  |
 
 ### v2 Phase 1 list (core improvements)
 
-| Feature | Your list | Real status | Notes |
-|---|---|---|---|
-| Backend date validation fix | done | ✅ | Timezone-safe; IST users can add "today" after midnight |
-| Date validation with an npm date library | done | ✅ | date-fns on both sides |
-| Export to Excel | done | ✅ | Dashboard → Export, per month |
-| Debounced search | done | ✅ | 300 ms on Transactions |
-| Feedback form | done | ✅ | "Send feedback" in the sidebar / account menu |
-| Backend pagination / infinite scroll | done | ✅ | Server paging with "Load more" |
-| Email service (Amazon SES) | done | ✅ | SES client and mailer set up |
-| Stop recurring transactions | done | 🟡 | Pause / resume works. **Missing:** delete a rule, set an end date from the UI |
-| Email notifications | done | 🟡 | **Only** "payment due tomorrow" reminders. Overspending alerts and monthly summaries are **not built** |
-| Recurring options (daily → yearly) | done | 🟡 | Daily, weekly, monthly, yearly only. **Biweekly, quarterly, half-yearly are not built** |
-| Footer component | done | ⚠️ | Removed in the redesign (feedback moved to the sidebar) |
-| Social media links (GitHub, LinkedIn) | done | ⚠️ | Were in the footer, so also gone; needs a new home |
-| Goal-based budgeting | pending | ✅ | Goals page: targets, contributions, progress, completion |
-| Edit recurring transactions with validation | pending | 🟡 | Editing the **first** transaction updates the rule's amount, category and note. **Missing:** editing frequency or dates, and skipping one occurrence |
-| Custom labels for transactions | pending | 🟡 | Tags exist (auto-tagged from the note by OpenAI) and show on rows. **Missing:** add or edit tags yourself, filter by tag |
-| Category budget warning notifications | pending | 🟡 | The budget guide turns amber when Needs or Wants go over the guideline. **Missing:** a budget per category, and alerts |
-| CSV / Excel import | pending | ⬜ | |
-| Export to PDF | pending | ⬜ | |
-| User settings panel | pending | 🟡 | Profile and theme exist. **Missing:** notification settings, budgets, default category, currency |
-| Multi-user groundwork (shared wallets) | pending | ⬜ | |
-| Password-protected export | pending | ⬜ | See section 4: the proposed password scheme isn't safe |
-| Admin role | pending | ⬜ | Only a commented-out "all feedback" route exists |
+| Feature                                     | Your list | Real status | Notes                                                                                                                                                |
+| ------------------------------------------- | --------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend date validation fix                 | done      | ✅          | Timezone-safe; IST users can add "today" after midnight                                                                                              |
+| Date validation with an npm date library    | done      | ✅          | date-fns on both sides                                                                                                                               |
+| Export to Excel                             | done      | ✅          | Dashboard → Export, per month                                                                                                                        |
+| Debounced search                            | done      | ✅          | 300 ms on Transactions                                                                                                                               |
+| Feedback form                               | done      | ✅          | "Send feedback" in the sidebar / account menu                                                                                                        |
+| Backend pagination / infinite scroll        | done      | ✅          | Server paging with "Load more"                                                                                                                       |
+| Email service (Amazon SES)                  | done      | ✅          | SES client and mailer set up                                                                                                                         |
+| Stop recurring transactions                 | done      | 🟡          | Pause / resume works. **Missing:** delete a rule, set an end date from the UI                                                                        |
+| Email notifications                         | done      | 🟡          | **Only** "payment due tomorrow" reminders. Overspending alerts and monthly summaries are **not built**                                               |
+| Recurring options (daily → yearly)          | done      | 🟡          | Daily, weekly, monthly, yearly only. **Biweekly, quarterly, half-yearly are not built**                                                              |
+| Footer component                            | done      | ⚠️          | Removed in the redesign (feedback moved to the sidebar)                                                                                              |
+| Social media links (GitHub, LinkedIn)       | done      | ⚠️          | Were in the footer, so also gone; needs a new home                                                                                                   |
+| Goal-based budgeting                        | pending   | ✅          | Goals page: targets, contributions, progress, completion                                                                                             |
+| Edit recurring transactions with validation | pending   | 🟡          | Editing the **first** transaction updates the rule's amount, category and note. **Missing:** editing frequency or dates, and skipping one occurrence |
+| Custom labels for transactions              | pending   | 🟡          | Tags exist (auto-tagged from the note by OpenAI) and show on rows. **Missing:** add or edit tags yourself, filter by tag                             |
+| Category budget warning notifications       | pending   | 🟡          | The budget guide turns amber when Needs or Wants go over the guideline. **Missing:** a budget per category, and alerts                               |
+| CSV / Excel import                          | pending   | ⬜          |                                                                                                                                                      |
+| Export to PDF                               | pending   | ⬜          |                                                                                                                                                      |
+| User settings panel                         | pending   | 🟡          | Profile and theme exist. **Missing:** notification settings, budgets, default category, currency                                                     |
+| Multi-user groundwork (shared wallets)      | pending   | ⬜          |                                                                                                                                                      |
+| Password-protected export                   | pending   | ⬜          | See section 4: the proposed password scheme isn't safe                                                                                               |
+| Admin role                                  | pending   | ⬜          | Only a commented-out "all feedback" route exists                                                                                                     |
 
 ### v2 Phase 2 list (intelligence and insights)
 
-| Feature | Real status | Notes |
-|---|---|---|
-| Yearly dashboard + compare | 🟡 | Insights page shows a full year by month. **Missing:** year-vs-year compare |
-| Smart trend advisor (spikes) | 🟡 | Spike/drop detection with 3 methods and plain-language alerts. **Missing:** suggestions ("dining is up 40%, try…") |
-| Recurring transaction dashboard | 🟡 | Recurring page: list, monthly in/out totals, pause, resume, sync. **Missing:** skip once, edit, delete |
-| Savings forecasting | ⬜ | |
-| Insights module (premium) | ⬜ | Needs a pricing decision first |
+| Feature                         | Real status | Notes                                                                                                              |
+| ------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------ |
+| Yearly dashboard + compare      | 🟡          | Insights page shows a full year by month. **Missing:** year-vs-year compare                                        |
+| Smart trend advisor (spikes)    | 🟡          | Spike/drop detection with 3 methods and plain-language alerts. **Missing:** suggestions ("dining is up 40%, try…") |
+| Recurring transaction dashboard | 🟡          | Recurring page: list, monthly in/out totals, pause, resume, sync. **Missing:** skip once, edit, delete             |
+| Savings forecasting             | ⬜          |                                                                                                                    |
+| Insights module (premium)       | ⬜          | Needs a pricing decision first                                                                                     |
 
 ### v2 Phase 3 and stretch
 
-| Feature | Status |
-|---|---|
-| Multi-currency | ⬜ |
-| Receipt upload + OCR | ⬜ |
-| Debt tracker (loans, cards, EMIs) | ⬜ |
-| Offline mode / installable app (PWA) | ⬜ |
-| Chatbot assistant ("how much on food last month?") | ⬜ |
-| Developer API | ⬜ |
+| Feature                                            | Status |
+| -------------------------------------------------- | ------ |
+| Multi-currency                                     | ⬜     |
+| Receipt upload + OCR                               | ⬜     |
+| Debt tracker (loans, cards, EMIs)                  | ⬜     |
+| Offline mode / installable app (PWA)               | ⬜     |
+| Chatbot assistant ("how much on food last month?") | ⬜     |
+| Developer API                                      | ⬜     |
 
 ### Also done (not on the list)
 
@@ -104,43 +104,43 @@ Security hardening (secrets removed, rate limits, secure cookies, 0 vulnerabilit
 
 ### 🟢 Build next: high value, mostly building on what exists
 
-| Feature | Why now | Size |
-|---|---|---|
-| **Edit recurring** (amount, frequency, end date) + **skip once** + **delete** | Listed as your 1st priority; the engine already supports end dates and anchored schedules | M |
-| **More frequencies:** biweekly, quarterly, half-yearly | The shared recurrence code makes this a small change | S |
-| **Category budgets + warnings** (in the app first) | Turns tracking into planning; the budget guide already has the UI pattern | M |
-| **Monthly summary + overspending emails** | SES is already working; only the email content and scheduling are missing | M |
-| **Tags you can edit + filter by tag** | Tags already exist on every transaction; the filter is half-wired on the server | S |
-| **Footer / social links back** | Lost in the redesign; small links at the bottom of the sidebar and on the login page | S |
-| **Forgot password** (emailed reset link) | Today a user who forgets their password is locked out for good | M |
-| **Admin role (read-only)**: view feedback, user count | You can't read the feedback users send without querying the database | S |
-| **Savings forecast** ("at this pace, ₹X left on the 30th") | Simple maths on data the Dashboard already loads | S |
-| **Year-vs-year compare** on Insights | The monthly summary API already has the data | S |
+| Feature                                                                       | Why now                                                                                   | Size |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ---- |
+| **Edit recurring** (amount, frequency, end date) + **skip once** + **delete** | Listed as your 1st priority; the engine already supports end dates and anchored schedules | M    |
+| **More frequencies:** biweekly, quarterly, half-yearly                        | The shared recurrence code makes this a small change                                      | S    |
+| **Category budgets + warnings** (in the app first)                            | Turns tracking into planning; the budget guide already has the UI pattern                 | M    |
+| **Monthly summary + overspending emails**                                     | SES is already working; only the email content and scheduling are missing                 | M    |
+| **Tags you can edit + filter by tag**                                         | Tags already exist on every transaction; the filter is half-wired on the server           | S    |
+| **Footer / social links back**                                                | Lost in the redesign; small links at the bottom of the sidebar and on the login page      | S    |
+| **Forgot password** (emailed reset link)                                      | Today a user who forgets their password is locked out for good                            | M    |
+| **Admin role (read-only)**: view feedback, user count                         | You can't read the feedback users send without querying the database                      | S    |
+| **Savings forecast** ("at this pace, ₹X left on the 30th")                    | Simple maths on data the Dashboard already loads                                          | S    |
+| **Year-vs-year compare** on Insights                                          | The monthly summary API already has the data                                              | S    |
 
 ### 🟡 Later: useful, but bigger or depends on something else
 
-| Feature | Why later |
-|---|---|
-| **CSV / Excel import** | High value (manual entry is why people quit budgeting apps), but each bank's format differs. Do it once categories and budgets are solid |
-| **Export to PDF** | Excel covers the need; PDF is a nicer report for sharing |
-| **User settings panel** | Becomes worthwhile once there are settings to hold (budgets, notifications) |
-| **Trend advisor suggestions** | Build after category budgets, so advice can say "over budget" not just "higher" |
-| **Debt tracker (EMIs, cards)** | Needs accounts and transfers first, or numbers double-count |
-| **Installable app (PWA)** | Good for phones; worth doing once the core features settle |
-| **Two-factor login, active sessions page** | Security upgrades once there are more users |
+| Feature                                    | Why later                                                                                                                                |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **CSV / Excel import**                     | High value (manual entry is why people quit budgeting apps), but each bank's format differs. Do it once categories and budgets are solid |
+| **Export to PDF**                          | Excel covers the need; PDF is a nicer report for sharing                                                                                 |
+| **User settings panel**                    | Becomes worthwhile once there are settings to hold (budgets, notifications)                                                              |
+| **Trend advisor suggestions**              | Build after category budgets, so advice can say "over budget" not just "higher"                                                          |
+| **Debt tracker (EMIs, cards)**             | Needs accounts and transfers first, or numbers double-count                                                                              |
+| **Installable app (PWA)**                  | Good for phones; worth doing once the core features settle                                                                               |
+| **Two-factor login, active sessions page** | Security upgrades once there are more users                                                                                              |
 
 ### 🔴 Park: not now
 
-| Feature | Why park |
-|---|---|
-| **Multi-currency** | Users are in India and everything is in ₹; adds complexity to every number |
-| **Receipt OCR** | Costly per scan and error-prone; plain receipt upload (no OCR) can come first if wanted |
-| **Chatbot assistant** | Every question sends financial data to an AI provider: cost and privacy questions. Revisit after insights mature |
-| **Developer API** | No demand yet; a public API is a long-term support commitment |
-| **Premium insights module** | Needs a pricing decision first (see decisions) |
-| **Multi-user / shared wallets** | A big data-model change (every query becomes per-wallet); only worth it with clear demand |
-| **Custom labels as a premium feature** | Basic tag editing is cheap and expected; keep it free (in "Build next") |
-| **Password-protected export as specified** | See section 4 |
+| Feature                                    | Why park                                                                                                         |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| **Multi-currency**                         | Users are in India and everything is in ₹; adds complexity to every number                                       |
+| **Receipt OCR**                            | Costly per scan and error-prone; plain receipt upload (no OCR) can come first if wanted                          |
+| **Chatbot assistant**                      | Every question sends financial data to an AI provider: cost and privacy questions. Revisit after insights mature |
+| **Developer API**                          | No demand yet; a public API is a long-term support commitment                                                    |
+| **Premium insights module**                | Needs a pricing decision first (see decisions)                                                                   |
+| **Multi-user / shared wallets**            | A big data-model change (every query becomes per-wallet); only worth it with clear demand                        |
+| **Custom labels as a premium feature**     | Basic tag editing is cheap and expected; keep it free (in "Build next")                                          |
+| **Password-protected export as specified** | See section 4                                                                                                    |
 
 ---
 
@@ -150,55 +150,55 @@ Security hardening (secrets removed, rate limits, secure cookies, 0 vulnerabilit
 
 **Goal:** put today's work live safely, and make future changes testable.
 
-| Item | Size |
-|---|---|
-| Move the test suites into the repos (85 API checks, 17 browser flows) + `npm test` | M |
-| GitHub Actions: lint, test, build on every push | S |
-| ESLint + Prettier | S |
-| Finish secret rotation (AWS, OpenAI, Firebase key) | S |
-| Production deploy: Atlas password on EC2, `NODE_ENV=production`, `TRUST_PROXY=1`, nginx `X-Forwarded-For`, check 29th–31st recurring rules, merge to `main` | S |
-| Node 22 on EC2 (AWS SDK needs it from Jan 2027), then Vite 7 | S |
-| Error tracking (Sentry) + uptime check + daily Atlas backup | S |
+| Item                                                                                                                                                        | Size |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| Move the test suites into the repos (85 API checks, 17 browser flows) + `npm test`                                                                          | M    |
+| GitHub Actions: lint, test, build on every push                                                                                                             | S    |
+| ESLint + Prettier                                                                                                                                           | S    |
+| Finish secret rotation (AWS, OpenAI, Firebase key)                                                                                                          | S    |
+| Production deploy: Atlas password on EC2, `NODE_ENV=production`, `TRUST_PROXY=1`, nginx `X-Forwarded-For`, check 29th–31st recurring rules, merge to `main` | S    |
+| Node 22 on EC2 (AWS SDK needs it from Jan 2027), then Vite 7                                                                                                | S    |
+| Error tracking (Sentry) + uptime check + daily Atlas backup                                                                                                 | S    |
 
 ### Part 1: Core improvements and quick wins
 
-| Order | Item | Size |
-|---|---|---|
-| 1 | Edit recurring (amount, frequency, end date), skip once, delete | M |
-| 1 | Biweekly, quarterly, half-yearly frequencies | S |
-| 1 | Footer / social links back | S |
-| 2 | Forgot password (SES email reset link) | M |
-| 2 | Tags: add / edit / remove, filter by tag | S |
-| 2 | Admin role (read-only feedback and stats) | S |
-| 3 | Category budgets + in-app warnings at 80% / 100% | M |
-| 3 | Emails: overspending alert, monthly summary (with an on/off setting) | M |
-| 3 | Savings forecast on the Dashboard | S |
+| Order | Item                                                                 | Size |
+| ----- | -------------------------------------------------------------------- | ---- |
+| 1     | Edit recurring (amount, frequency, end date), skip once, delete      | M    |
+| 1     | Biweekly, quarterly, half-yearly frequencies                         | S    |
+| 1     | Footer / social links back                                           | S    |
+| 2     | Forgot password (SES email reset link)                               | M    |
+| 2     | Tags: add / edit / remove, filter by tag                             | S    |
+| 2     | Admin role (read-only feedback and stats)                            | S    |
+| 3     | Category budgets + in-app warnings at 80% / 100%                     | M    |
+| 3     | Emails: overspending alert, monthly summary (with an on/off setting) | M    |
+| 3     | Savings forecast on the Dashboard                                    | S    |
 
 **Done when:** recurring payments can be fully managed, users get budget warnings, and nobody is locked out by a forgotten password.
 
 ### Part 2: Intelligence and insights
 
-| Item | Size |
-|---|---|
-| Year-vs-year compare on Insights | S |
-| Trend advisor: category trends + suggestions ("dining up 40% over 3 months") | M |
-| Recurring insights: total committed per month, upcoming 30 days, price changes | S |
-| CSV / Excel import with column mapping and duplicate detection | L |
-| Export to PDF (monthly report) | M |
-| User settings panel (notifications, budgets, defaults) | M |
-| Weekly summary email | S |
+| Item                                                                           | Size |
+| ------------------------------------------------------------------------------ | ---- |
+| Year-vs-year compare on Insights                                               | S    |
+| Trend advisor: category trends + suggestions ("dining up 40% over 3 months")   | M    |
+| Recurring insights: total committed per month, upcoming 30 days, price changes | S    |
+| CSV / Excel import with column mapping and duplicate detection                 | L    |
+| Export to PDF (monthly report)                                                 | M    |
+| User settings panel (notifications, budgets, defaults)                         | M    |
+| Weekly summary email                                                           | S    |
 
 ### Part 3: Growth
 
-| Item | Size |
-|---|---|
-| Accounts (bank, card, cash) + transfers between them | L |
-| Debt tracker: loans, card dues, EMI schedule | M |
-| Receipt upload (photo on a transaction; OCR stays parked) | M |
-| Installable app (PWA) + push notifications | M |
-| Two-factor login + active sessions page | M |
-| Separate worker for the daily job and emails (needed before running 2+ API instances) | M |
-| Rename the database from Atlas's default `test` to `budgetwise` | S |
+| Item                                                                                  | Size |
+| ------------------------------------------------------------------------------------- | ---- |
+| Accounts (bank, card, cash) + transfers between them                                  | L    |
+| Debt tracker: loans, card dues, EMI schedule                                          | M    |
+| Receipt upload (photo on a transaction; OCR stays parked)                             | M    |
+| Installable app (PWA) + push notifications                                            | M    |
+| Two-factor login + active sessions page                                               | M    |
+| Separate worker for the daily job and emails (needed before running 2+ API instances) | M    |
+| Rename the database from Atlas's default `test` to `budgetwise`                       | S    |
 
 ### Parked
 

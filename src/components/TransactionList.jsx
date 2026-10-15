@@ -2,11 +2,24 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { Pencil, Trash2, Repeat } from "lucide-react";
-import { removeTransaction, updateTransaction } from "../utils/redux/transactionSlice";
+import {
+  removeTransaction,
+  updateTransaction,
+} from "../utils/redux/transactionSlice";
 import { api } from "../utils/api";
 import { money } from "../utils/format";
-import { categoryMeta, isIncome, EXPENSE_CATEGORIES, CATEGORIES } from "../utils/categories";
-import { dayKey, formatDay, todayString, firstOfMonthString } from "../utils/dates";
+import {
+  categoryMeta,
+  isIncome,
+  EXPENSE_CATEGORIES,
+  CATEGORIES,
+} from "../utils/categories";
+import {
+  dayKey,
+  formatDay,
+  todayString,
+  firstOfMonthString,
+} from "../utils/dates";
 import { ConfirmDialog, Modal, Field, Segmented } from "./ui";
 import { sortTransactions } from "../utils/transactions";
 
@@ -34,31 +47,50 @@ export const TransactionRow = ({ txn, onEdit, onDelete, showDate = false }) => {
       <div className="min-w-0 flex-1">
         <p className="flex items-center gap-1.5 truncate font-medium">
           <span className="truncate">{txn.note || meta.label}</span>
-          {txn.isRecurring && <Repeat size={13} className="shrink-0 text-base-content/40" aria-label="Recurring" />}
+          {txn.isRecurring && (
+            <Repeat
+              size={13}
+              className="shrink-0 text-base-content/40"
+              aria-label="Recurring"
+            />
+          )}
         </p>
         <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-base-content/55">
           <span>{meta.label}</span>
           {showDate && <span>· {formatDay(txn.date)}</span>}
           {txn.tags?.slice(0, 3).map((tag) => (
-            <span key={tag} className="rounded-full bg-base-200 px-2 py-0.5 text-[11px] text-base-content/60">
+            <span
+              key={tag}
+              className="rounded-full bg-base-200 px-2 py-0.5 text-[11px] text-base-content/60"
+            >
               {tag}
             </span>
           ))}
         </p>
       </div>
-      <p className={`num shrink-0 text-right font-semibold ${income ? "text-success" : ""}`}>
+      <p
+        className={`num shrink-0 text-right font-semibold ${income ? "text-success" : ""}`}
+      >
         {income ? "+" : "−"}
         {money(txn.amount, { exact: true })}
       </p>
       {(onEdit || onDelete) && (
         <div className="flex shrink-0 gap-0.5 opacity-100 transition-opacity sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
           {onEdit && (
-            <button className="btn btn-ghost btn-xs btn-square" onClick={() => onEdit(txn)} aria-label={`Edit ${txn.note || "transaction"}`}>
+            <button
+              className="btn btn-ghost btn-xs btn-square"
+              onClick={() => onEdit(txn)}
+              aria-label={`Edit ${txn.note || "transaction"}`}
+            >
               <Pencil size={15} />
             </button>
           )}
           {onDelete && (
-            <button className="btn btn-ghost btn-xs btn-square text-error" onClick={() => onDelete(txn)} aria-label={`Delete ${txn.note || "transaction"}`}>
+            <button
+              className="btn btn-ghost btn-xs btn-square text-error"
+              onClick={() => onDelete(txn)}
+              aria-label={`Delete ${txn.note || "transaction"}`}
+            >
               <Trash2 size={15} />
             </button>
           )}
@@ -84,13 +116,18 @@ function EditModal({ txn, onClose, onChanged }) {
   const save = async () => {
     const amount = parseFloat(form.amount);
     if (!(amount > 0)) return toast.error("Amount must be a positive number.");
-    if (form.date > todayString()) return toast.error("Date can't be in the future.");
-    if (form.date < firstOfMonthString()) return toast.error("Only this month's transactions can be edited.");
+    if (form.date > todayString())
+      return toast.error("Date can't be in the future.");
+    if (form.date < firstOfMonthString())
+      return toast.error("Only this month's transactions can be edited.");
     setSaving(true);
-    const { ok, data, error } = await api(`/user/update/transaction/${txn._id}`, {
-      method: "PATCH",
-      body: { ...form, amount: Math.round(amount * 100) / 100 },
-    });
+    const { ok, data, error } = await api(
+      `/user/update/transaction/${txn._id}`,
+      {
+        method: "PATCH",
+        body: { ...form, amount: Math.round(amount * 100) / 100 },
+      }
+    );
     setSaving(false);
     if (!ok) return toast.error(error);
     dispatch(updateTransaction(data.data));
@@ -106,7 +143,9 @@ function EditModal({ txn, onClose, onChanged }) {
       title="Edit transaction"
       footer={
         <>
-          <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
+          <button className="btn btn-ghost" onClick={onClose}>
+            Cancel
+          </button>
           <button className="btn btn-primary" onClick={save} disabled={saving}>
             {saving && <span className="loading loading-spinner loading-sm" />}
             Save changes
@@ -118,7 +157,10 @@ function EditModal({ txn, onClose, onChanged }) {
         {!isGoal && (
           <Segmented
             label="Type"
-            options={[{ value: "expense", label: "Expense" }, { value: "income", label: "Income" }]}
+            options={[
+              { value: "expense", label: "Expense" },
+              { value: "income", label: "Income" },
+            ]}
             value={form.type}
             onChange={set("type")}
           />
@@ -132,20 +174,34 @@ function EditModal({ txn, onClose, onChanged }) {
               inputMode="decimal"
               className="num"
               value={form.amount}
-              onChange={(e) => /^\d*(\.\d{0,2})?$/.test(e.target.value) && set("amount")(e.target.value)}
+              onChange={(e) =>
+                /^\d*(\.\d{0,2})?$/.test(e.target.value) &&
+                set("amount")(e.target.value)
+              }
             />
           </label>
         </Field>
         {!isGoal && form.type === "expense" && (
           <Field label="Category" htmlFor="edit-category">
-            <select id="edit-category" className="select w-full" value={form.category} onChange={(e) => set("category")(e.target.value)}>
+            <select
+              id="edit-category"
+              className="select w-full"
+              value={form.category}
+              onChange={(e) => set("category")(e.target.value)}
+            >
               {EXPENSE_CATEGORIES.map((c) => (
-                <option key={c} value={c}>{CATEGORIES[c].label}</option>
+                <option key={c} value={c}>
+                  {CATEGORIES[c].label}
+                </option>
               ))}
             </select>
           </Field>
         )}
-        <Field label="Date" hint="Transactions from this month can be edited" htmlFor="edit-date">
+        <Field
+          label="Date"
+          hint="Transactions from this month can be edited"
+          htmlFor="edit-date"
+        >
           <input
             id="edit-date"
             type="date"
@@ -157,7 +213,13 @@ function EditModal({ txn, onClose, onChanged }) {
           />
         </Field>
         <Field label="Note" htmlFor="edit-note">
-          <input id="edit-note" className="input w-full" maxLength={200} value={form.note} onChange={(e) => set("note")(e.target.value)} />
+          <input
+            id="edit-note"
+            className="input w-full"
+            maxLength={200}
+            value={form.note}
+            onChange={(e) => set("note")(e.target.value)}
+          />
         </Field>
       </div>
     </Modal>
@@ -167,7 +229,13 @@ function EditModal({ txn, onClose, onChanged }) {
 // Groups consecutive same-day rows and handles edit + confirmed delete.
 // onChanged(before, after) fires after an edit (after = updated row) or a
 // delete (after = null), so a parent can keep its own totals in sync.
-export default function TransactionList({ transactions, groupByDay = true, limit, order = "newest", onChanged }) {
+export default function TransactionList({
+  transactions,
+  groupByDay = true,
+  limit,
+  order = "newest",
+  onChanged,
+}) {
   const dispatch = useDispatch();
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
@@ -178,7 +246,10 @@ export default function TransactionList({ transactions, groupByDay = true, limit
 
   const confirmDelete = async () => {
     setBusy(true);
-    const { ok, error } = await api(`/user/transaction/delete/${deleting._id}`, { method: "DELETE" });
+    const { ok, error } = await api(
+      `/user/transaction/delete/${deleting._id}`,
+      { method: "DELETE" }
+    );
     setBusy(false);
     if (!ok) return toast.error(error);
     dispatch(removeTransaction(deleting));
@@ -190,7 +261,11 @@ export default function TransactionList({ transactions, groupByDay = true, limit
   const groups = [];
   for (const txn of shown) {
     const key = dayKey(txn.date);
-    if (!groupByDay || !groups.length || groups[groups.length - 1].key !== key) {
+    if (
+      !groupByDay ||
+      !groups.length ||
+      groups[groups.length - 1].key !== key
+    ) {
       groups.push({ key, items: [txn] });
     } else {
       groups[groups.length - 1].items.push(txn);
@@ -201,24 +276,42 @@ export default function TransactionList({ transactions, groupByDay = true, limit
     <>
       <div className="divide-y divide-base-300">
         {groups.map((g) => {
-          const net = g.items.reduce((s, t) => s + (isIncome(t) ? t.amount : -t.amount), 0);
+          const net = g.items.reduce(
+            (s, t) => s + (isIncome(t) ? t.amount : -t.amount),
+            0
+          );
           return (
             <div key={g.key + g.items[0]._id}>
               {groupByDay && (
                 <div className="flex items-center justify-between bg-base-200/50 px-5 py-2 text-xs font-medium text-base-content/55">
                   <span>{formatDay(g.key, { weekday: "short" })}</span>
-                  <span className="num">{net >= 0 ? "+" : "−"}{money(Math.abs(net))}</span>
+                  <span className="num">
+                    {net >= 0 ? "+" : "−"}
+                    {money(Math.abs(net))}
+                  </span>
                 </div>
               )}
               {g.items.map((txn) => (
-                <TransactionRow key={txn._id} txn={txn} onEdit={setEditing} onDelete={setDeleting} showDate={!groupByDay} />
+                <TransactionRow
+                  key={txn._id}
+                  txn={txn}
+                  onEdit={setEditing}
+                  onDelete={setDeleting}
+                  showDate={!groupByDay}
+                />
               ))}
             </div>
           );
         })}
       </div>
 
-      {editing && <EditModal txn={editing} onClose={() => setEditing(null)} onChanged={onChanged} />}
+      {editing && (
+        <EditModal
+          txn={editing}
+          onClose={() => setEditing(null)}
+          onChanged={onChanged}
+        />
+      )}
       <ConfirmDialog
         open={!!deleting}
         title="Delete transaction?"

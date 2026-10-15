@@ -17,7 +17,9 @@ const transactionSlice = createSlice({
     // added elsewhere in the meantime shifts positions by one)
     appendTransactions: (state, action) => {
       const seen = new Set(state.transactions.map((t) => t._id));
-      state.transactions.push(...action.payload.filter((t) => !seen.has(t._id)));
+      state.transactions.push(
+        ...action.payload.filter((t) => !seen.has(t._id))
+      );
     },
     removeTransaction: (state, action) => {
       state.transactions = state.transactions.filter(

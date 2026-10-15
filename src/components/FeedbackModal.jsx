@@ -44,8 +44,14 @@ const FeedbackModal = ({ open, onClose }) => {
       title="Send feedback"
       footer={
         <>
-          <button className="btn btn-ghost" onClick={close}>Cancel</button>
-          <button className="btn btn-primary" onClick={submit} disabled={sending}>
+          <button className="btn btn-ghost" onClick={close}>
+            Cancel
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={submit}
+            disabled={sending}
+          >
             {sending && <span className="loading loading-spinner loading-sm" />}
             Send
           </button>
@@ -53,8 +59,18 @@ const FeedbackModal = ({ open, onClose }) => {
       }
     >
       <div className="flex flex-col gap-4">
-        <Segmented label="Feedback type" options={TYPES} value={type} onChange={setType} size="sm" />
-        <Field label="Your message" hint={`${text.length}/500`} htmlFor="feedback-text">
+        <Segmented
+          label="Feedback type"
+          options={TYPES}
+          value={type}
+          onChange={setType}
+          size="sm"
+        />
+        <Field
+          label="Your message"
+          hint={`${text.length}/500`}
+          htmlFor="feedback-text"
+        >
           <textarea
             id="feedback-text"
             className="textarea w-full"

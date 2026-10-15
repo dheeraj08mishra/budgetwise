@@ -38,7 +38,13 @@ export default defineConfig({
       output: {
         // Long-lived vendor chunks: app changes don't bust their cache
         manualChunks: {
-          react: ["react", "react-dom", "react-router-dom", "react-redux", "@reduxjs/toolkit"],
+          react: [
+            "react",
+            "react-dom",
+            "react-router-dom",
+            "react-redux",
+            "@reduxjs/toolkit",
+          ],
           charts: ["recharts"],
         },
       },

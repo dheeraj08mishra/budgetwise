@@ -37,7 +37,10 @@ const AuthObserver = ({ children }) => {
   if (checking) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <span className="loading loading-spinner loading-lg" aria-label="Loading" />
+        <span
+          className="loading loading-spinner loading-lg"
+          aria-label="Loading"
+        />
       </div>
     );
   }

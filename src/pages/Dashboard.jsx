@@ -2,14 +2,33 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { Wallet, ArrowDownLeft, ShoppingBag, PiggyBank, Download, Plus, Inbox, Repeat, Target, ChevronRight } from "lucide-react";
+import {
+  Wallet,
+  ArrowDownLeft,
+  ShoppingBag,
+  PiggyBank,
+  Download,
+  Plus,
+  Inbox,
+  Repeat,
+  Target,
+  ChevronRight,
+} from "lucide-react";
 import { addTransaction } from "../utils/redux/transactionSlice";
 import { api } from "../utils/api";
 import { BASE_URL } from "../utils/constants";
 import { money, change, percent, MONTHS, capitalize } from "../utils/format";
 import { isIncome, isSpending, isSavings } from "../utils/categories";
 import { formatDay } from "../utils/dates";
-import { Card, CardHeader, StatCard, Delta, EmptyState, Skeleton, PageHeader } from "../components/ui";
+import {
+  Card,
+  CardHeader,
+  StatCard,
+  Delta,
+  EmptyState,
+  Skeleton,
+  PageHeader,
+} from "../components/ui";
 import TransactionList from "../components/TransactionList";
 import SpendingTrend from "../components/charts/SpendingTrend";
 import CategoryDonut from "../components/charts/CategoryDonut";
@@ -22,12 +41,35 @@ const greeting = () => {
 // 50/30/20 guide: needs ≤ 50%, wants ≤ 30%, savings + investments ≥ 20% of income
 function BudgetGuide({ income, needs, wants, saved }) {
   const rows = [
-    { label: "Needs", value: needs, target: 50, max: true, color: "bg-emerald-500" },
-    { label: "Wants", value: wants, target: 30, max: true, color: "bg-amber-500" },
-    { label: "Savings & investments", value: saved, target: 20, max: false, color: "bg-violet-500" },
+    {
+      label: "Needs",
+      value: needs,
+      target: 50,
+      max: true,
+      color: "bg-emerald-500",
+    },
+    {
+      label: "Wants",
+      value: wants,
+      target: 30,
+      max: true,
+      color: "bg-amber-500",
+    },
+    {
+      label: "Savings & investments",
+      value: saved,
+      target: 20,
+      max: false,
+      color: "bg-violet-500",
+    },
   ];
   if (!income) {
-    return <p className="label-muted px-5 pb-5">Add this month’s income to see how your spending compares with the 50/30/20 guide.</p>;
+    return (
+      <p className="label-muted px-5 pb-5">
+        Add this month’s income to see how your spending compares with the
+        50/30/20 guide.
+      </p>
+    );
   }
   return (
     <div className="space-y-5 px-5 pb-5">
@@ -39,15 +81,34 @@ function BudgetGuide({ income, needs, wants, saved }) {
             <div className="mb-1.5 flex items-baseline justify-between text-sm">
               <span className="font-medium">{r.label}</span>
               <span className="num">
-                <span className={off ? "font-semibold text-warning" : "font-semibold"}>{percent(pct)}</span>
-                <span className="text-base-content/50"> / {r.max ? "≤" : "≥"}{r.target}%</span>
+                <span
+                  className={
+                    off ? "font-semibold text-warning" : "font-semibold"
+                  }
+                >
+                  {percent(pct)}
+                </span>
+                <span className="text-base-content/50">
+                  {" "}
+                  / {r.max ? "≤" : "≥"}
+                  {r.target}%
+                </span>
               </span>
             </div>
             <div className="relative h-2 overflow-hidden rounded-full bg-base-200">
-              <div className={`h-full rounded-full ${off ? "bg-warning" : r.color}`} style={{ width: `${Math.min(pct, 100)}%` }} />
-              <div className="absolute inset-y-0 w-0.5 bg-base-content/40" style={{ left: `${r.target}%` }} title={`Target ${r.target}%`} />
+              <div
+                className={`h-full rounded-full ${off ? "bg-warning" : r.color}`}
+                style={{ width: `${Math.min(pct, 100)}%` }}
+              />
+              <div
+                className="absolute inset-y-0 w-0.5 bg-base-content/40"
+                style={{ left: `${r.target}%` }}
+                title={`Target ${r.target}%`}
+              />
             </div>
-            <p className="num mt-1 text-xs text-base-content/50">{money(r.value)} of {money(income)}</p>
+            <p className="num mt-1 text-xs text-base-content/50">
+              {money(r.value)} of {money(income)}
+            </p>
           </div>
         );
       })}
@@ -78,18 +139,35 @@ export default function Dashboard() {
         api("/recurring/transactions?limit=20"),
       ]);
       if (!alive) return;
-      const list = (m.data?.data || []).map(({ month, year }) => ({ year, month: MONTHS.indexOf(month) + 1 }));
+      const list = (m.data?.data || []).map(({ month, year }) => ({
+        year,
+        month: MONTHS.indexOf(month) + 1,
+      }));
       const now = new Date();
       const thisMonth = { year: now.getFullYear(), month: now.getMonth() + 1 };
       // Always offer the current month, even before its first transaction
-      if (!list.some((x) => x.year === thisMonth.year && x.month === thisMonth.month)) list.unshift(thisMonth);
+      if (
+        !list.some(
+          (x) => x.year === thisMonth.year && x.month === thisMonth.month
+        )
+      )
+        list.unshift(thisMonth);
       setMonths(list);
       setSelected(`${thisMonth.year}-${thisMonth.month}`);
       setSummary(s.data?.summary || []);
       setGoals((g.data?.goals || []).filter((x) => !x.isCompleted).slice(0, 3));
-      setUpcoming((r.data?.data || []).filter((x) => x.isActive && x.nextOccurrence).sort((a, b) => new Date(a.nextOccurrence) - new Date(b.nextOccurrence)).slice(0, 4));
+      setUpcoming(
+        (r.data?.data || [])
+          .filter((x) => x.isActive && x.nextOccurrence)
+          .sort(
+            (a, b) => new Date(a.nextOccurrence) - new Date(b.nextOccurrence)
+          )
+          .slice(0, 4)
+      );
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const [year, month] = selected ? selected.split("-").map(Number) : [0, 0];
@@ -98,17 +176,22 @@ export default function Dashboard() {
     if (!selected) return;
     let alive = true;
     setLoadingMonth(true);
-    api(`/user/transactions/monthly?month=${month}&year=${year}`).then(({ ok, data, error }) => {
-      if (!alive) return;
-      if (!ok) toast.error(error);
-      dispatch(addTransaction(ok ? data.data.transactions : []));
-      setLoadingMonth(false);
-    });
-    return () => { alive = false; };
+    api(`/user/transactions/monthly?month=${month}&year=${year}`).then(
+      ({ ok, data, error }) => {
+        if (!alive) return;
+        if (!ok) toast.error(error);
+        dispatch(addTransaction(ok ? data.data.transactions : []));
+        setLoadingMonth(false);
+      }
+    );
+    return () => {
+      alive = false;
+    };
   }, [selected, year, month, dispatch]);
 
   const totals = useMemo(() => {
-    const sum = (fn, filter) => transactions.filter(filter).reduce((s, t) => s + fn(t), 0);
+    const sum = (fn, filter) =>
+      transactions.filter(filter).reduce((s, t) => s + fn(t), 0);
     const amt = (t) => t.amount;
     const income = sum(amt, isIncome);
     const spending = sum(amt, isSpending);
@@ -131,10 +214,21 @@ export default function Dashboard() {
   }, [summary, year, month]);
 
   const exportExcel = async () => {
-    const res = await fetch(`${BASE_URL}/user/transactions/export/excel?month=${month}&year=${year}`, { credentials: "include" });
-    if (!res.ok) return toast.error(res.status === 404 ? "No transactions to export for this month." : "Export failed. Please try again.");
+    const res = await fetch(
+      `${BASE_URL}/user/transactions/export/excel?month=${month}&year=${year}`,
+      { credentials: "include" }
+    );
+    if (!res.ok)
+      return toast.error(
+        res.status === 404
+          ? "No transactions to export for this month."
+          : "Export failed. Please try again."
+      );
     const url = URL.createObjectURL(await res.blob());
-    const a = Object.assign(document.createElement("a"), { href: url, download: `budgetwise_${year}-${String(month).padStart(2, "0")}.xlsx` });
+    const a = Object.assign(document.createElement("a"), {
+      href: url,
+      download: `budgetwise_${year}-${String(month).padStart(2, "0")}.xlsx`,
+    });
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -146,28 +240,50 @@ export default function Dashboard() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-12 w-72" />
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-32" />)}</div>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-32" />
+          ))}
+        </div>
         <Skeleton className="h-72" />
       </div>
     );
   }
 
   const monthLabel = `${MONTHS[month - 1]} ${year}`;
-  const isCurrent = selected === `${new Date().getFullYear()}-${new Date().getMonth() + 1}`;
+  const isCurrent =
+    selected === `${new Date().getFullYear()}-${new Date().getMonth() + 1}`;
 
   return (
     <div className="space-y-6">
       <PageHeader
         title={`${greeting()}, ${capitalize(user?.firstName)}`}
-        subtitle={isCurrent ? "Here's where your money stands this month." : `Looking back at ${monthLabel}.`}
+        subtitle={
+          isCurrent
+            ? "Here's where your money stands this month."
+            : `Looking back at ${monthLabel}.`
+        }
         actions={
           <>
-            <select className="select select-sm w-44" value={selected} onChange={(e) => setSelected(e.target.value)} aria-label="Month">
+            <select
+              className="select select-sm w-44"
+              value={selected}
+              onChange={(e) => setSelected(e.target.value)}
+              aria-label="Month"
+            >
               {months.map((m) => (
-                <option key={`${m.year}-${m.month}`} value={`${m.year}-${m.month}`}>{MONTHS[m.month - 1]} {m.year}</option>
+                <option
+                  key={`${m.year}-${m.month}`}
+                  value={`${m.year}-${m.month}`}
+                >
+                  {MONTHS[m.month - 1]} {m.year}
+                </option>
               ))}
             </select>
-            <button className="btn btn-sm btn-ghost border-base-300" onClick={exportExcel}>
+            <button
+              className="btn btn-sm btn-ghost border-base-300"
+              onClick={exportExcel}
+            >
               <Download size={16} /> Export
             </button>
           </>
@@ -175,20 +291,63 @@ export default function Dashboard() {
       />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Left this month" icon={Wallet} tone="primary" value={loadingMonth ? "…" : money(totals.left)}
-          footer={<span className="text-xs text-base-content/50">After spending and savings</span>} />
-        <StatCard label="Income" icon={ArrowDownLeft} tone="success" value={loadingMonth ? "…" : money(totals.income)}
-          footer={<Delta value={change(totals.income, prev?.income)} />} />
-        <StatCard label="Spending" icon={ShoppingBag} tone="error" value={loadingMonth ? "…" : money(totals.spending)}
-          footer={<Delta value={change(totals.spending, prev?.expense)} goodWhenUp={false} />} />
-        <StatCard label="Saved to goals" icon={PiggyBank} tone="violet" value={loadingMonth ? "…" : money(totals.saved)}
-          footer={<span className="text-xs text-base-content/50">{totals.income ? `${percent((totals.saved / totals.income) * 100)} of income` : "—"}</span>} />
+        <StatCard
+          label="Left this month"
+          icon={Wallet}
+          tone="primary"
+          value={loadingMonth ? "…" : money(totals.left)}
+          footer={
+            <span className="text-xs text-base-content/50">
+              After spending and savings
+            </span>
+          }
+        />
+        <StatCard
+          label="Income"
+          icon={ArrowDownLeft}
+          tone="success"
+          value={loadingMonth ? "…" : money(totals.income)}
+          footer={<Delta value={change(totals.income, prev?.income)} />}
+        />
+        <StatCard
+          label="Spending"
+          icon={ShoppingBag}
+          tone="error"
+          value={loadingMonth ? "…" : money(totals.spending)}
+          footer={
+            <Delta
+              value={change(totals.spending, prev?.expense)}
+              goodWhenUp={false}
+            />
+          }
+        />
+        <StatCard
+          label="Saved to goals"
+          icon={PiggyBank}
+          tone="violet"
+          value={loadingMonth ? "…" : money(totals.saved)}
+          footer={
+            <span className="text-xs text-base-content/50">
+              {totals.income
+                ? `${percent((totals.saved / totals.income) * 100)} of income`
+                : "—"}
+            </span>
+          }
+        />
       </div>
 
       {!loadingMonth && transactions.length === 0 ? (
         <Card>
-          <EmptyState icon={Inbox} title={`No transactions in ${monthLabel}`} text="Add your income and expenses to see your trends, budget and insights here."
-            action={<Link to="/add" className="btn btn-primary"><Plus size={18} /> Add transaction</Link>} />
+          <EmptyState
+            icon={Inbox}
+            title={`No transactions in ${monthLabel}`}
+            text="Add your income and expenses to see your trends, budget and insights here."
+            action={
+              <Link to="/add" className="btn btn-primary">
+                <Plus size={18} /> Add transaction
+              </Link>
+            }
+          />
         </Card>
       ) : (
         <>
@@ -196,70 +355,155 @@ export default function Dashboard() {
             <Card className="lg:col-span-2">
               <CardHeader title="Daily spending" subtitle={monthLabel} />
               <div className="px-3 pb-4 pt-2">
-                {loadingMonth ? <Skeleton className="mx-2 h-64" /> : <SpendingTrend transactions={transactions} year={year} month={month} />}
+                {loadingMonth ? (
+                  <Skeleton className="mx-2 h-64" />
+                ) : (
+                  <SpendingTrend
+                    transactions={transactions}
+                    year={year}
+                    month={month}
+                  />
+                )}
               </div>
             </Card>
             <Card>
               <CardHeader title="Budget guide" subtitle="50 / 30 / 20 rule" />
               <div className="pt-5">
-                <BudgetGuide income={totals.income} needs={totals.needs} wants={totals.wants} saved={totals.saved + totals.invested} />
+                <BudgetGuide
+                  income={totals.income}
+                  needs={totals.needs}
+                  wants={totals.wants}
+                  saved={totals.saved + totals.invested}
+                />
               </div>
             </Card>
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <Card className="lg:col-span-2">
-              <CardHeader title="Where it went" subtitle="Money out by category" />
-              <div className="p-5">{loadingMonth ? <Skeleton className="h-44" /> : <CategoryDonut transactions={transactions} />}</div>
+              <CardHeader
+                title="Where it went"
+                subtitle="Money out by category"
+              />
+              <div className="p-5">
+                {loadingMonth ? (
+                  <Skeleton className="h-44" />
+                ) : (
+                  <CategoryDonut transactions={transactions} />
+                )}
+              </div>
             </Card>
             <Card>
-              <CardHeader title="Upcoming payments" action={<Link to="/recurring" className="btn btn-ghost btn-xs">All <ChevronRight size={14} /></Link>} />
+              <CardHeader
+                title="Upcoming payments"
+                action={
+                  <Link to="/recurring" className="btn btn-ghost btn-xs">
+                    All <ChevronRight size={14} />
+                  </Link>
+                }
+              />
               {upcoming.length ? (
                 <ul className="divide-y divide-base-300 pt-2">
                   {upcoming.map((r) => (
-                    <li key={r._id} className="flex items-center gap-3 px-5 py-3">
-                      <span className="grid grid-cols-1 size-9 place-items-center rounded-xl bg-primary/10 text-primary"><Repeat size={16} /></span>
+                    <li
+                      key={r._id}
+                      className="flex items-center gap-3 px-5 py-3"
+                    >
+                      <span className="grid grid-cols-1 size-9 place-items-center rounded-xl bg-primary/10 text-primary">
+                        <Repeat size={16} />
+                      </span>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">{r.note || "Recurring payment"}</p>
-                        <p className="text-xs text-base-content/50">{formatDay(r.nextOccurrence)}</p>
+                        <p className="truncate text-sm font-medium">
+                          {r.note || "Recurring payment"}
+                        </p>
+                        <p className="text-xs text-base-content/50">
+                          {formatDay(r.nextOccurrence)}
+                        </p>
                       </div>
-                      <span className={`num text-sm font-semibold ${r.type === "income" ? "text-success" : ""}`}>{money(r.amount)}</span>
+                      <span
+                        className={`num text-sm font-semibold ${r.type === "income" ? "text-success" : ""}`}
+                      >
+                        {money(r.amount)}
+                      </span>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <EmptyState icon={Repeat} title="No upcoming payments" text="Mark a transaction as recurring to see it here." />
+                <EmptyState
+                  icon={Repeat}
+                  title="No upcoming payments"
+                  text="Mark a transaction as recurring to see it here."
+                />
               )}
             </Card>
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <Card className="lg:col-span-2">
-              <CardHeader title="Recent activity" action={<Link to="/transactions" className="btn btn-ghost btn-xs">View all <ChevronRight size={14} /></Link>} />
+              <CardHeader
+                title="Recent activity"
+                action={
+                  <Link to="/transactions" className="btn btn-ghost btn-xs">
+                    View all <ChevronRight size={14} />
+                  </Link>
+                }
+              />
               <div className="mt-3 overflow-hidden rounded-b-box">
-                {loadingMonth ? <Skeleton className="m-5 h-40" /> : <TransactionList transactions={transactions} limit={6} />}
+                {loadingMonth ? (
+                  <Skeleton className="m-5 h-40" />
+                ) : (
+                  <TransactionList transactions={transactions} limit={6} />
+                )}
               </div>
             </Card>
             <Card>
-              <CardHeader title="Goals" action={<Link to="/goals" className="btn btn-ghost btn-xs">All <ChevronRight size={14} /></Link>} />
+              <CardHeader
+                title="Goals"
+                action={
+                  <Link to="/goals" className="btn btn-ghost btn-xs">
+                    All <ChevronRight size={14} />
+                  </Link>
+                }
+              />
               {goals.length ? (
                 <ul className="space-y-5 p-5">
                   {goals.map((g) => {
-                    const pct = Math.min((g.currentAmount / g.targetAmount) * 100, 100);
+                    const pct = Math.min(
+                      (g.currentAmount / g.targetAmount) * 100,
+                      100
+                    );
                     return (
                       <li key={g._id}>
                         <div className="mb-1.5 flex justify-between text-sm">
-                          <span className="truncate font-medium">{g.title}</span>
-                          <span className="num text-base-content/60">{percent(pct)}</span>
+                          <span className="truncate font-medium">
+                            {g.title}
+                          </span>
+                          <span className="num text-base-content/60">
+                            {percent(pct)}
+                          </span>
                         </div>
-                        <progress className="progress progress-primary h-2 w-full" value={pct} max="100" />
-                        <p className="num mt-1 text-xs text-base-content/50">{money(g.currentAmount)} of {money(g.targetAmount)}</p>
+                        <progress
+                          className="progress progress-primary h-2 w-full"
+                          value={pct}
+                          max="100"
+                        />
+                        <p className="num mt-1 text-xs text-base-content/50">
+                          {money(g.currentAmount)} of {money(g.targetAmount)}
+                        </p>
                       </li>
                     );
                   })}
                 </ul>
               ) : (
-                <EmptyState icon={Target} title="No active goals" action={<Link to="/goals" className="btn btn-sm btn-primary">Create a goal</Link>} />
+                <EmptyState
+                  icon={Target}
+                  title="No active goals"
+                  action={
+                    <Link to="/goals" className="btn btn-sm btn-primary">
+                      Create a goal
+                    </Link>
+                  }
+                />
               )}
             </Card>
           </div>

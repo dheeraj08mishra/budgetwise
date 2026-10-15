@@ -36,7 +36,10 @@ const NAV = [
 const MOBILE_NAV = [NAV[0], NAV[1], null, NAV[3], NAV[4]];
 
 const Logo = () => (
-  <Link to="/" className="flex items-center gap-2.5 font-semibold tracking-tight">
+  <Link
+    to="/"
+    className="flex items-center gap-2.5 font-semibold tracking-tight"
+  >
     <span className="grid grid-cols-1 size-8 place-items-center rounded-lg bg-primary text-primary-content">
       <Wallet size={17} aria-hidden />
     </span>
@@ -46,7 +49,8 @@ const Logo = () => (
 
 const Avatar = ({ user, size = "size-9" }) => {
   const [broken, setBroken] = useState(false);
-  const initials = `${user?.firstName?.[0] || ""}${user?.lastName?.[0] || ""}`.toUpperCase();
+  const initials =
+    `${user?.firstName?.[0] || ""}${user?.lastName?.[0] || ""}`.toUpperCase();
   return user?.photo && !broken ? (
     <img
       src={user.photo}
@@ -55,7 +59,9 @@ const Avatar = ({ user, size = "size-9" }) => {
       onError={() => setBroken(true)}
     />
   ) : (
-    <span className={`${size} grid shrink-0 place-items-center rounded-full bg-primary/15 text-sm font-semibold text-primary`}>
+    <span
+      className={`${size} grid shrink-0 place-items-center rounded-full bg-primary/15 text-sm font-semibold text-primary`}
+    >
       {initials || "?"}
     </span>
   );
@@ -90,7 +96,8 @@ const AppShell = () => {
         : "text-base-content/70 hover:bg-base-200 hover:text-base-content"
     }`;
 
-  const fullName = capitalize(user?.firstName) + " " + capitalize(user?.lastName);
+  const fullName =
+    capitalize(user?.firstName) + " " + capitalize(user?.lastName);
 
   return (
     <div className="min-h-screen lg:pl-64">
@@ -112,11 +119,21 @@ const AppShell = () => {
           ))}
         </nav>
         <div className="flex flex-col gap-1 px-3 pb-3">
-          <button className="flex items-center gap-3 rounded-field px-3 py-2 text-sm text-base-content/70 hover:bg-base-200" onClick={() => setFeedbackOpen(true)}>
+          <button
+            className="flex items-center gap-3 rounded-field px-3 py-2 text-sm text-base-content/70 hover:bg-base-200"
+            onClick={() => setFeedbackOpen(true)}
+          >
             <MessageSquare size={18} aria-hidden /> Send feedback
           </button>
-          <button className="flex items-center gap-3 rounded-field px-3 py-2 text-sm text-base-content/70 hover:bg-base-200" onClick={toggleTheme}>
-            {theme === THEMES.dark ? <Sun size={18} aria-hidden /> : <Moon size={18} aria-hidden />}
+          <button
+            className="flex items-center gap-3 rounded-field px-3 py-2 text-sm text-base-content/70 hover:bg-base-200"
+            onClick={toggleTheme}
+          >
+            {theme === THEMES.dark ? (
+              <Sun size={18} aria-hidden />
+            ) : (
+              <Moon size={18} aria-hidden />
+            )}
             {theme === THEMES.dark ? "Light mode" : "Dark mode"}
           </button>
         </div>
@@ -124,9 +141,16 @@ const AppShell = () => {
           <Avatar user={user} />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium">{fullName}</p>
-            <p className="truncate text-xs text-base-content/50">{user?.email}</p>
+            <p className="truncate text-xs text-base-content/50">
+              {user?.email}
+            </p>
           </div>
-          <button className="btn btn-ghost btn-sm btn-square" onClick={signOut} aria-label="Sign out" title="Sign out">
+          <button
+            className="btn btn-ghost btn-sm btn-square"
+            onClick={signOut}
+            aria-label="Sign out"
+            title="Sign out"
+          >
             <LogOut size={17} />
           </button>
         </div>
@@ -136,18 +160,45 @@ const AppShell = () => {
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-base-300 bg-base-100/90 px-4 py-3 backdrop-blur lg:hidden">
         <Logo />
         <div className="flex items-center gap-1">
-          <button className="btn btn-ghost btn-sm btn-square" onClick={toggleTheme} aria-label="Toggle theme">
+          <button
+            className="btn btn-ghost btn-sm btn-square"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+          >
             {theme === THEMES.dark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
           <div className="dropdown dropdown-end">
-            <button tabIndex={0} className="btn btn-ghost btn-sm btn-circle" aria-label="Account menu">
+            <button
+              tabIndex={0}
+              className="btn btn-ghost btn-sm btn-circle"
+              aria-label="Account menu"
+            >
               <Avatar user={user} size="size-8" />
             </button>
-            <ul tabIndex={0} className="menu dropdown-content z-40 mt-2 w-52 rounded-box border border-base-300 bg-base-100 p-2 shadow-lg">
-              <li><Link to="/profile"><User size={16} /> Profile</Link></li>
-              <li><Link to="/recurring"><Repeat size={16} /> Recurring</Link></li>
-              <li><button onClick={() => setFeedbackOpen(true)}><MessageSquare size={16} /> Send feedback</button></li>
-              <li><button className="text-error" onClick={signOut}><LogOut size={16} /> Sign out</button></li>
+            <ul
+              tabIndex={0}
+              className="menu dropdown-content z-40 mt-2 w-52 rounded-box border border-base-300 bg-base-100 p-2 shadow-lg"
+            >
+              <li>
+                <Link to="/profile">
+                  <User size={16} /> Profile
+                </Link>
+              </li>
+              <li>
+                <Link to="/recurring">
+                  <Repeat size={16} /> Recurring
+                </Link>
+              </li>
+              <li>
+                <button onClick={() => setFeedbackOpen(true)}>
+                  <MessageSquare size={16} /> Send feedback
+                </button>
+              </li>
+              <li>
+                <button className="text-error" onClick={signOut}>
+                  <LogOut size={16} /> Sign out
+                </button>
+              </li>
             </ul>
           </div>
         </div>
@@ -158,7 +209,10 @@ const AppShell = () => {
       </main>
 
       {/* Mobile bottom tab bar */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-base-300 bg-base-100/95 backdrop-blur lg:hidden" aria-label="Main">
+      <nav
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-base-300 bg-base-100/95 backdrop-blur lg:hidden"
+        aria-label="Main"
+      >
         <div className="mx-auto grid max-w-md grid-cols-5 items-end px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2">
           {MOBILE_NAV.map((item) =>
             item ? (
@@ -174,7 +228,12 @@ const AppShell = () => {
                 {item.label}
               </NavLink>
             ) : (
-              <Link key="add" to="/add" className="mx-auto -mt-6 grid grid-cols-1 size-14 place-items-center rounded-full bg-primary text-primary-content shadow-lg shadow-primary/30" aria-label="Add transaction">
+              <Link
+                key="add"
+                to="/add"
+                className="mx-auto -mt-6 grid grid-cols-1 size-14 place-items-center rounded-full bg-primary text-primary-content shadow-lg shadow-primary/30"
+                aria-label="Add transaction"
+              >
                 <Plus size={26} />
               </Link>
             )
@@ -182,7 +241,10 @@ const AppShell = () => {
         </div>
       </nav>
 
-      <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+      <FeedbackModal
+        open={feedbackOpen}
+        onClose={() => setFeedbackOpen(false)}
+      />
     </div>
   );
 };

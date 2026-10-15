@@ -24,7 +24,8 @@ export const moneyShort = (n) => {
   return `${sign}₹${v}`;
 };
 
-export const percent = (n, digits = 0) => `${(Number(n) || 0).toFixed(digits)}%`;
+export const percent = (n, digits = 0) =>
+  `${(Number(n) || 0).toFixed(digits)}%`;
 
 // Percentage change a -> b, or null when there is nothing to compare
 export const change = (current, previous) =>
@@ -33,6 +34,16 @@ export const change = (current, previous) =>
 export const capitalize = (s = "") => s.charAt(0).toUpperCase() + s.slice(1);
 
 export const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];

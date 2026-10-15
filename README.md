@@ -19,13 +19,13 @@ This repo is the **React frontend**. What's planned next: [ROADMAP.md](ROADMAP.m
 
 ## 🔧 Tech stack
 
-| | |
-|---|---|
-| UI | React 19, React Router 7, Tailwind CSS 4 + daisyUI 5 (custom light/dark themes), Lucide icons, Inter |
-| State | Redux Toolkit |
-| Charts | Recharts |
-| Dates | date-fns |
-| Build | Vite 6 |
+|        |                                                                                                      |
+| ------ | ---------------------------------------------------------------------------------------------------- |
+| UI     | React 19, React Router 7, Tailwind CSS 4 + daisyUI 5 (custom light/dark themes), Lucide icons, Inter |
+| State  | Redux Toolkit                                                                                        |
+| Charts | Recharts                                                                                             |
+| Dates  | date-fns                                                                                             |
+| Build  | Vite 6                                                                                               |
 
 ## 🛠️ Running locally
 
