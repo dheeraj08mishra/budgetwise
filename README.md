@@ -1,128 +1,133 @@
-## 💰 BudgetWise – Personal Finance Tracker 
+# 💰 BudgetWise
 
-- BudgetWise is a comprehensive full-stack MERN web application that empowers users to efficiently manage their income, expenses, and budgets with clear, actionable insights.  
-- The platform features an intuitive dashboard for seamlessly adding, editing, and visualizing both expenses and incomes.  
-- Designed to be responsive and user-friendly, BudgetWise helps users gain a deeper understanding of their financial activity. With powerful tools for categorizing spending, visualizing financial trends, and making smarter money decisions, BudgetWise makes personal finance management simple and effective.
+A personal finance tracker for India: record income and spending, see where the money goes, set budgets, automate the payments that repeat, and save towards goals. Works on desktop and phone, and installs as an app.
 
-**Live demo:** [https://www.budgetwiseapp.in/](https://www.budgetwiseapp.in/)
+**Live demo:** [budgetwiseapp.in](https://www.budgetwiseapp.in/)
 
----
+This repo is the **React frontend**. The API lives in [finance_tracker_server](https://github.com/dheeraj08mishra/finance_tracker_server) (Express + MongoDB). What's done and what's next: [ROADMAP.md](ROADMAP.md).
 
-## 🚀 How BudgetWise Solves Real-Life Problems
-
-- **Losing Track of Expenses:** BudgetWise lets you record every transaction, so you always know where your money is going.
-- **Overspending:** With real-time balance updates, category budgets, and spending breakdowns, you can instantly spot overspending and stay on track.
-- **Unclear Financial Trends:** Visual dashboards show day-wise trends, category-wise pie charts, and monthly summaries, helping you identify habits and make better decisions.
-- **Difficult Search & Organization:** Quickly search, filter, and sort your transaction history by date, description, or category—even with thousands of records.
-- **Cumbersome Budget Management:** Set budgets per category and track how you’re doing in real time.
-- **Need for Anytime, Anywhere Access:** The app is fully responsive, ensuring seamless use on phones, tablets, and desktops.
-- **Secure Data:** Authentication is handled securely using JWT, and your data is stored safely on your account.
+![BudgetWise dashboard](docs/screenshots/dashboard.png)
 
 ---
 
-## 🔧 Tech Stack
+## 🚀 What it helps with
 
-- **Full Stack:** MERN (MongoDB, Express.js, React, Node.js)
-- **Frontend:** React, Tailwind CSS, Redux Toolkit, Recharts (Data Visualization)
-- **Backend:** Node.js, Express.js, MongoDB  
-  &nbsp;&nbsp;→ [Backend Repo](https://github.com/dheeraj08mishra/finance_tracker_server)
-- **Authentication:** JWT-based
-- **Bundler:** Parcel
-
----
+- **Losing track of money:** every transaction in one place, grouped by day, searchable and taggable, with an optional photo or PDF of the receipt.
+- **Overspending:** monthly budgets per category, a warning when you reach 80% and when you go over, and a month-end forecast at your current pace.
+- **Bills that repeat:** rent, SIPs and subscriptions are added automatically, with a reminder the day before, the next 30 days at a glance, and an alert when a price changes.
+- **Not seeing the trend:** month-by-month insights flag unusual spikes and drops, and you can compare this year with last year.
+- **Saving with a purpose:** goals with targets and progress; contributions count as savings, not spending.
+- **Using it anywhere:** responsive on phone, tablet and desktop, installable on your home screen, and readable offline.
 
 ## ✨ Features
 
-- ✅ **Transaction Management:** Add, edit, and delete transactions with robust validation.
-- ✅ **Real-time Balance Summary:** Instant updates on your financial status at a glance.
-- ✅ **Income vs. Expense Breakdown:** Clear visualization of your earnings and spendings.
-- ✅ **Category-wise Pie Chart:** Understand your spending patterns across different categories.
-- ✅ **Budget Tracker Section:** Set and monitor budgets for every category.
-- ✅ **Day-wise Trends:** Visualize daily spending habits using a line chart.
-- ✅ **Recent Transactions & Full History:** See your last 10 transactions on the dashboard, and easily access your complete, sortable, filterable, and paginated history. 
-- ✅ **Search & Filter:** Quickly find transactions by description, category, or date.
-- ✅ **User Profile Management:** Update your personal details and manage your account.
-- ✅ **Responsive UI:** Seamless experience on mobile, tablet, and desktop.
-- ✅ **Secure Authentication:** JWT-based login and session management.
+| Area                    | What you can do                                                                                                                                                                                                            |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Accounts & security** | Sign up and sign in (httpOnly session cookie) · forgot password by email · change password (the last 3 can't be reused) · see every signed-in device and sign out one or all others · delete your account and all its data |
+| **Dashboard**           | Month picker · left this month, income, spending and saved vs last month · daily spending chart · category budgets or the 50/30/20 guide · where the money went · month-end forecast · upcoming payments · Excel export    |
+| **Transactions**        | Add, edit, delete · search, filter by category, date and tag · sort · 25 at a time with Load more · tags (auto-suggested from the note) · receipts (JPG, PNG, WebP or PDF)                                                 |
+| **Recurring**           | Daily to yearly (7 options) with an optional end date · edit future payments · skip the next one · pause, resume, delete · committed per month · next 30 days · price-change alerts                                        |
+| **Goals**               | Targets, quick contributions, progress, completed badge                                                                                                                                                                    |
+| **Insights**            | Income vs spending by month · spike and drop detection (vs last month, 3-month average or z-score) · year-vs-year compare by month and category                                                                            |
+| **Settings**            | Light, dark or match system · default category and repeat for new transactions · email notifications on/off · budgets · install the app                                                                                    |
+| **Admin**               | Usage stats and charts · users list (no amounts) · feedback triage with private notes                                                                                                                                      |
 
----
+## 🧠 Engineering highlights
+
+- **Recurring engine:** occurrences are counted from the start date, so a payment on the 31st stays on month-end instead of drifting; missed dates are caught up, and a unique index guarantees each payment is created once even when two syncs race.
+- **Sessions:** one record per signed-in device, so any device can be signed out remotely; password changes sign out everything else. A token mode with rotating refresh tokens and stolen-token detection is ready for the mobile apps.
+- **Scheduled jobs:** reminders and summary emails are claimed atomically per day or month, so they run once even with several API servers or a separate worker.
+- **Receipts:** the file type is checked from the bytes (not the name), files are stored under random names, served only to their owner with a sandboxing header, and deleted with the transaction.
+- **Installable app:** a service worker generated at build time with that build's file list; offline shows the last-loaded data read-only, a new version waits for "Reload" instead of breaking an open tab, and saved data is wiped on sign-in and sign-out.
+- **Timezones:** the server runs in UTC with calendar-day dates, so someone in IST can add "today" just after midnight.
+- **Tests:** 116 API tests on an in-memory MongoDB replica set, 34 browser flows in Chrome (Playwright), installable-app checks against a production build, and CI on Node 20 and 22.
 
 ## 📸 Screenshots
 
-### Dashboard Analytics (Category Breakdown, Budget Overview, Month Selector)
+| Transactions                                                                      | Recurring                                                                                |
+| --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| ![Transactions: grouped by day, filters, tags](docs/screenshots/transactions.png) | ![Recurring: price-change alert and next 30 days](docs/screenshots/recurring.png)        |
+| **Insights**                                                                      | **On a phone**                                                                           |
+| ![Insights: month by month and 2026 vs 2025](docs/screenshots/insights.png)       | <img src="docs/screenshots/mobile-dashboard.png" alt="Dashboard on a phone" width="260"> |
 
-<img width="1465" alt="Screenshot 2025-05-31 at 9 15 30 PM" src="https://github.com/user-attachments/assets/7d40a98d-33e9-4e00-8521-04a702114c88" />
+## 🔧 Tech stack
 
+|         |                                                                                                                                 |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| UI      | React 19, React Router 7, Tailwind CSS 4 + daisyUI 5 (custom light/dark themes), Lucide icons, Inter                            |
+| State   | Redux Toolkit                                                                                                                   |
+| Charts  | Recharts                                                                                                                        |
+| Dates   | date-fns                                                                                                                        |
+| Build   | Vite 6, plus a small plugin that generates the service worker                                                                   |
+| Backend | Node.js, Express 5, MongoDB (Mongoose), JWT sessions → [server repo](https://github.com/dheeraj08mishra/finance_tracker_server) |
 
-### Day-wise Trend & Recent Transactions
+## 🛠️ Running locally
 
-<img width="1459" alt="Screenshot 2025-05-31 at 9 16 10 PM" src="https://github.com/user-attachments/assets/af90adf7-5041-45bf-ae31-bd1ae6109391" />
-
-
-
-### Transaction History – Filtering, Sorting, and Pagination
-
-
-<img width="1456" alt="Screenshot 2025-05-31 at 9 16 44 PM" src="https://github.com/user-attachments/assets/d8abd0e4-eb63-40e7-9bb0-8e56a98211e4" />
-
-<img width="1460" alt="Screenshot 2025-05-31 at 9 16 59 PM" src="https://github.com/user-attachments/assets/15c49646-3dae-4d0b-96bf-b696491a49d8" />
-
-<img width="1467" alt="Screenshot 2025-05-31 at 9 17 59 PM" src="https://github.com/user-attachments/assets/046ba41a-e6f3-4ab6-ab61-3adf8f05d490" />
-
-### Edit Transaction 
-<img width="1145" alt="Screenshot 2025-05-31 at 9 17 36 PM" src="https://github.com/user-attachments/assets/096ea71f-6813-4dfa-9fe8-7a2cc77fb2b7" />
-
-
-
-### Profile Update Page
-<img width="1451" alt="Screenshot 2025-05-31 at 9 18 31 PM" src="https://github.com/user-attachments/assets/c2d971d0-cbc6-4d90-a353-3f270e5db02f" />
-
-
-### Add Transaction Page
-
-<img width="1081" alt="Screenshot 2025-05-31 at 9 18 54 PM" src="https://github.com/user-attachments/assets/32293207-020c-4fa6-b659-26920e6bad5b" />
-
-### Sign Up and Sign in
-![image](https://github.com/user-attachments/assets/ed012fe0-fe04-4242-b128-c1843f0f896b)
-
-![image](https://github.com/user-attachments/assets/6cfbf479-640f-468f-9e9f-0f9974836692)
-
-
-
-
----
-
-## ⚡ Quick Start
+You need the API running first (see the server repo). Then:
 
 ```bash
-# 1. Clone the repo
 git clone https://github.com/dheeraj08mishra/budgetwise.git
 cd budgetwise
-
-# 2. Install dependencies
 npm install
 
-# 3. Start the development server
-npm run start
+# API on port 3000 (default):
+npm run dev
+
+# API on another port:
+API_PROXY_TARGET=http://localhost:3001 npm run dev
 ```
 
-> **Note:**  
-> Backend setup and environment variables are managed in the [finance_tracker_server](https://github.com/dheeraj08mishra/finance_tracker_server) repository.
+Open http://localhost:1234. The dev server proxies `/api` to the Express server, the same way nginx does in production, so the app never needs CORS or a hard-coded API URL. With the server's demo data (`npm run seed:demo` there), sign in as `demo@budgetwise.app` / `Demo@1234`.
 
----
+## 📦 Production build
 
-## 🔑 Environment Variables
+```bash
+npm run build      # outputs to build/, including the service worker
+npm run preview    # serve the build locally (also proxies /api)
+```
 
-Create a `.env` file in the root with necessary credentials. Refer to the backend repository for required variables for connecting to MongoDB and JWT configuration.
+In production the app calls the API at `/api` on the same domain (nginx proxies `/api` to the Express server). Set `VITE_API_URL` at build time to call an API elsewhere.
 
----
+## ✅ Checks
+
+```bash
+npm run lint           # ESLint (React + hooks rules)
+npm run format:check   # Prettier (npm run format to fix)
+npm test               # unit tests for the helpers (node:test)
+npm run test:e2e       # 34 end-to-end flows in Chrome (Playwright)
+npm run test:pwa       # install, offline and update checks on a production build
+```
+
+`test:e2e` and `test:pwa` drive the real app, so they need the local stack running: the API with a local MongoDB and the demo account (`npm run seed:demo` in the server repo), plus `npm run dev` here for `test:e2e` (`test:pwa` builds and serves its own copy). Start the API with high rate limits for test runs (`AUTH_RATE_LIMIT=500 API_RATE_LIMIT=10000`), and set `E2E_SERVER_LOG` to the API's log file so the forgot-password flow can read the reset link the server prints locally. The flows change the demo data, so re-seed afterwards. GitHub Actions runs lint, format check, unit tests and the build on every push.
+
+## 📁 Project layout
+
+```
+index.html          entry page
+public/             icons and the web app manifest
+pwa/                service worker template + the Vite plugin that fills it in
+src/
+  main.jsx          bootstraps React, theme, font and the service worker
+  index.css         Tailwind + the two daisyUI themes (bw-light, bw-dark)
+  pages/            one lazily loaded file per route
+  components/       app shell, shared UI kit (ui.jsx), transaction list, charts/
+  utils/
+    api.js          fetch wrapper (errors, expired sessions, file uploads)
+    format.js       ₹ formatting
+    categories.js   category labels, icons, colours
+    dates.js        local "today" and UTC-safe date display
+    pwa.js          install, offline and update helpers
+    receipts.js     receipt upload (shrinks large photos first)
+    redux/          store and slices
+test/               unit tests
+e2e/                browser flows and installable-app checks
+docs/screenshots/   images used in this README
+```
 
 ## 🤝 Contributing
 
-Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
----
+## 🧑‍💻 How it was built
 
-## 📄 License
-
-[MIT](LICENSE)
+Designed and maintained by [Dheeraj Mishra](https://github.com/dheeraj08mishra). Recent versions were built with AI pair programming (Claude Code): I made the product and design decisions and reviewed every change, and the test suites and CI above check the result.

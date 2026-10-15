@@ -1,5 +1,122 @@
 @import "tailwindcss";
 
+/* No built-in daisyUI themes: only the two BudgetWise themes below */
 @plugin "daisyui" {
-    themes: all;
+  themes: false;
+}
+
+/* Light: white cards on a soft grey page, one indigo accent */
+@plugin "daisyui/theme" {
+  name: "bw-light";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(97.5% 0.004 265);
+  --color-base-300: oklch(92.5% 0.008 265);
+  --color-base-content: oklch(23% 0.025 265);
+  --color-primary: oklch(51% 0.23 277);
+  --color-primary-content: oklch(99% 0 0);
+  --color-secondary: oklch(60% 0.15 250);
+  --color-secondary-content: oklch(99% 0 0);
+  --color-accent: oklch(70% 0.14 182);
+  --color-accent-content: oklch(20% 0.03 182);
+  --color-neutral: oklch(30% 0.02 265);
+  --color-neutral-content: oklch(98% 0 0);
+  --color-info: oklch(62% 0.14 240);
+  --color-info-content: oklch(99% 0 0);
+  --color-success: oklch(62% 0.15 160);
+  --color-success-content: oklch(99% 0 0);
+  --color-warning: oklch(75% 0.15 70);
+  --color-warning-content: oklch(25% 0.05 70);
+  --color-error: oklch(60% 0.2 15);
+  --color-error-content: oklch(99% 0 0);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+/* Dark: deep slate, same accent family */
+@plugin "daisyui/theme" {
+  name: "bw-dark";
+  default: false;
+  /* false: theme.js picks the OS preference; a CSS fallback here would
+       override an explicit light choice on dark-mode machines */
+  prefersdark: false;
+  color-scheme: dark;
+  --color-base-100: oklch(21% 0.018 265);
+  --color-base-200: oklch(17% 0.016 265);
+  --color-base-300: oklch(28% 0.02 265);
+  --color-base-content: oklch(93% 0.01 265);
+  --color-primary: oklch(66% 0.18 277);
+  --color-primary-content: oklch(99% 0 0);
+  --color-secondary: oklch(68% 0.13 250);
+  --color-secondary-content: oklch(15% 0.02 250);
+  --color-accent: oklch(74% 0.13 182);
+  --color-accent-content: oklch(18% 0.03 182);
+  --color-neutral: oklch(32% 0.02 265);
+  --color-neutral-content: oklch(95% 0 0);
+  --color-info: oklch(70% 0.12 240);
+  --color-info-content: oklch(15% 0.02 240);
+  --color-success: oklch(72% 0.15 160);
+  --color-success-content: oklch(15% 0.03 160);
+  --color-warning: oklch(80% 0.14 75);
+  --color-warning-content: oklch(20% 0.04 75);
+  --color-error: oklch(68% 0.19 15);
+  --color-error-content: oklch(15% 0.03 15);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  --font-sans:
+    "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    @apply bg-base-200 text-base-content;
+  }
+  /* Money and numbers line up in columns */
+  .num {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .card-surface {
+    @apply rounded-box border border-base-300 bg-base-100 shadow-[0_1px_2px_rgb(0_0_0/0.04)];
+  }
+  .label-muted {
+    @apply text-sm text-base-content/60;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -81,3 +81,6 @@ jest.config.js
 build/
 # local-only notes (server details)
 *.local.md
+
+# e2e failure screenshot
+e2e-failure.png
