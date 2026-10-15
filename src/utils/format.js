@@ -47,3 +47,14 @@ export const MONTHS = [
   "November",
   "December",
 ];
+
+// Month numbers as a label: "Jan–Sep", "Feb", or "5 months" when they
+// aren't one unbroken run
+export function periodLabel(period) {
+  if (!period?.length) return "";
+  const short = (m) => MONTHS[m - 1].slice(0, 3);
+  const first = period[0];
+  const last = period[period.length - 1];
+  if (last - first + 1 !== period.length) return `${period.length} months`;
+  return first === last ? short(first) : `${short(first)}–${short(last)}`;
+}

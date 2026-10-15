@@ -12,6 +12,7 @@ import {
   Skeleton,
 } from "../components/ui";
 import InsightsChart from "../components/charts/InsightsChart";
+import YearCompare from "../components/YearCompare";
 
 const METHODS = [
   { value: "previous", label: "vs last month" },
@@ -176,6 +177,8 @@ export default function Insights() {
           </p>
         )}
       </Card>
+
+      {year && <YearCompare year={year} years={years} />}
 
       <Card>
         <CardHeader title="Spending alerts" subtitle="Months that stand out" />

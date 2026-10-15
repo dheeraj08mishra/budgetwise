@@ -9,6 +9,7 @@ import {
   change,
   percent,
   capitalize,
+  periodLabel,
 } from "../src/utils/format.js";
 import {
   dayKey,
@@ -147,4 +148,11 @@ test("tags: same rules as the server", async () => {
   assert.equal(isValidTag("<b>"), false);
   assert.equal(isValidTag("x".repeat(21)), false);
   assert.equal(MAX_TAGS, 10);
+});
+
+test("periodLabel names the months a comparison covers", () => {
+  assert.equal(periodLabel([1, 2, 3, 4, 5, 6, 7, 8, 9]), "Jan–Sep");
+  assert.equal(periodLabel([2]), "Feb");
+  assert.equal(periodLabel([2, 5, 6]), "3 months");
+  assert.equal(periodLabel([]), "");
 });

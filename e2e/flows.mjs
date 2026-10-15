@@ -308,6 +308,21 @@ await step("month-end forecast on the current month only", async () => {
     throw new Error("forecast shown for a past month");
 });
 
+await step("Insights: compare this year with last year", async () => {
+  await page.goto(APP + "/insights", { waitUntil: "networkidle" });
+  await waitText(/2026 vs 2025/);
+  // the unfinished current month is left out of the totals
+  await waitText(/Totals cover Jan–\w{3}: finished months/);
+  await waitText(/₹[\d,]+ in 2025/);
+  await waitText(/Spending by category, Jan–\w{3}/);
+  // goal saving only started in 2026
+  await waitText(/New in 2026/);
+  await page.click('[role="radiogroup"][aria-label="Compare"] >> text=Income');
+  await page.waitForSelector(
+    '[role="radiogroup"][aria-label="Compare"] [aria-checked="true"]:text-is("Income")'
+  );
+});
+
 await step("Escape closes a dialog", async () => {
   await page.goto(APP + "/goals", { waitUntil: "networkidle" });
   await clickText("button", /^New goal$/);
