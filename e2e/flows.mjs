@@ -294,6 +294,20 @@ await step(
   }
 );
 
+await step("month-end forecast on the current month only", async () => {
+  await page.goto(APP, { waitUntil: "networkidle" });
+  await waitText(/Month-end forecast/);
+  await waitText(/Everyday spending, ₹[\d,]+\/day × \d+ days/);
+  const months = await page.$$eval('select[aria-label="Month"] option', (o) =>
+    o.map((x) => x.value)
+  );
+  if (months.length < 2) throw new Error("demo should have past months");
+  await page.selectOption('select[aria-label="Month"]', months[1]);
+  await waitText(/Looking back at/);
+  if ((await text()).includes("Month-end forecast"))
+    throw new Error("forecast shown for a past month");
+});
+
 await step("Escape closes a dialog", async () => {
   await page.goto(APP + "/goals", { waitUntil: "networkidle" });
   await clickText("button", /^New goal$/);

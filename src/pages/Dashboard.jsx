@@ -30,6 +30,7 @@ import {
   PageHeader,
 } from "../components/ui";
 import TransactionList from "../components/TransactionList";
+import ForecastCard from "../components/ForecastCard";
 import { BudgetBars, BudgetAlerts, BudgetsModal } from "../components/Budgets";
 import SpendingTrend from "../components/charts/SpendingTrend";
 import CategoryDonut from "../components/charts/CategoryDonut";
@@ -418,7 +419,7 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
             <Card className="lg:col-span-2">
               <CardHeader
                 title="Where it went"
@@ -432,52 +433,10 @@ export default function Dashboard() {
                 )}
               </div>
             </Card>
-            <Card>
-              <CardHeader
-                title="Upcoming payments"
-                action={
-                  <Link to="/recurring" className="btn btn-ghost btn-xs">
-                    All <ChevronRight size={14} />
-                  </Link>
-                }
-              />
-              {upcoming.length ? (
-                <ul className="divide-y divide-base-300 pt-2">
-                  {upcoming.map((r) => (
-                    <li
-                      key={r._id}
-                      className="flex items-center gap-3 px-5 py-3"
-                    >
-                      <span className="grid grid-cols-1 size-9 place-items-center rounded-xl bg-primary/10 text-primary">
-                        <Repeat size={16} />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">
-                          {r.note || "Recurring payment"}
-                        </p>
-                        <p className="text-xs text-base-content/50">
-                          {formatDay(r.nextOccurrence)}
-                        </p>
-                      </div>
-                      <span
-                        className={`num text-sm font-semibold ${r.type === "income" ? "text-success" : ""}`}
-                      >
-                        {money(r.amount)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <EmptyState
-                  icon={Repeat}
-                  title="No upcoming payments"
-                  text="Mark a transaction as recurring to see it here."
-                />
-              )}
-            </Card>
+            {isCurrent && <ForecastCard refreshKey={transactions} />}
           </div>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
             <Card className="lg:col-span-2">
               <CardHeader
                 title="Recent activity"
@@ -495,56 +454,101 @@ export default function Dashboard() {
                 )}
               </div>
             </Card>
-            <Card>
-              <CardHeader
-                title="Goals"
-                action={
-                  <Link to="/goals" className="btn btn-ghost btn-xs">
-                    All <ChevronRight size={14} />
-                  </Link>
-                }
-              />
-              {goals.length ? (
-                <ul className="space-y-5 p-5">
-                  {goals.map((g) => {
-                    const pct = Math.min(
-                      (g.currentAmount / g.targetAmount) * 100,
-                      100
-                    );
-                    return (
-                      <li key={g._id}>
-                        <div className="mb-1.5 flex justify-between text-sm">
-                          <span className="truncate font-medium">
-                            {g.title}
-                          </span>
-                          <span className="num text-base-content/60">
-                            {percent(pct)}
-                          </span>
-                        </div>
-                        <progress
-                          className="progress progress-primary h-2 w-full"
-                          value={pct}
-                          max="100"
-                        />
-                        <p className="num mt-1 text-xs text-base-content/50">
-                          {money(g.currentAmount)} of {money(g.targetAmount)}
-                        </p>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <EmptyState
-                  icon={Target}
-                  title="No active goals"
+            <div className="flex flex-col gap-6">
+              <Card>
+                <CardHeader
+                  title="Upcoming payments"
                   action={
-                    <Link to="/goals" className="btn btn-sm btn-primary">
-                      Create a goal
+                    <Link to="/recurring" className="btn btn-ghost btn-xs">
+                      All <ChevronRight size={14} />
                     </Link>
                   }
                 />
-              )}
-            </Card>
+                {upcoming.length ? (
+                  <ul className="divide-y divide-base-300 pt-2">
+                    {upcoming.map((r) => (
+                      <li
+                        key={r._id}
+                        className="flex items-center gap-3 px-5 py-3"
+                      >
+                        <span className="grid grid-cols-1 size-9 place-items-center rounded-xl bg-primary/10 text-primary">
+                          <Repeat size={16} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium">
+                            {r.note || "Recurring payment"}
+                          </p>
+                          <p className="text-xs text-base-content/50">
+                            {formatDay(r.nextOccurrence)}
+                          </p>
+                        </div>
+                        <span
+                          className={`num text-sm font-semibold ${r.type === "income" ? "text-success" : ""}`}
+                        >
+                          {money(r.amount)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <EmptyState
+                    icon={Repeat}
+                    title="No upcoming payments"
+                    text="Mark a transaction as recurring to see it here."
+                  />
+                )}
+              </Card>
+              <Card>
+                <CardHeader
+                  title="Goals"
+                  action={
+                    <Link to="/goals" className="btn btn-ghost btn-xs">
+                      All <ChevronRight size={14} />
+                    </Link>
+                  }
+                />
+                {goals.length ? (
+                  <ul className="space-y-5 p-5">
+                    {goals.map((g) => {
+                      const pct = Math.min(
+                        (g.currentAmount / g.targetAmount) * 100,
+                        100
+                      );
+                      return (
+                        <li key={g._id}>
+                          <div className="mb-1.5 flex justify-between text-sm">
+                            <span className="truncate font-medium">
+                              {g.title}
+                            </span>
+                            <span className="num text-base-content/60">
+                              {percent(pct)}
+                            </span>
+                          </div>
+                          <progress
+                            className="progress progress-primary h-2 w-full"
+                            value={pct}
+                            max="100"
+                          />
+                          <p className="num mt-1 text-xs text-base-content/50">
+                            {money(g.currentAmount)} of {money(g.targetAmount)}
+                          </p>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <EmptyState
+                    icon={Target}
+                    title="No active goals"
+                    action={
+                      <Link to="/goals" className="btn btn-sm btn-primary">
+                        Create a goal
+                      </Link>
+                    }
+                  />
+                )}
+              </Card>
+            </div>
           </div>
         </>
       )}
