@@ -6,7 +6,7 @@ import { timeAgo } from "../utils/format";
 import { formatDay } from "../utils/dates";
 import { Card, CardHeader, ConfirmDialog, Skeleton } from "./ui";
 
-const isPhone = (device) => /iOS|Android/.test(device);
+const isPhone = (s) => s.kind === "app" || /iOS|Android/.test(s.device);
 
 // Where this account is signed in; sign out one device or all the others
 export default function SignedInDevices() {
@@ -70,7 +70,7 @@ export default function SignedInDevices() {
       ) : (
         <ul className="divide-y divide-base-300 pt-2">
           {sessions.map((s) => {
-            const Icon = isPhone(s.device) ? Smartphone : Monitor;
+            const Icon = isPhone(s) ? Smartphone : Monitor;
             return (
               <li key={s._id} className="flex items-center gap-3 px-5 py-3">
                 <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-base-200 text-base-content/60">
