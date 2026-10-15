@@ -2,12 +2,22 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { Sun, Moon, Monitor, User, ChevronRight } from "lucide-react";
+import {
+  Sun,
+  Moon,
+  Monitor,
+  User,
+  ChevronRight,
+  Download,
+  CircleCheck,
+  Share,
+} from "lucide-react";
 import { api } from "../utils/api";
 import { money } from "../utils/format";
 import { CATEGORIES, EXPENSE_CATEGORIES } from "../utils/categories";
 import { themeChoice, setThemeChoice, onThemeChange } from "../utils/theme";
 import { updateProfile } from "../utils/redux/profileSlice";
+import { useInstallState, promptInstall } from "../utils/pwa";
 import { Card, CardHeader, PageHeader, Skeleton } from "../components/ui";
 import FrequencyPicker from "../components/FrequencyPicker";
 import NotificationSettings from "../components/NotificationSettings";
@@ -200,6 +210,47 @@ function BudgetSettings() {
   );
 }
 
+// Home-screen app: one tap where the browser allows it, steps on iPhone
+function InstallApp() {
+  const state = useInstallState();
+  const install = async () => {
+    if (await promptInstall()) toast.success("BudgetWise was installed");
+  };
+  const body = {
+    installed: (
+      <p className="flex items-center gap-2 text-sm">
+        <CircleCheck size={16} className="text-success" aria-hidden />
+        You&rsquo;re using the installed app.
+      </p>
+    ),
+    available: (
+      <button className="btn btn-primary btn-sm" onClick={install}>
+        <Download size={16} /> Install BudgetWise
+      </button>
+    ),
+    ios: (
+      <p className="text-sm text-base-content/70">
+        In Safari, tap <Share size={14} className="inline" aria-label="Share" />{" "}
+        Share, then <span className="font-medium">Add to Home Screen</span>.
+      </p>
+    ),
+    unsupported: (
+      <p className="text-sm text-base-content/70">
+        Open BudgetWise in Chrome or Edge (or Safari on iPhone) to install it.
+      </p>
+    ),
+  }[state];
+  return (
+    <Card>
+      <CardHeader
+        title="Install the app"
+        subtitle="Opens from your home screen in its own window, and shows your last-loaded data when you're offline."
+      />
+      <div className="p-5">{body}</div>
+    </Card>
+  );
+}
+
 export default function Settings() {
   return (
     <div>
@@ -211,6 +262,7 @@ export default function Settings() {
         <div className="flex flex-col gap-6">
           <Appearance />
           <TransactionDefaults />
+          <InstallApp />
         </div>
         <div className="flex flex-col gap-6">
           <NotificationSettings />

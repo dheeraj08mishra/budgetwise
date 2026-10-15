@@ -3,6 +3,7 @@ import { BASE_URL } from "./constants";
 import store from "./redux/appStore";
 import { logout } from "./redux/profileSlice";
 import { removeAllTransactions } from "./redux/transactionSlice";
+import { clearOfflineData } from "./pwa";
 
 // Paths where a 401 is an expected answer, not an expired session
 const AUTH_PATHS = ["/login", "/signup", "/me"];
@@ -52,6 +53,7 @@ export async function api(
   ) {
     store.dispatch(logout());
     store.dispatch(removeAllTransactions());
+    clearOfflineData();
     // the server says why when it knows (signed out elsewhere, new password)
     const reason = /sign in again/i.test(data?.message || "")
       ? data.message

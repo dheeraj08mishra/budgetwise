@@ -28,8 +28,19 @@ export default [
     },
   },
   {
-    // Node-side files: config and unit tests
-    files: ["*.config.js", "test/**/*.js"],
+    // Service worker template: placeholders are filled in at build time
+    files: ["pwa/sw.js"],
+    languageOptions: {
+      globals: {
+        ...globals.serviceworker,
+        __BUILD__: "readonly",
+        __PRECACHE__: "readonly",
+      },
+    },
+  },
+  {
+    // Node-side files: config, build plugin and unit tests
+    files: ["*.config.js", "pwa/plugin.js", "test/**/*.js"],
     languageOptions: { globals: { ...globals.node } },
   },
   {

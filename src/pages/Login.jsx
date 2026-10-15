@@ -10,6 +10,7 @@ import { resetSalary } from "../utils/redux/budgetSlice";
 import { api } from "../utils/api";
 import { Segmented, Field } from "../components/ui";
 import AuthLayout from "../components/AuthLayout";
+import { clearOfflineData } from "../utils/pwa";
 import PasswordStrength, {
   isStrongPassword,
 } from "../components/PasswordStrength";
@@ -76,6 +77,7 @@ export default function Login() {
     });
     setLoading(false);
     if (!ok) return toast.error(error);
+    clearOfflineData(); // a previous account's saved data on this device
     dispatch(logout());
     dispatch(removeAllTransactions());
     dispatch(resetSalary());

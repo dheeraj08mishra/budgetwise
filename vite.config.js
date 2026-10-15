@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import serviceWorker from "./pwa/plugin.js";
 
 // Dev mirrors production: the app always calls /api, and the dev server
 // proxies it to Express (like nginx does in production).
@@ -8,7 +9,7 @@ import tailwindcss from "@tailwindcss/vite";
 const apiTarget = process.env.API_PROXY_TARGET || "http://localhost:3000";
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), serviceWorker()],
   server: {
     port: 1234,
     strictPort: true,

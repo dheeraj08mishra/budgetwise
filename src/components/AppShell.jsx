@@ -17,10 +17,12 @@ import {
   Wallet,
   ShieldCheck,
   Settings,
+  WifiOff,
 } from "lucide-react";
 import { logout } from "../utils/redux/profileSlice";
 import { removeAllTransactions } from "../utils/redux/transactionSlice";
 import { api } from "../utils/api";
+import { clearOfflineData, useOnline } from "../utils/pwa";
 import {
   THEMES,
   applyTheme,
@@ -83,6 +85,7 @@ const AppShell = () => {
   const navigate = useNavigate();
   const [theme, setTheme] = useState(initialTheme);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const online = useOnline();
 
   // the Settings page (or the OS, on "system") can change it too
   useEffect(() => onThemeChange(setTheme), []);
@@ -92,6 +95,7 @@ const AppShell = () => {
 
   const signOut = async () => {
     await api("/logout", { method: "POST" });
+    clearOfflineData();
     dispatch(logout());
     dispatch(removeAllTransactions());
     toast.success("Signed out");
@@ -232,6 +236,16 @@ const AppShell = () => {
       </header>
 
       <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-12 lg:pt-8">
+        {!online && (
+          <div
+            role="status"
+            className="mb-5 flex items-center gap-2 rounded-box border border-warning/40 bg-warning/10 px-4 py-2.5 text-sm"
+          >
+            <WifiOff size={16} className="shrink-0 text-warning" aria-hidden />
+            You&rsquo;re offline. Showing what was loaded last; changes
+            can&rsquo;t be saved until you&rsquo;re back online.
+          </div>
+        )}
         <Outlet />
         <SiteFooter className="mt-12 border-t border-base-300 pt-6" />
       </main>

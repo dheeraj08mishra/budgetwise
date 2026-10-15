@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "node --test --test-reporter=spec test/*.test.js",
-    "test:e2e": "node e2e/flows.mjs"
+    "test:e2e": "node e2e/flows.mjs",
+    "test:pwa": "node e2e/pwa.mjs"
   },
   "keywords": [],
   "author": "",
