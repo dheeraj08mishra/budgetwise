@@ -75,13 +75,13 @@ Sizes: **S** = a day or two · **M** = about a week · **L** = two weeks or more
 
 ### v2 Phase 2 list (intelligence and insights)
 
-| Feature                         | Real status | Notes                                                                                                                                              |
-| ------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Yearly dashboard + compare      | 🟡          | Insights page shows a full year by month. **Missing:** year-vs-year compare                                                                        |
-| Smart trend advisor (spikes)    | 🟡          | Spike/drop detection with 3 methods and plain-language alerts. **Missing:** suggestions ("dining is up 40%, try…")                                 |
-| Recurring transaction dashboard | 🟡          | Recurring page: list, monthly in/out totals, pause, resume, sync, edit, skip next, delete. **Missing:** price-change and upcoming-30-days insights |
-| Savings forecasting             | ⬜          |                                                                                                                                                    |
-| Insights module (premium)       | ⬜          | Needs a pricing decision first                                                                                                                     |
+| Feature                         | Real status | Notes                                                                                                                                                    |
+| ------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Yearly dashboard + compare      | 🟡          | Insights page shows a full year by month. **Missing:** year-vs-year compare                                                                              |
+| Smart trend advisor (spikes)    | 🟡          | Spike/drop detection with 3 methods and plain-language alerts. **Missing:** suggestions ("dining is up 40%, try…")                                       |
+| Recurring transaction dashboard | 🟡          | Recurring page: list, monthly in/out totals, pause, resume, sync, edit, skip next, delete. **Missing:** price-change and upcoming-30-days insights       |
+| Savings forecasting             | ✅          | Month-end forecast on the Dashboard: income + recurring income still due − spending − everyday pace × days left − recurring payments still due − savings |
+| Insights module (premium)       | ⬜          | Needs a pricing decision first                                                                                                                           |
 
 ### v2 Phase 3 and stretch
 
@@ -174,7 +174,7 @@ Security hardening (secrets removed, rate limits, secure cookies, 0 vulnerabilit
 | 2     | Admin role (read-only feedback and stats) ✅                            | S    |
 | 3     | Category budgets + in-app warnings at 80% / 100% ✅                     | M    |
 | 3     | Emails: overspending alert, monthly summary (with an on/off setting) ✅ | M    |
-| 3     | Savings forecast on the Dashboard                                       | S    |
+| 3     | Savings forecast on the Dashboard ✅                                    | S    |
 
 **Done when:** recurring payments can be fully managed, users get budget warnings, and nobody is locked out by a forgotten password.
 
