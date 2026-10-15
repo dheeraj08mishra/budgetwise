@@ -87,7 +87,7 @@ function ChangePasswordModal({ open, onClose }) {
         <Field label="Confirm new password" error={errors.confirm} htmlFor="pw-confirm">
           <input id="pw-confirm" type={type} autoComplete="new-password" className={`input w-full ${errors.confirm ? "input-error" : ""}`} value={form.confirm} onChange={set("confirm")} />
         </Field>
-        <p className="text-xs text-base-content/55">You'll stay signed in here. Every other device is signed out.</p>
+        <p className="text-xs text-base-content/55">You’ll stay signed in here. Every other device is signed out.</p>
       </form>
     </Modal>
   );

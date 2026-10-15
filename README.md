@@ -54,6 +54,17 @@ npm run preview    # serve the build locally (also proxies /api)
 
 In production the app calls the API at `/api` on the same domain (nginx proxies `/api` to the Express server). Set `VITE_API_URL` at build time to call an API elsewhere.
 
+## ✅ Checks
+
+```bash
+npm run lint           # ESLint (React + hooks rules)
+npm run format:check   # Prettier (npm run format to fix)
+npm test               # unit tests for the helpers (node:test)
+npm run test:e2e       # 17 end-to-end flows in Chrome (Playwright)
+```
+
+`test:e2e` drives the real app, so it needs the local stack running: the API with a local MongoDB and the demo account (`npm run seed:demo` in the server repo), plus `npm run dev` here. It changes the demo data, so re-seed afterwards. GitHub Actions runs lint, format check, unit tests and the build on every push.
+
 ## 📁 Project layout
 
 ```
@@ -69,4 +80,6 @@ src/
     categories.js   category labels, icons, colours
     dates.js        local "today" and UTC-safe date display
     redux/          store and slices
+test/               unit tests
+e2e/                browser flows
 ```

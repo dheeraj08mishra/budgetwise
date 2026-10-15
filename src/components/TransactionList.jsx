@@ -8,6 +8,9 @@ import { money } from "../utils/format";
 import { categoryMeta, isIncome, EXPENSE_CATEGORIES, CATEGORIES } from "../utils/categories";
 import { dayKey, formatDay, todayString, firstOfMonthString } from "../utils/dates";
 import { ConfirmDialog, Modal, Field, Segmented } from "./ui";
+import { sortTransactions } from "../utils/transactions";
+
+export { sortTransactions };
 
 export const CategoryIcon = ({ txn, size = "size-10" }) => {
   const meta = categoryMeta(txn);
@@ -161,19 +164,7 @@ function EditModal({ txn, onClose, onChanged }) {
   );
 }
 
-// order: "newest" | "oldest" by transaction date (ties: when added),
-// or "server" to keep the given order (e.g. sorted by amount)
-export const sortTransactions = (list, order = "newest") => {
-  if (order === "server") return list;
-  const dir = order === "oldest" ? -1 : 1;
-  return [...list].sort(
-    (a, b) =>
-      dir * dayKey(b.date).localeCompare(dayKey(a.date)) ||
-      dir * (new Date(b.createdAt) - new Date(a.createdAt))
-  );
-};
-
-// Groups consecutive same-day rows and handles edit + confirmed delete
+// Groups consecutive same-day rows and handles edit + confirmed delete.
 // onChanged(before, after) fires after an edit (after = updated row) or a
 // delete (after = null), so a parent can keep its own totals in sync.
 export default function TransactionList({ transactions, groupByDay = true, limit, order = "newest", onChanged }) {

@@ -27,7 +27,7 @@ function BudgetGuide({ income, needs, wants, saved }) {
     { label: "Savings & investments", value: saved, target: 20, max: false, color: "bg-violet-500" },
   ];
   if (!income) {
-    return <p className="label-muted px-5 pb-5">Add this month's income to see how your spending compares with the 50/30/20 guide.</p>;
+    return <p className="label-muted px-5 pb-5">Add this month’s income to see how your spending compares with the 50/30/20 guide.</p>;
   }
   return (
     <div className="space-y-5 px-5 pb-5">

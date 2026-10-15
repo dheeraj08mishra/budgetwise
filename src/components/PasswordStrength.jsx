@@ -1,15 +1,5 @@
 import { Check } from "lucide-react";
-
-// Same rules as the server (validator.isStrongPassword defaults)
-export const PASSWORD_RULES = [
-  { test: (p) => p.length >= 8, label: "8+ characters" },
-  { test: (p) => /[a-z]/.test(p), label: "Lowercase" },
-  { test: (p) => /[A-Z]/.test(p), label: "Uppercase" },
-  { test: (p) => /\d/.test(p), label: "Number" },
-  { test: (p) => /[^A-Za-z0-9]/.test(p), label: "Symbol" },
-];
-
-export const isStrongPassword = (p) => PASSWORD_RULES.every((r) => r.test(p));
+import { PASSWORD_RULES } from "../utils/password";
 
 export default function PasswordStrength({ password }) {
   const passed = PASSWORD_RULES.filter((r) => r.test(password)).length;
@@ -33,3 +23,6 @@ export default function PasswordStrength({ password }) {
     </div>
   );
 }
+
+// Kept here too so existing imports keep working
+export { isStrongPassword } from "../utils/password";
