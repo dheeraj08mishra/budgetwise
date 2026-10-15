@@ -110,3 +110,28 @@ test("sortTransactions: newest/oldest by day, ties by time added; server keeps o
     "input not mutated"
   );
 });
+
+test("frequency labels and monthly amounts", async () => {
+  const { FREQUENCIES, frequencyLabel, monthlyAmount } =
+    await import("../src/utils/frequency.js");
+  assert.deepEqual(
+    FREQUENCIES.map((f) => f.value),
+    [
+      "daily",
+      "weekly",
+      "biweekly",
+      "monthly",
+      "quarterly",
+      "halfyearly",
+      "yearly",
+    ],
+    "same list as the server"
+  );
+  assert.equal(frequencyLabel("halfyearly"), "Every 6 months");
+  assert.equal(monthlyAmount({ amount: 1200, frequency: "yearly" }), 100);
+  assert.equal(monthlyAmount({ amount: 300, frequency: "quarterly" }), 100);
+  assert.equal(
+    Math.round(monthlyAmount({ amount: 100, frequency: "weekly" })),
+    433
+  );
+});

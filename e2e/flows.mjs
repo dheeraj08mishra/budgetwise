@@ -208,6 +208,78 @@ await step("pause (with confirm) and resume a recurring payment", async () => {
   await waitText(/Resumed/);
 });
 
+// Click a menu item inside one recurring row (every row has its own menu)
+const clickInRow = (name, label) =>
+  page.evaluate(
+    ({ name, label }) => {
+      const row = [...document.querySelectorAll("li")].find((li) =>
+        li.querySelector(`button[aria-label="More actions for ${name}"]`)
+      );
+      if (!row) throw new Error(`no row for ${name}`);
+      const b = [...row.querySelectorAll("button")].find(
+        (x) => x.textContent.trim() === label
+      );
+      if (!b) throw new Error(`no ${label} in row ${name}`);
+      b.click();
+    },
+    { name, label }
+  );
+
+const confirmInModal = (label) =>
+  page.evaluate((label) => {
+    const b = [...document.querySelectorAll(".modal-box button")].find(
+      (x) => x.textContent.trim() === label
+    );
+    if (!b) throw new Error(`no modal button ${label}`);
+    b.click();
+  }, label);
+
+await step("edit a recurring series (amount + end date)", async () => {
+  await page.goto(APP + "/recurring", { waitUntil: "networkidle" });
+  await clickInRow("House rent", "Edit");
+  await waitText(/Edit recurring payment/);
+  await page.fill("#rule-amount", "23000");
+  const nextYear = `${new Date().getFullYear() + 1}-12-31`;
+  await page.fill("#rule-end", nextYear);
+  await confirmInModal("Save changes");
+  await waitText(/Recurring payment updated/);
+  const t = await text();
+  if (!t.includes("₹23,000")) throw new Error("new amount not shown");
+  if (!/until 31 Dec/.test(t)) throw new Error("end date not shown");
+});
+
+await step("skip the next payment of a series", async () => {
+  await clickInRow("Mutual fund SIP", "Skip next payment");
+  await waitText(/Skip the next payment\?/);
+  await confirmInModal("Skip it");
+  // The SIP is due on the 5th: proves the right series was skipped
+  await waitText(/Skipped 5 \w{3}\. Next payment: 5 \w{3}\./);
+});
+
+await step("delete a series (with confirmation)", async () => {
+  await clickInRow("Netflix subscription", "Delete series");
+  await waitText(/Delete this recurring series\?/);
+  await confirmInModal("Delete series");
+  await waitText(/Past transactions were kept/);
+  await wait(500);
+  if ((await text()).includes("Netflix subscription"))
+    throw new Error("still listed");
+});
+
+await step("add a quarterly payment with an end date", async () => {
+  await page.goto(APP + "/add", { waitUntil: "networkidle" });
+  await page.fill("#amount", "4500");
+  await page.fill("#note", "Water purifier service");
+  await page.evaluate(() => document.querySelector("input.toggle").click());
+  await clickText("button", /^Quarterly$/);
+  await page.fill("#end-date", `${new Date().getFullYear() + 2}-06-30`);
+  await clickText("button", /^Save expense$/);
+  await waitText(/Expense added/);
+  await page.goto(APP + "/recurring", { waitUntil: "networkidle" });
+  await waitText(/Water purifier service/);
+  if (!/Quarterly/.test(await text())) throw new Error("frequency not shown");
+});
+
 await step("theme toggle switches and persists across reload", async () => {
   const before = await page.evaluate(
     () => document.documentElement.dataset.theme

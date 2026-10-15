@@ -6,13 +6,8 @@ import { api } from "../utils/api";
 import { CATEGORIES, EXPENSE_CATEGORIES } from "../utils/categories";
 import { todayString, firstOfMonthString } from "../utils/dates";
 import { Card, PageHeader, Segmented, Field } from "../components/ui";
+import FrequencyPicker from "../components/FrequencyPicker";
 
-const FREQUENCIES = [
-  { value: "daily", label: "Daily" },
-  { value: "weekly", label: "Weekly" },
-  { value: "monthly", label: "Monthly" },
-  { value: "yearly", label: "Yearly" },
-];
 const MAX = 1000000;
 
 export default function AddTransaction() {
@@ -24,6 +19,7 @@ export default function AddTransaction() {
   const [note, setNote] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
   const [frequency, setFrequency] = useState("monthly");
+  const [endDate, setEndDate] = useState(""); // optional
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -35,6 +31,8 @@ export default function AddTransaction() {
     if (date > todayString()) e.date = "Date can't be in the future.";
     else if (date < firstOfMonthString())
       e.date = "Pick a date in the current month.";
+    if (isRecurring && endDate && endDate < date)
+      e.endDate = "The end date can't be before the first payment.";
     setErrors(e);
     return !Object.keys(e).length;
   };
@@ -52,7 +50,7 @@ export default function AddTransaction() {
         date,
         note: note.trim(),
         isRecurring,
-        ...(isRecurring && { frequency }),
+        ...(isRecurring && { frequency, ...(endDate && { endDate }) }),
       },
     });
     setSaving(false);
@@ -194,14 +192,23 @@ export default function AddTransaction() {
               />
             </label>
             {isRecurring && (
-              <div className="mt-4">
-                <Segmented
-                  label="Frequency"
-                  options={FREQUENCIES}
-                  value={frequency}
-                  onChange={setFrequency}
-                  size="sm"
-                />
+              <div className="mt-4 flex flex-col gap-4">
+                <FrequencyPicker value={frequency} onChange={setFrequency} />
+                <Field
+                  label="Ends on"
+                  hint="Optional. Leave empty to repeat until you stop it."
+                  error={errors.endDate}
+                  htmlFor="end-date"
+                >
+                  <input
+                    id="end-date"
+                    type="date"
+                    className={`input w-full sm:w-56 ${errors.endDate ? "input-error" : ""}`}
+                    value={endDate}
+                    min={date}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
+                </Field>
               </div>
             )}
           </div>
