@@ -194,13 +194,15 @@ Security hardening (secrets removed, rate limits, secure cookies, 0 vulnerabilit
 
 ### Part 3: Growth
 
+Your picks (15 Oct 2026), smallest first: sessions → receipts → PWA → worker. ⏸ = not needed for now.
+
 | Item                                                                                  | Size |
 | ------------------------------------------------------------------------------------- | ---- |
-| Accounts (bank, card, cash) + transfers between them                                  | L    |
-| Debt tracker: loans, card dues, EMI schedule                                          | M    |
+| Accounts (bank, card, cash) + transfers between them ⏸                                | L    |
+| Debt tracker: loans, card dues, EMI schedule ⏸                                        | M    |
 | Receipt upload (photo on a transaction; OCR stays parked)                             | M    |
 | Installable app (PWA) + push notifications                                            | M    |
-| Two-factor login + active sessions page                                               | M    |
+| Two-factor login ⏸ + active sessions page ✅ (Profile → Signed-in devices)            | M    |
 | Separate worker for the daily job and emails (needed before running 2+ API instances) | M    |
 | Rename the database from Atlas's default `test` to `budgetwise`                       | S    |
 

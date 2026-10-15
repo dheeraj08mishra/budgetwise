@@ -10,6 +10,7 @@ import {
   percent,
   capitalize,
   periodLabel,
+  timeAgo,
 } from "../src/utils/format.js";
 import {
   dayKey,
@@ -149,4 +150,15 @@ test("periodLabel names the months a comparison covers", () => {
   assert.equal(periodLabel([2]), "Feb");
   assert.equal(periodLabel([2, 5, 6]), "3 months");
   assert.equal(periodLabel([]), "");
+});
+
+test("timeAgo for 'last active'", () => {
+  const now = Date.parse("2026-10-15T12:00:00Z");
+  const ago = (ms) => timeAgo(new Date(now - ms), now);
+  assert.equal(ago(20e3), "just now");
+  assert.equal(ago(5 * 60e3), "5 min ago");
+  assert.equal(ago(3 * 3600e3), "3 h ago");
+  assert.equal(ago(26 * 3600e3), "1 day ago");
+  assert.equal(ago(3 * 86400e3), "3 days ago");
+  assert.equal(ago(10 * 86400e3), "5 Oct");
 });

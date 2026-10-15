@@ -532,7 +532,7 @@ await step(
 );
 
 await step(
-  "change password signs out the other device, keeps this one",
+  "change password signs out the other device; Profile lists devices and signs others out",
   async () => {
     const email = `pw_${Date.now()}@example.com`;
     // fresh account through the sign-up form
@@ -590,6 +590,28 @@ await step(
     await other.type("#password", "NewPass2@");
     await other.keyboard.press("Enter");
     await waitText(/Good (morning|afternoon|evening)/, 8000, other);
+
+    // Profile lists both devices; sign out the other one from here
+    await page.goto(APP + "/profile", { waitUntil: "networkidle" });
+    await waitText(/Signed-in devices/);
+    await waitText(/This device/);
+    await page.waitForFunction(
+      () =>
+        document.querySelectorAll('button[aria-label^="Sign out "]').length ===
+        1
+    );
+    await clickText("button", /^Sign out all others$/);
+    await waitText(/Sign out all other devices\?/);
+    await page.evaluate(() =>
+      [...document.querySelectorAll(".modal-box button")]
+        .find((b) => b.textContent.trim() === "Sign out others")
+        .click()
+    );
+    await waitText(/1 other device was signed out/);
+    // the other device, still open, is refused on its next action and says why
+    await other.click('aside a[href="/transactions"]');
+    await waitText(/This device was signed out/, 6000, other);
+    await waitText(/Welcome back/, 6000, other);
     await ctx.close();
   }
 );

@@ -19,6 +19,7 @@ import { Card, CardHeader, PageHeader, Field, Modal } from "../components/ui";
 import PasswordStrength, {
   isStrongPassword,
 } from "../components/PasswordStrength";
+import SignedInDevices from "../components/SignedInDevices";
 import { Avatar } from "../components/AppShell";
 
 const NAME_RE = /^[a-zA-Z ]{3,20}$/;
@@ -263,90 +264,93 @@ export default function Profile() {
           </Card>
         </div>
 
-        <Card className="lg:col-span-2">
-          <CardHeader
-            title="Personal details"
-            subtitle="Email can't be changed."
-          />
-          <form
-            onSubmit={save}
-            className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2"
-            noValidate
-          >
-            <Field
-              label="First name"
-              error={errors.firstName}
-              htmlFor="p-first"
+        <div className="space-y-6 lg:col-span-2">
+          <Card>
+            <CardHeader
+              title="Personal details"
+              subtitle="Email can't be changed."
+            />
+            <form
+              onSubmit={save}
+              className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2"
+              noValidate
             >
-              <input
-                id="p-first"
-                className={`input w-full ${errors.firstName ? "input-error" : ""}`}
-                value={form.firstName}
-                onChange={set("firstName")}
-                maxLength={20}
-              />
-            </Field>
-            <Field label="Last name" error={errors.lastName} htmlFor="p-last">
-              <input
-                id="p-last"
-                className={`input w-full ${errors.lastName ? "input-error" : ""}`}
-                value={form.lastName}
-                onChange={set("lastName")}
-                maxLength={20}
-              />
-            </Field>
-            <Field label="Phone" error={errors.phoneNumber} htmlFor="p-phone">
-              <input
-                id="p-phone"
-                type="tel"
-                inputMode="numeric"
-                className={`input w-full ${errors.phoneNumber ? "input-error" : ""}`}
-                value={form.phoneNumber}
-                onChange={(e) =>
-                  /^\d{0,10}$/.test(e.target.value) && set("phoneNumber")(e)
-                }
-              />
-            </Field>
-            <Field label="Gender" htmlFor="p-gender">
-              <select
-                id="p-gender"
-                className="select w-full"
-                value={form.gender}
-                onChange={set("gender")}
-              >
-                <option value="">Prefer not to say</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </Field>
-            <div className="sm:col-span-2">
               <Field
-                label="Photo URL"
-                hint="Link to an image (https://…). Leave empty to show your initials."
-                error={errors.photo}
-                htmlFor="p-photo"
+                label="First name"
+                error={errors.firstName}
+                htmlFor="p-first"
               >
                 <input
-                  id="p-photo"
-                  type="url"
-                  className={`input w-full ${errors.photo ? "input-error" : ""}`}
-                  placeholder="https://…"
-                  value={form.photo}
-                  onChange={set("photo")}
+                  id="p-first"
+                  className={`input w-full ${errors.firstName ? "input-error" : ""}`}
+                  value={form.firstName}
+                  onChange={set("firstName")}
+                  maxLength={20}
                 />
               </Field>
-            </div>
-            <div className="flex justify-end sm:col-span-2">
-              <button className="btn btn-primary" disabled={saving}>
-                {saving && (
-                  <span className="loading loading-spinner loading-sm" />
-                )}
-                Save changes
-              </button>
-            </div>
-          </form>
-        </Card>
+              <Field label="Last name" error={errors.lastName} htmlFor="p-last">
+                <input
+                  id="p-last"
+                  className={`input w-full ${errors.lastName ? "input-error" : ""}`}
+                  value={form.lastName}
+                  onChange={set("lastName")}
+                  maxLength={20}
+                />
+              </Field>
+              <Field label="Phone" error={errors.phoneNumber} htmlFor="p-phone">
+                <input
+                  id="p-phone"
+                  type="tel"
+                  inputMode="numeric"
+                  className={`input w-full ${errors.phoneNumber ? "input-error" : ""}`}
+                  value={form.phoneNumber}
+                  onChange={(e) =>
+                    /^\d{0,10}$/.test(e.target.value) && set("phoneNumber")(e)
+                  }
+                />
+              </Field>
+              <Field label="Gender" htmlFor="p-gender">
+                <select
+                  id="p-gender"
+                  className="select w-full"
+                  value={form.gender}
+                  onChange={set("gender")}
+                >
+                  <option value="">Prefer not to say</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </Field>
+              <div className="sm:col-span-2">
+                <Field
+                  label="Photo URL"
+                  hint="Link to an image (https://…). Leave empty to show your initials."
+                  error={errors.photo}
+                  htmlFor="p-photo"
+                >
+                  <input
+                    id="p-photo"
+                    type="url"
+                    className={`input w-full ${errors.photo ? "input-error" : ""}`}
+                    placeholder="https://…"
+                    value={form.photo}
+                    onChange={set("photo")}
+                  />
+                </Field>
+              </div>
+              <div className="flex justify-end sm:col-span-2">
+                <button className="btn btn-primary" disabled={saving}>
+                  {saving && (
+                    <span className="loading loading-spinner loading-sm" />
+                  )}
+                  Save changes
+                </button>
+              </div>
+            </form>
+          </Card>
+          <SignedInDevices />
+        </div>
       </div>
       <ChangePasswordModal
         open={changingPassword}

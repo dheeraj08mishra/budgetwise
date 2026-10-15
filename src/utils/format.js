@@ -58,3 +58,18 @@ export function periodLabel(period) {
   if (last - first + 1 !== period.length) return `${period.length} months`;
   return first === last ? short(first) : `${short(first)}–${short(last)}`;
 }
+
+// "just now", "5 min ago", "3 h ago", "2 days ago", then a date
+export function timeAgo(date, now = Date.now()) {
+  const mins = Math.floor((now - new Date(date)) / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins} min ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
+  return new Date(date).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+  });
+}

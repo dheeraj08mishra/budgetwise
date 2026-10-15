@@ -43,9 +43,11 @@ export async function api(path, { method = "GET", body, signal } = {}) {
   ) {
     store.dispatch(logout());
     store.dispatch(removeAllTransactions());
-    toast.error("Your session expired. Please sign in again.", {
-      id: "session-expired",
-    });
+    // the server says why when it knows (signed out elsewhere, new password)
+    const reason = /sign in again/i.test(data?.message || "")
+      ? data.message
+      : "Your session expired. Please sign in again.";
+    toast.error(reason, { id: "session-expired" });
   }
 
   const error = res.ok
