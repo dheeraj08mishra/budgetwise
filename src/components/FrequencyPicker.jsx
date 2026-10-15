@@ -1,13 +1,13 @@
 import { FREQUENCIES } from "../utils/frequency";
 
 // Wrapping chip group (7 options don't fit a single segmented row on phones)
-export default function FrequencyPicker({ value, onChange }) {
+export default function FrequencyPicker({
+  value,
+  onChange,
+  label = "Frequency",
+}) {
   return (
-    <div
-      role="radiogroup"
-      aria-label="Frequency"
-      className="flex flex-wrap gap-2"
-    >
+    <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-2">
       {FREQUENCIES.map((f) => {
         const active = f.value === value;
         return (

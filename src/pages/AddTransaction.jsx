@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { Repeat } from "lucide-react";
 import { api } from "../utils/api";
@@ -15,11 +16,15 @@ export default function AddTransaction() {
   const navigate = useNavigate();
   const [type, setType] = useState("expense");
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("need");
+  // starting values come from Settings → New transactions
+  const prefs = useSelector((s) => s.profile.currentUser?.preferences);
+  const [category, setCategory] = useState(prefs?.defaultCategory || "need");
   const [date, setDate] = useState(todayString());
   const [note, setNote] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
-  const [frequency, setFrequency] = useState("monthly");
+  const [frequency, setFrequency] = useState(
+    prefs?.defaultFrequency || "monthly"
+  );
   const [endDate, setEndDate] = useState(""); // optional
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});

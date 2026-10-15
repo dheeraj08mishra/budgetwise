@@ -269,9 +269,9 @@ await step(
 );
 
 await step(
-  "email settings on Profile persist; the budget alert was emailed",
+  "email settings on Settings persist; the budget alert was emailed",
   async () => {
-    await page.goto(APP + "/profile", { waitUntil: "networkidle" });
+    await page.goto(APP + "/settings", { waitUntil: "networkidle" });
     await waitText(/Email notifications/);
     const box = 'input[aria-label="Monthly summary"]';
     if (!(await page.isChecked(box))) throw new Error("should start on");
@@ -445,6 +445,53 @@ await step("add a quarterly payment with an end date", async () => {
   await waitText(/Water purifier service/);
   if (!/Quarterly/.test(await text())) throw new Error("frequency not shown");
 });
+
+await step(
+  "Settings: defaults for new transactions and the theme choice",
+  async () => {
+    await page.goto(APP + "/settings", { waitUntil: "networkidle" });
+    const radio = (group, label) =>
+      `[role="radiogroup"][aria-label="${group}"] [role="radio"]:text-is("${label}")`;
+    await page.click(radio("Default category", "Wants"));
+    await waitText(/Saved/);
+    await page.waitForSelector(
+      radio("Default category", "Wants") + '[aria-checked="true"]'
+    );
+    await page.click(radio("Default repeat", "Weekly"));
+    await page.waitForSelector(
+      radio("Default repeat", "Weekly") + '[aria-checked="true"]'
+    );
+
+    // the Add form starts from them, also after a reload
+    await page.goto(APP + "/add", { waitUntil: "networkidle" });
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForSelector('button[aria-pressed="true"]:has-text("Wants")');
+    await page.click("input.toggle");
+    await page.waitForSelector(
+      radio("Frequency", "Weekly") + '[aria-checked="true"]'
+    );
+
+    // theme: Dark, then back to following the OS
+    await page.goto(APP + "/settings", { waitUntil: "networkidle" });
+    await page.click(radio("Theme", "Dark"));
+    if (
+      (await page.evaluate(() => document.documentElement.dataset.theme)) !==
+      "bw-dark"
+    )
+      throw new Error("dark not applied");
+    await waitText(/Light mode/); // the sidebar toggle followed
+    await page.click(radio("Theme", "Match system"));
+    if (await page.evaluate(() => localStorage.getItem("theme")))
+      throw new Error("system choice should clear the saved theme");
+
+    // put the demo back
+    await page.click(radio("Default category", "Needs"));
+    await page.click(radio("Default repeat", "Monthly"));
+    await page.waitForSelector(
+      radio("Default repeat", "Monthly") + '[aria-checked="true"]'
+    );
+  }
+);
 
 await step("theme toggle switches and persists across reload", async () => {
   const before = await page.evaluate(

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, Link, Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
@@ -16,11 +16,17 @@ import {
   MessageSquare,
   Wallet,
   ShieldCheck,
+  Settings,
 } from "lucide-react";
 import { logout } from "../utils/redux/profileSlice";
 import { removeAllTransactions } from "../utils/redux/transactionSlice";
 import { api } from "../utils/api";
-import { THEMES, applyTheme, initialTheme } from "../utils/theme";
+import {
+  THEMES,
+  applyTheme,
+  initialTheme,
+  onThemeChange,
+} from "../utils/theme";
 import FeedbackModal from "./FeedbackModal";
 import SiteFooter from "./SiteFooter";
 import { capitalize } from "../utils/format";
@@ -32,6 +38,7 @@ const NAV = [
   { to: "/goals", label: "Goals", icon: Target },
   { to: "/insights", label: "Insights", icon: ChartLine },
   { to: "/profile", label: "Profile", icon: User },
+  { to: "/settings", label: "Settings", icon: Settings },
 ];
 
 // Phone tab bar: four destinations around a central Add button
@@ -77,11 +84,11 @@ const AppShell = () => {
   const [theme, setTheme] = useState(initialTheme);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
-  const toggleTheme = () => {
-    const next = theme === THEMES.dark ? THEMES.light : THEMES.dark;
-    setTheme(next);
-    applyTheme(next);
-  };
+  // the Settings page (or the OS, on "system") can change it too
+  useEffect(() => onThemeChange(setTheme), []);
+
+  const toggleTheme = () =>
+    applyTheme(theme === THEMES.dark ? THEMES.light : THEMES.dark);
 
   const signOut = async () => {
     await api("/logout", { method: "POST" });
@@ -190,6 +197,11 @@ const AppShell = () => {
               <li>
                 <Link to="/profile">
                   <User size={16} /> Profile
+                </Link>
+              </li>
+              <li>
+                <Link to="/settings">
+                  <Settings size={16} /> Settings
                 </Link>
               </li>
               <li>

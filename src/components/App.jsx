@@ -22,6 +22,7 @@ const Recurring = lazy(() => import("../pages/Recurring"));
 const Goals = lazy(() => import("../pages/Goals"));
 const Insights = lazy(() => import("../pages/Insights"));
 const Profile = lazy(() => import("../pages/Profile"));
+const Settings = lazy(() => import("../pages/Settings"));
 const Admin = lazy(() => import("../pages/Admin"));
 const ForgotPassword = lazy(() => import("../pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("../pages/ResetPassword"));
@@ -69,6 +70,7 @@ const router = createBrowserRouter([
       { path: "goals", element: page(Goals) },
       { path: "insights", element: page(Insights) },
       { path: "profile", element: page(Profile) },
+      { path: "settings", element: page(Settings) },
       { path: "admin", element: page(Admin) },
       { path: "*", element: <NotFound /> },
     ],
