@@ -15,6 +15,7 @@ import {
   Moon,
   MessageSquare,
   Wallet,
+  ShieldCheck,
 } from "lucide-react";
 import { logout } from "../utils/redux/profileSlice";
 import { removeAllTransactions } from "../utils/redux/transactionSlice";
@@ -97,6 +98,12 @@ const AppShell = () => {
         : "text-base-content/70 hover:bg-base-200 hover:text-base-content"
     }`;
 
+  // The Admin page is listed for admins only (the API enforces it too)
+  const isAdmin = user?.role === "admin";
+  const nav = isAdmin
+    ? [...NAV, { to: "/admin", label: "Admin", icon: ShieldCheck }]
+    : NAV;
+
   const fullName =
     capitalize(user?.firstName) + " " + capitalize(user?.lastName);
 
@@ -113,7 +120,7 @@ const AppShell = () => {
           </Link>
         </div>
         <nav className="mt-5 flex flex-1 flex-col gap-1 px-3" aria-label="Main">
-          {NAV.map(({ to, label, icon: Icon, end }) => (
+          {nav.map(({ to, label, icon: Icon, end }) => (
             <NavLink key={to} to={to} end={end} className={navClass}>
               <Icon size={18} aria-hidden /> {label}
             </NavLink>
@@ -190,6 +197,13 @@ const AppShell = () => {
                   <Repeat size={16} /> Recurring
                 </Link>
               </li>
+              {isAdmin && (
+                <li>
+                  <Link to="/admin">
+                    <ShieldCheck size={16} /> Admin
+                  </Link>
+                </li>
+              )}
               <li>
                 <button onClick={() => setFeedbackOpen(true)}>
                   <MessageSquare size={16} /> Send feedback

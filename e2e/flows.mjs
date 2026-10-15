@@ -525,6 +525,35 @@ await step(
   }
 );
 
+await step(
+  "admin: stats and feedback for admins, hidden from users",
+  async () => {
+    const signIn = async (email, password) => {
+      await context.clearCookies();
+      await page.goto(APP, { waitUntil: "networkidle" });
+      await page.fill("#email", email);
+      await page.fill("#password", password);
+      await page.keyboard.press("Enter");
+      await waitText(/Good (morning|afternoon|evening)/);
+    };
+    // a regular user: no Admin link, and the page says so
+    await signIn(DEMO.email, DEMO.password);
+    if (await page.$('nav a[href="/admin"]'))
+      throw new Error("Admin link shown to a user");
+    await page.goto(APP + "/admin", { waitUntil: "networkidle" });
+    await waitText(/Admins only/);
+
+    await signIn("admin@budgetwise.app", "Admin@1234");
+    await clickText("a", /^Admin$/);
+    await waitText(/Read-only overview/);
+    await waitText(/Would love budgets per category/);
+    await clickText("button", /^Bugs \(\d+\)$/);
+    await waitText(/Export took a while/);
+    if ((await text()).includes("Would love budgets"))
+      throw new Error("filter didn't apply");
+  }
+);
+
 await browser.close();
 console.log(
   `\n${pass} passed, ${fail} failed${errors.length ? `\nPAGE ERRORS:\n${[...new Set(errors)].join("\n")}` : ", no page errors"}`
