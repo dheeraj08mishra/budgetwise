@@ -58,14 +58,14 @@ Sizes: **S** = a day or two · **M** = about a week · **L** = two weeks or more
 | Backend pagination / infinite scroll        | done      | ✅          | Server paging with "Load more"                                                                                                                          |
 | Email service (Amazon SES)                  | done      | ✅          | SES client and mailer set up                                                                                                                            |
 | Stop recurring transactions                 | done      | ✅          | Pause / resume, delete a series (past transactions kept), optional end date                                                                             |
-| Email notifications                         | done      | 🟡          | **Only** "payment due tomorrow" reminders. Overspending alerts and monthly summaries are **not built**                                                  |
+| Email notifications                         | done      | ✅          | Budget alerts (80% / over, once each per month), monthly summary on the 1st, payment reminders; each can be switched off in Profile                     |
 | Recurring options (daily → yearly)          | done      | ✅          | Daily, weekly, every 2 weeks, monthly, quarterly, every 6 months, yearly                                                                                |
 | Footer component                            | done      | ✅          | Back on every page and the login screen                                                                                                                 |
 | Social media links (GitHub, LinkedIn)       | done      | ✅          | In the footer                                                                                                                                           |
 | Goal-based budgeting                        | pending   | ✅          | Goals page: targets, contributions, progress, completion                                                                                                |
 | Edit recurring transactions with validation | pending   | ✅          | Edit amount, type, category, note, frequency, end date (future only, no back-fill); skip next payment                                                   |
 | Custom labels for transactions              | pending   | ✅          | Add / edit / remove tags (any month, Hindi works), filter by tag, click a tag to filter; auto-tags from the note still added                            |
-| Category budget warning notifications       | pending   | 🟡          | ✅ Monthly budget per category, Dashboard bars + banner at 80% / 100%, warning when adding an expense. **Missing:** email alerts (next)                 |
+| Category budget warning notifications       | pending   | ✅          | Budget per category; Dashboard bars + banner, warning on add, email at 80% and when over                                                                |
 | CSV / Excel import                          | pending   | ⬜          |                                                                                                                                                         |
 | Export to PDF                               | pending   | ⬜          |                                                                                                                                                         |
 | User settings panel                         | pending   | 🟡          | Profile and theme exist. **Missing:** notification settings, budgets, default category, currency                                                        |
@@ -164,17 +164,17 @@ Security hardening (secrets removed, rate limits, secure cookies, 0 vulnerabilit
 
 ### Part 1: Core improvements and quick wins
 
-| Order | Item                                                                 | Size |
-| ----- | -------------------------------------------------------------------- | ---- |
-| 1     | Edit recurring (amount, frequency, end date), skip once, delete ✅   | M    |
-| 1     | Biweekly, quarterly, half-yearly frequencies ✅                      | S    |
-| 1     | Footer / social links back ✅                                        | S    |
-| 2     | Forgot password (SES email reset link) ✅                            | M    |
-| 2     | Tags: add / edit / remove, filter by tag ✅                          | S    |
-| 2     | Admin role (read-only feedback and stats) ✅                         | S    |
-| 3     | Category budgets + in-app warnings at 80% / 100% ✅                  | M    |
-| 3     | Emails: overspending alert, monthly summary (with an on/off setting) | M    |
-| 3     | Savings forecast on the Dashboard                                    | S    |
+| Order | Item                                                                    | Size |
+| ----- | ----------------------------------------------------------------------- | ---- |
+| 1     | Edit recurring (amount, frequency, end date), skip once, delete ✅      | M    |
+| 1     | Biweekly, quarterly, half-yearly frequencies ✅                         | S    |
+| 1     | Footer / social links back ✅                                           | S    |
+| 2     | Forgot password (SES email reset link) ✅                               | M    |
+| 2     | Tags: add / edit / remove, filter by tag ✅                             | S    |
+| 2     | Admin role (read-only feedback and stats) ✅                            | S    |
+| 3     | Category budgets + in-app warnings at 80% / 100% ✅                     | M    |
+| 3     | Emails: overspending alert, monthly summary (with an on/off setting) ✅ | M    |
+| 3     | Savings forecast on the Dashboard                                       | S    |
 
 **Done when:** recurring payments can be fully managed, users get budget warnings, and nobody is locked out by a forgotten password.
 
@@ -231,7 +231,7 @@ This gives real protection and costs about the same to build. Until then, the ex
 2. **Editing past months:** today only the current month can be edited. Any month, the last N months, or keep as is?
 3. **Premium tier:** stay free, or plan paid features? This decides the insights module and custom labels.
 4. **CSV import:** which banks first? Each exports differently.
-5. **Emails:** on by default (with an unsubscribe link), or opt-in?
+5. ~~**Emails:** on by default or opt-in?~~ Went with on by default, each type switchable in Profile → Notifications (one-line change to flip).
 
 ---
 
