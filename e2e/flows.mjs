@@ -810,6 +810,48 @@ await step(
   }
 );
 
+await step(
+  "delete account: needs the password, then everything is gone",
+  async () => {
+    const ctx = await browser.newContext({
+      viewport: { width: 1280, height: 900 },
+    });
+    const p = await ctx.newPage();
+    p.on("pageerror", (e) => errors.push(e.message));
+    const email = `del_${Date.now()}@example.com`;
+    await p.goto(APP, { waitUntil: "networkidle" });
+    await p.click('button:text-is("Create account")');
+    await p.type("#first", "Delete");
+    await p.type("#last", "Tester");
+    await p.type("#email", email);
+    await p.type(
+      "#phone",
+      String(9400000000 + Math.floor(Math.random() * 599999999))
+    );
+    await p.type("#password", "DelPass1@");
+    await p.click("form button[type=submit]");
+    await waitText(/Good (morning|afternoon|evening)/, 8000, p);
+
+    await p.goto(APP + "/profile", { waitUntil: "networkidle" });
+    await p.click('button:has-text("Delete account")');
+    await waitText(/Delete your account\?/, 6000, p);
+    await p.type("#delete-password", "WrongPass1@");
+    await p.click('button:text-is("Delete my account")');
+    await waitText(/Password is incorrect/, 6000, p);
+    await p.fill("#delete-password", "DelPass1@");
+    await p.click('button:text-is("Delete my account")');
+    await waitText(/Your account and all its data were deleted/, 6000, p);
+    await waitText(/Welcome back/, 6000, p);
+
+    // the login is gone too
+    await p.type("#email", email);
+    await p.type("#password", "DelPass1@");
+    await p.keyboard.press("Enter");
+    await waitText(/Invalid email or password/, 6000, p);
+    await ctx.close();
+  }
+);
+
 await browser.close();
 console.log(
   `\n${pass} passed, ${fail} failed${errors.length ? `\nPAGE ERRORS:\n${[...new Set(errors)].join("\n")}` : ", no page errors"}`

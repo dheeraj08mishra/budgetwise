@@ -20,6 +20,7 @@ import PasswordStrength, {
   isStrongPassword,
 } from "../components/PasswordStrength";
 import SignedInDevices from "../components/SignedInDevices";
+import DeleteAccount from "../components/DeleteAccount";
 import { Avatar } from "../components/AppShell";
 
 const NAME_RE = /^[a-zA-Z ]{3,20}$/;
@@ -350,6 +351,7 @@ export default function Profile() {
             </form>
           </Card>
           <SignedInDevices />
+          <DeleteAccount />
         </div>
       </div>
       <ChangePasswordModal
