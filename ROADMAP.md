@@ -169,7 +169,7 @@ Security hardening (secrets removed, rate limits, secure cookies, 0 vulnerabilit
 | 1     | Edit recurring (amount, frequency, end date), skip once, delete ✅   | M    |
 | 1     | Biweekly, quarterly, half-yearly frequencies ✅                      | S    |
 | 1     | Footer / social links back ✅                                        | S    |
-| 2     | Forgot password (SES email reset link)                               | M    |
+| 2     | Forgot password (SES email reset link) ✅                            | M    |
 | 2     | Tags: add / edit / remove, filter by tag                             | S    |
 | 2     | Admin role (read-only feedback and stats)                            | S    |
 | 3     | Category budgets + in-app warnings at 80% / 100%                     | M    |
