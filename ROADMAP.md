@@ -65,7 +65,7 @@ Sizes: **S** = a day or two · **M** = about a week · **L** = two weeks or more
 | Goal-based budgeting                        | pending   | ✅          | Goals page: targets, contributions, progress, completion                                                                                                |
 | Edit recurring transactions with validation | pending   | ✅          | Edit amount, type, category, note, frequency, end date (future only, no back-fill); skip next payment                                                   |
 | Custom labels for transactions              | pending   | ✅          | Add / edit / remove tags (any month, Hindi works), filter by tag, click a tag to filter; auto-tags from the note still added                            |
-| Category budget warning notifications       | pending   | 🟡          | The budget guide turns amber when Needs or Wants go over the guideline. **Missing:** a budget per category, and alerts                                  |
+| Category budget warning notifications       | pending   | 🟡          | ✅ Monthly budget per category, Dashboard bars + banner at 80% / 100%, warning when adding an expense. **Missing:** email alerts (next)                 |
 | CSV / Excel import                          | pending   | ⬜          |                                                                                                                                                         |
 | Export to PDF                               | pending   | ⬜          |                                                                                                                                                         |
 | User settings panel                         | pending   | 🟡          | Profile and theme exist. **Missing:** notification settings, budgets, default category, currency                                                        |
@@ -172,7 +172,7 @@ Security hardening (secrets removed, rate limits, secure cookies, 0 vulnerabilit
 | 2     | Forgot password (SES email reset link) ✅                            | M    |
 | 2     | Tags: add / edit / remove, filter by tag ✅                          | S    |
 | 2     | Admin role (read-only feedback and stats) ✅                         | S    |
-| 3     | Category budgets + in-app warnings at 80% / 100%                     | M    |
+| 3     | Category budgets + in-app warnings at 80% / 100% ✅                  | M    |
 | 3     | Emails: overspending alert, monthly summary (with an on/off setting) | M    |
 | 3     | Savings forecast on the Dashboard                                    | S    |
 
