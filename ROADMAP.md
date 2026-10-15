@@ -150,15 +150,17 @@ Security hardening (secrets removed, rate limits, secure cookies, 0 vulnerabilit
 
 **Goal:** put today's work live safely, and make future changes testable.
 
-| Item                                                                                                                                                        | Size |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
-| Move the test suites into the repos (85 API checks, 17 browser flows) + `npm test`                                                                          | M    |
-| GitHub Actions: lint, test, build on every push                                                                                                             | S    |
-| ESLint + Prettier                                                                                                                                           | S    |
-| Finish secret rotation (AWS, OpenAI, Firebase key)                                                                                                          | S    |
-| Production deploy: Atlas password on EC2, `NODE_ENV=production`, `TRUST_PROXY=1`, nginx `X-Forwarded-For`, check 29th–31st recurring rules, merge to `main` | S    |
-| Node 22 on EC2 (AWS SDK needs it from Jan 2027), then Vite 7                                                                                                | S    |
-| Error tracking (Sentry) + uptime check + daily Atlas backup                                                                                                 | S    |
+| Item                                                                                                                                                 | Status                        |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Test suites in the repos: server `npm test` (41 API tests, in-memory MongoDB), app `npm test` (8 unit tests) + `npm run test:e2e` (17 browser flows) | ✅                            |
+| GitHub Actions: lint, format check, tests, build on Node 20 and 22                                                                                   | ✅                            |
+| ESLint + Prettier in both repos                                                                                                                      | ✅                            |
+| `/health` endpoint; the API exits instead of running without a database; graceful shutdown                                                           | ✅                            |
+| Release checklist (Node 22, `.env`, nginx, recurring-rule check, smoke test, rollback)                                                               | ✅ in `DEPLOY_NOTES.local.md` |
+| Finish secret rotation (AWS, OpenAI, Firebase key)                                                                                                   | ⬜ yours                      |
+| Production deploy following the checklist (merge to `main`, EC2)                                                                                     | ⬜ yours                      |
+| Node 22 on EC2, then Vite 7                                                                                                                          | ⬜ yours (in the checklist)   |
+| Error tracking (Sentry) + uptime check on `/api/health` + daily Atlas backup                                                                         | ⬜ needs your accounts        |
 
 ### Part 1: Core improvements and quick wins
 
