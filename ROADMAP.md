@@ -130,16 +130,16 @@ Plan: wrap the existing React app with **Capacitor** (same code in a native shel
 
 Nothing new can reach users until this is done. The steps are in `DEPLOY_NOTES.local.md`.
 
-| Item                                                                                                          | Status | Notes                                                                                    |
-| ------------------------------------------------------------------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------- |
-| **Update the Atlas password in the EC2 `.env`**                                                               | ⬜     | **Urgent:** it was rotated on 14 Oct, so the live site probably can't reach its database |
-| Rotate the old AWS, OpenAI and Firebase keys                                                                  | ⬜     | They were in git history                                                                 |
-| Production deploy: merge `development` → `main`, follow the checklist                                         | ⬜     |                                                                                          |
-| Node 22 on EC2 (then Vite 7)                                                                                  | ⬜     | Needed before Jan 2027 (AWS SDK)                                                         |
-| HTTPS, nginx settings for receipts (6 MB uploads) and the installable app (`sw.js` not cached, manifest type) | ⬜     | In the checklist                                                                         |
-| A permanent folder (or S3) for receipts                                                                       | ⬜     | Uploads must survive deploys                                                             |
-| Rename the database from Atlas's default `test` to `budgetwise`                                               | ⬜     | One-time migration at deploy                                                             |
-| Error tracking (Sentry), uptime check on `/api/health`, daily Atlas backup                                    | ⬜     | Needs your accounts                                                                      |
+| Item                                                                                                          | Status | Notes                                                                                             |
+| ------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------- |
+| **Update the Atlas password in the EC2 `.env`**                                                               | ⬜     | **Urgent:** it was rotated on 14 Oct, so the live site probably can't reach its database          |
+| Rotate the old AWS, OpenAI and Firebase keys                                                                  | ⬜     | Exposed in local files during the audit; a scan on 16 Oct found none in either repo's git history |
+| Production deploy: merge `development` → `main`, follow the checklist                                         | ⬜     |                                                                                                   |
+| Node 22 on EC2 (then Vite 7)                                                                                  | ⬜     | Needed before Jan 2027 (AWS SDK)                                                                  |
+| HTTPS, nginx settings for receipts (6 MB uploads) and the installable app (`sw.js` not cached, manifest type) | ⬜     | In the checklist                                                                                  |
+| A permanent folder (or S3) for receipts                                                                       | ⬜     | Uploads must survive deploys                                                                      |
+| Rename the database from Atlas's default `test` to `budgetwise`                                               | ⬜     | One-time migration at deploy                                                                      |
+| Error tracking (Sentry), uptime check on `/api/health`, daily Atlas backup                                    | ⬜     | Needs your accounts                                                                               |
 
 ### Deferred (waiting on something)
 
