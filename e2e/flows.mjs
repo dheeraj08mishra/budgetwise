@@ -154,6 +154,67 @@ await step("delete after confirming", async () => {
   if ((await text()).includes(note)) throw new Error("still listed");
 });
 
+await step("receipts: attach on add, view, remove, attach a PDF", async () => {
+  const rNote = `Receipt test ${Date.now()}`;
+  // a real 1×1 PNG, so the thumbnail actually decodes
+  const png = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+    "base64"
+  );
+  await page.goto(APP + "/add", { waitUntil: "networkidle" });
+  await page.type("#amount", "120");
+  await page.type("#note", rNote);
+  await page.setInputFiles('input[aria-label="Receipt file"]', {
+    name: "bill.png",
+    mimeType: "image/png",
+    buffer: png,
+  });
+  await waitText(/bill\.png/);
+  await clickText("button", /^Save expense$/);
+  await waitText(new RegExp(rNote));
+
+  await page.goto(APP + "/transactions", { waitUntil: "networkidle" });
+  await page.type('input[type="search"]', rNote);
+  await waitText(/^[\s\S]*1 transaction\b/);
+  await page.waitForSelector('[aria-label="Has a receipt"]');
+  await clickText("button", new RegExp(`^Edit ${rNote}$`));
+  await waitText(/Edit transaction/);
+  // the thumbnail is served by the API to its owner only
+  await page.waitForFunction(() => {
+    const img = document.querySelector('a[aria-label="Open receipt"] img');
+    return img && img.complete && img.naturalWidth === 1;
+  });
+
+  await page.click('button[aria-label="Remove receipt"]');
+  await waitText(/Remove this receipt\?/);
+  await page.evaluate(() =>
+    [...document.querySelectorAll(".modal-box button")]
+      .find((b) => b.textContent.trim() === "Remove")
+      .click()
+  );
+  await waitText(/Receipt removed/);
+  await waitText(/Attach a receipt/);
+
+  await page.setInputFiles('.modal-box input[aria-label="Receipt file"]', {
+    name: "invoice.pdf",
+    mimeType: "application/pdf",
+    buffer: Buffer.from("%PDF-1.4\n%e2e\n"),
+  });
+  await waitText(/Receipt attached/);
+  await waitText(/invoice\.pdf/);
+  await page.keyboard.press("Escape");
+
+  // clean up: deleting the transaction deletes its file
+  await clickText("button", new RegExp(`^Delete ${rNote}$`));
+  await waitText(/Delete transaction\?/);
+  await page.evaluate(() =>
+    [...document.querySelectorAll(".modal-box button")]
+      .find((b) => b.textContent.trim() === "Delete")
+      .click()
+  );
+  await waitText(/Transaction deleted/);
+});
+
 await step(
   "Transactions loads 25 at a time; Load more appends the next 25",
   async () => {
@@ -229,7 +290,7 @@ await step("past months: only tags can be edited", async () => {
   await page.evaluate(() =>
     document.querySelector('button[aria-label^="Edit "]').click()
   );
-  await waitText(/only its tags can be changed/);
+  await waitText(/only its tags and receipt can be changed/);
   // a <fieldset disabled> locks its inputs without setting .disabled on them
   if (!(await page.$eval("#edit-amount", (i) => i.matches(":disabled"))))
     throw new Error("amount editable");

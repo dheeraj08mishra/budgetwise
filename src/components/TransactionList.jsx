@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
-import { Pencil, Trash2, Repeat } from "lucide-react";
+import { Pencil, Trash2, Repeat, Paperclip } from "lucide-react";
 import {
   removeTransaction,
   updateTransaction,
@@ -22,6 +22,7 @@ import {
 } from "../utils/dates";
 import { ConfirmDialog, Modal, Field, Segmented } from "./ui";
 import TagEditor from "./TagEditor";
+import ReceiptField from "./ReceiptField";
 import { sortTransactions } from "../utils/transactions";
 
 export { sortTransactions };
@@ -59,6 +60,13 @@ export const TransactionRow = ({
               size={13}
               className="shrink-0 text-base-content/40"
               aria-label="Recurring"
+            />
+          )}
+          {txn.receipt && (
+            <Paperclip
+              size={13}
+              className="shrink-0 text-base-content/40"
+              aria-label="Has a receipt"
             />
           )}
         </p>
@@ -136,6 +144,7 @@ function EditModal({ txn, onClose, onChanged }) {
   };
   const [form, setForm] = useState(original);
   const [tags, setTags] = useState(txn.tags || []);
+  const [receipt, setReceipt] = useState(txn.receipt || null);
   const [suggestions, setSuggestions] = useState([]);
   const [saving, setSaving] = useState(false);
   const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
@@ -213,7 +222,8 @@ function EditModal({ txn, onClose, onChanged }) {
       <div className="flex flex-col gap-4">
         {pastMonth && (
           <p className="rounded-field bg-base-200 px-3 py-2 text-xs text-base-content/70">
-            This is from a past month, so only its tags can be changed.
+            This is from a past month, so only its tags and receipt can be
+            changed.
           </p>
         )}
         <fieldset disabled={pastMonth} className="flex flex-col gap-4">
@@ -297,6 +307,19 @@ function EditModal({ txn, onClose, onChanged }) {
             suggestions={suggestions}
           />
         </Field>
+        <div>
+          <p className="mb-1.5 text-sm font-medium">Receipt</p>
+          <ReceiptField
+            txn={{ ...txn, receipt }}
+            onChange={(r) => {
+              setReceipt(r);
+              // saved already: update the list without waiting for Save
+              const next = { ...txn, receipt: r };
+              dispatch(updateTransaction(next));
+              onChanged?.(txn, next);
+            }}
+          />
+        </div>
       </div>
     </Modal>
   );

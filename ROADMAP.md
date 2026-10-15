@@ -200,7 +200,7 @@ Your picks (15 Oct 2026), smallest first: sessions → receipts → PWA → work
 | ------------------------------------------------------------------------------------- | ---- |
 | Accounts (bank, card, cash) + transfers between them ⏸                                | L    |
 | Debt tracker: loans, card dues, EMI schedule ⏸                                        | M    |
-| Receipt upload (photo on a transaction; OCR stays parked)                             | M    |
+| Receipt upload (photo on a transaction; OCR stays parked) ✅ local disk; S3 at deploy | M    |
 | Installable app (PWA) + push notifications                                            | M    |
 | Two-factor login ⏸ + active sessions page ✅ (Profile → Signed-in devices)            | M    |
 | Separate worker for the daily job and emails (needed before running 2+ API instances) | M    |

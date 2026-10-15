@@ -12,15 +12,24 @@ const AUTH_PATHS = ["/login", "/signup", "/me"];
  * Always resolves (except on abort) to { ok, status, data, error, res }.
  * On 401 for a logged-in user it logs out and explains why.
  */
-export async function api(path, { method = "GET", body, signal } = {}) {
+export async function api(
+  path,
+  { method = "GET", body, signal, headers = {} } = {}
+) {
+  // a File/Blob is sent as-is (receipt uploads), anything else as JSON
+  const file = typeof Blob !== "undefined" && body instanceof Blob;
   let res;
   try {
     res = await fetch(BASE_URL + path, {
       method,
       credentials: "include",
-      headers:
-        body !== undefined ? { "Content-Type": "application/json" } : undefined,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      headers: {
+        ...(file
+          ? { "Content-Type": body.type || "application/octet-stream" }
+          : body !== undefined && { "Content-Type": "application/json" }),
+        ...headers,
+      },
+      body: file ? body : body !== undefined ? JSON.stringify(body) : undefined,
       signal,
     });
   } catch (err) {

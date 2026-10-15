@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { Repeat } from "lucide-react";
+import { Repeat, Paperclip, X } from "lucide-react";
 import { api } from "../utils/api";
 import { money } from "../utils/format";
 import { CATEGORIES, EXPENSE_CATEGORIES } from "../utils/categories";
 import { todayString, firstOfMonthString } from "../utils/dates";
 import { Card, PageHeader, Segmented, Field } from "../components/ui";
 import FrequencyPicker from "../components/FrequencyPicker";
+import { RECEIPT_ACCEPT, fileSize, uploadReceipt } from "../utils/receipts";
 
 const MAX = 1000000;
 
@@ -26,6 +27,7 @@ export default function AddTransaction() {
     prefs?.defaultFrequency || "monthly"
   );
   const [endDate, setEndDate] = useState(""); // optional
+  const [receipt, setReceipt] = useState(null); // File, uploaded after saving
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -59,8 +61,21 @@ export default function AddTransaction() {
         ...(isRecurring && { frequency, ...(endDate && { endDate }) }),
       },
     });
+    if (!ok) {
+      setSaving(false);
+      return toast.error(error);
+    }
+    // The transaction exists now; a failed upload doesn't undo it
+    if (receipt) {
+      try {
+        await uploadReceipt(data.data._id, receipt);
+      } catch (err) {
+        toast.error(`Saved, but the receipt wasn't attached: ${err.message}`, {
+          duration: 7000,
+        });
+      }
+    }
     setSaving(false);
-    if (!ok) return toast.error(error);
     // Tagging calls OpenAI and can be slow: fire and forget
     if (note.trim()) api(`/extractTags/${data.data._id}`, { method: "POST" });
     toast.success(type === "income" ? "Income added" : "Expense added");
@@ -229,6 +244,38 @@ export default function AddTransaction() {
               </div>
             )}
           </div>
+
+          <Field label="Receipt" hint="Optional. Photo or PDF, up to 5 MB.">
+            {receipt ? (
+              <div className="flex items-center gap-3 rounded-field border border-base-300 px-3 py-2 text-sm">
+                <Paperclip size={16} className="text-base-content/50" />
+                <span className="min-w-0 flex-1 truncate">{receipt.name}</span>
+                <span className="text-xs text-base-content/55">
+                  {fileSize(receipt.size)}
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-xs btn-square"
+                  onClick={() => setReceipt(null)}
+                  aria-label="Don't attach this receipt"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ) : (
+              <label className="flex cursor-pointer items-center gap-3 rounded-field border border-dashed border-base-300 px-3 py-2.5 text-sm text-base-content/70 hover:bg-base-200">
+                <Paperclip size={16} aria-hidden />
+                Attach a receipt
+                <input
+                  type="file"
+                  accept={RECEIPT_ACCEPT}
+                  className="hidden"
+                  aria-label="Receipt file"
+                  onChange={(e) => setReceipt(e.target.files?.[0] || null)}
+                />
+              </label>
+            )}
+          </Field>
 
           <div className="flex gap-3">
             <button
