@@ -2,7 +2,7 @@
 
 A personal finance tracker for India: record income and spending, see where the money goes, set budgets, automate the payments that repeat, and save towards goals. Works on desktop and phone, and installs as an app.
 
-**Live demo:** coming soon at mybudgetwise.in (being redeployed). Meanwhile, see the screenshots below or run it locally.
+**Live demo:** [mybudgetwise.in](https://mybudgetwise.in)
 
 This repo is the **React frontend**. The API lives in [finance_tracker_server](https://github.com/dheeraj08mishra/finance_tracker_server) (Express + MongoDB). What's done and what's next: [ROADMAP.md](ROADMAP.md).
 
