@@ -4,6 +4,10 @@ A personal finance tracker for India: record income and spending, see where the 
 
 **Live demo:** [mybudgetwise.in](https://mybudgetwise.in)
 
+### 🎬 30-second showreel
+
+https://github.com/user-attachments/assets/b1795b5e-ce8c-4737-bb1d-b0b08f09f692
+
 This repo is the **React frontend**. The API lives in [finance_tracker_server](https://github.com/dheeraj08mishra/finance_tracker_server) (Express + MongoDB). What's done and what's next: [ROADMAP.md](ROADMAP.md).
 
 ![BudgetWise dashboard](docs/screenshots/dashboard.png)
